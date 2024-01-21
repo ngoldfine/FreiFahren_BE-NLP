@@ -17,24 +17,21 @@ class DeconstructedMessage:
         self.direction = direction
         
 
-uBahnLines = ['U1', 'U2', 'U3', 'U4', 'U5', 'U6', 'U7', 'U8', 'U9']
-sBahnLines = ['S1', 'S2', 'S3', 'S5', 'S7', 'S8' 'S9', 'S25', 'S26', 'S41', 'S42', 'S45', 'S46', 'S75', 'S47', 'S85']
+ubahn_lines = ['U1', 'U2', 'U3', 'U4', 'U5', 'U6', 'U7', 'U8', 'U9']
+sbahn_lines = ['S1', 'S2', 'S3', 'S5', 'S7', 'S8' 'S9', 'S25', 'S26', 'S41', 'S42', 'S45', 'S46', 'S75', 'S47', 'S85']
 
-uBahnStations = []
-sBahnStations = []
-
+def find_line(text, lines):
+    # remove all whitespaces from the text
+    text = text.replace(' ', '')
+    for line in lines:
+        if line.lower() in text.lower():
+            return line
+    return None
 
 @bot.message_handler(func=lambda msg: True)
 def get_info(message):
     text = message.text
-    found_line = None
-
-    # Check for uBahnLines and sBahnLines in the message
-    for line in uBahnLines + sBahnLines:
-        # remove all whitespaces from the text
-        text = text.replace(' ', '')
-        if line.lower() in text.lower():
-            found_line = line
+    found_line = find_line(text, ubahn_lines + sbahn_lines)
 
     if found_line:
         print(f'Found line: {found_line}')
