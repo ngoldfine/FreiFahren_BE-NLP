@@ -65,7 +65,7 @@ def get_info(message):
     text = message.text
     found_line = find_line(text, ubahn_lines + sbahn_lines)
     found_station = find_station(text)
-    if found_line and found_station:
+    if found_line or found_station:
         print(f'Found station: {found_station}')
         print(f'Found line: {found_line}')
     else:
