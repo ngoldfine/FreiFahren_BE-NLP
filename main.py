@@ -4,12 +4,6 @@ from fuzzywuzzy import process
 import telebot
 import json
 
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-
-bot = telebot.TeleBot(BOT_TOKEN)
-
-print('Bot is running... 🏃‍♂️')
-
 class TicketInspector:
     def __init__(self, time, train, station, direction):
         #self.time = time
@@ -60,17 +54,25 @@ def find_station(text, threshold=80):
     return None
 
 
-@bot.message_handler(func=lambda msg: True)
-def get_info(message):
-    text = message.text
-    found_line = find_line(text, ubahn_lines + sbahn_lines)
-    found_station = find_station(text)
-    if found_line or found_station:
-        print(f'Found station: {found_station}')
-        print(f'Found line: {found_line}')
-    else:
-        print('No valuable information found')
-        return
+if __name__ == "__main__":
+    BOT_TOKEN = os.environ.get('BOT_TOKEN')
+    bot = telebot.TeleBot(BOT_TOKEN)
 
+    print('Bot is running... 🏃‍♂️')
 
-bot.infinity_polling()
+    @bot.message_handler(func=lambda msg: True)
+    def get_info(message):
+        text = message.text
+        found_line = find_line(text, ubahn_lines + sbahn_lines)
+        found_station = find_station(text)
+        if found_line or found_station:
+            print(f'Found station: {found_station}')
+            print(f'Found line: {found_line}')
+            # create a TicketInspector object
+            ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=None)
+            print(ticket_inspector.__dict__)
+        else:
+            print('No valuable information found')
+            return
+
+    bot.infinity_polling()
