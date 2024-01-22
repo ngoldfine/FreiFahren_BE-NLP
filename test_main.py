@@ -1,5 +1,5 @@
 import unittest
-from main import find_station, find_line, ubahn_lines, sbahn_lines
+from main import find_station, find_line, ubahn_lines, sbahn_lines, find_direction
 
 class TestFindStationAndLineFunction(unittest.TestCase):
     def test_find_station_and_line_dynamic_threshold(self):
@@ -111,11 +111,16 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             failure_messages = []
 
             for text, expected_station, expected_line in test_cases:
-                station = find_station(text, threshold=threshold)
+                result = find_direction(text)
+                print(result)
+                found_direction = result[0]
+                text_without_direction = result[1]
+                station = find_station(text_without_direction, threshold)
+                find_line(text, ubahn_lines + sbahn_lines)
                 if station == expected_station:
                     successes += 1
                 elif report_failures:
-                    failure_messages.append(f"Text: '{text}'\nExpected: '{expected_station}'\nFound: '{station}'\n---")
+                    failure_messages.append(f"Text: '{text}'\nExpected Station: '{expected_station}'\nFound: '{station}'\n---")
 
             return successes, failure_messages
 

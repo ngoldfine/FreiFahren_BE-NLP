@@ -59,13 +59,24 @@ def find_direction(text):
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards']
     for keyword in direction_keywords:
         if keyword in text:
-            # check if a station is mentioned after the keyword
-            if find_station(text.split(keyword)[1]):
-                found_direction = find_station(text.split(keyword)[1])
-                # remove the station from the text
-                text = text.replace(found_direction, '')
-                return found_direction, text
+            # Split the text at the keyword
+            parts = text.split(keyword, 1)
+            if len(parts) > 1:
+                after_keyword = parts[1].strip()
 
+                # Split the text after keyword into words
+                words_after_keyword = after_keyword.split()
+
+                # Find the first station name in the text after the keyword
+                for word in words_after_keyword:
+                    found_direction = find_station(word)
+                    if found_direction:
+                        # Replace the word that was identified as a station, not the found direction
+                        replace_segment = keyword + ' ' + word
+                        text_without_direction = text.replace(replace_segment, keyword, 1).strip()
+                        return found_direction, text_without_direction
+
+    return None, text
 
 if __name__ == "__main__":
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
