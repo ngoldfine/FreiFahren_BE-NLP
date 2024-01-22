@@ -61,7 +61,10 @@ def find_direction(text):
         if keyword in text:
             # check if a station is mentioned after the keyword
             if find_station(text.split(keyword)[1]):
-                return find_station(text.split(keyword)[1])
+                found_direction = find_station(text.split(keyword)[1])
+                # remove the station from the text
+                text = text.replace(found_direction, '')
+                return found_direction, text
 
 
 if __name__ == "__main__":
@@ -74,9 +77,11 @@ if __name__ == "__main__":
     def get_info(message):
         text = message.text
         found_line = find_line(text, ubahn_lines + sbahn_lines)
-        found_station = find_station(text)
-        found_direction = find_direction(text)
-        if found_line or found_station:
+        result = find_direction(text)
+        found_direction = result[0]
+        text_without_direction = result[1]
+        found_station = find_station(text_without_direction)
+        if found_line or found_station or found_direction:
             print(f'Found station: {found_station}')
             print(f'Found line: {found_line}')
             # create a TicketInspector object
