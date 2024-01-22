@@ -9,7 +9,7 @@ class TicketInspector:
         #self.time = time
         self.train = train
         self.station = station
-        #self.direction = direction
+        self.direction = direction
         
 
 ubahn_lines = ['U1', 'U2', 'U3', 'U4', 'U5', 'U6', 'U7', 'U8', 'U9']
@@ -53,6 +53,16 @@ def find_station(text, threshold=80):
                     return station
     return None
 
+def find_direction(text):
+    text = format_text(text)
+
+    direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards']
+    for keyword in direction_keywords:
+        if keyword in text:
+            # check if a station is mentioned after the keyword
+            if find_station(text.split(keyword)[1]):
+                return find_station(text.split(keyword)[1])
+
 
 if __name__ == "__main__":
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
@@ -65,11 +75,12 @@ if __name__ == "__main__":
         text = message.text
         found_line = find_line(text, ubahn_lines + sbahn_lines)
         found_station = find_station(text)
+        found_direction = find_direction(text)
         if found_line or found_station:
             print(f'Found station: {found_station}')
             print(f'Found line: {found_line}')
             # create a TicketInspector object
-            ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=None)
+            ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
             print(ticket_inspector.__dict__)
         else:
             print('No valuable information found')
