@@ -35,7 +35,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             ("S1 Richtung Spindersfeld, männlich gelesen gerade bei hermannstraße geht durch die Bahn", "Hermannstraße", "S1", "Spindlersfeld"),
             ("S1 nach spindlersfelde war ein am hermannplatz oder vorher", "Hermannplatz", "S1", "Spindlersfeld"),
             ("U8 Wittenau sind U Jannowitzbrücke raus", "Jannowitzbrücke", "U8", "Wittenau"),
-            ("messe nord grad raus", "Messe Nord", None, None),
+            ("messe nord grad raus", "Messe Nord/ICC", None, None),
             ("3x weiblich jetzt westkreuz ina s41", "Westkreuz", "S41", None),
             ("Kontrolle in s42 jetzt Treptower Park", "Treptower Park", "S42", None),
             ("Kontrolle auf der Strecke u9", None, "U9", None),
