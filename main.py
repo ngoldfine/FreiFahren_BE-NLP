@@ -34,7 +34,7 @@ def format_text(text):
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
-def find_station(text, threshold=80):
+def find_station(text, threshold=46):
     text = format_text(text)
     all_stations = []
 
