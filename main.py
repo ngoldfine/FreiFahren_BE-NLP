@@ -56,7 +56,7 @@ def find_station(text, threshold=46):
 def find_direction(text):
     text = format_text(text)
 
-    direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards']
+    direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
     for keyword in direction_keywords:
         if keyword in text:
             # Split the text at the keyword
