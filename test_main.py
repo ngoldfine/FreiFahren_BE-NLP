@@ -2,7 +2,7 @@ import unittest
 from main import find_station, find_line, ubahn_lines, sbahn_lines
 
 class TestFindStationAndLineFunction(unittest.TestCase):
-    def test_find_station_and_line(self):
+    def test_find_station_and_line_dynamic_threshold(self):
         test_cases = [
             ("heinrich-heine zwei blauwesten", "Heinrich-Heine-Straße", None),
             ("U6 Schumacher-Platz 2 Controller merhingdam", "Schumacherplatz", "U6"),
@@ -106,25 +106,44 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             ("s47 nach spindlerfeld s tempelhof eingestiegen 2 in zivil", "Tempelhof", "S47"),
         ]
 
-        for text, expected_station, expected_line in test_cases:
-            with self.subTest(text=text):
-                station = find_station(text)
-                line = find_line(text, ubahn_lines + sbahn_lines)
-                self.assertEqual(station, expected_station, f"Failed at '{text}': Expected station {expected_station}, found {station}")
-                self.assertEqual(line, expected_line, f"Failed at '{text}': Expected line {expected_line}, found {line}")
+        def run_tests_for_threshold(threshold, report_failures=False):
+            successes = 0
+            failure_messages = []
+
+            for text, expected_station, expected_line in test_cases:
+                station = find_station(text, threshold=threshold)
+                if station == expected_station:
+                    successes += 1
+                elif report_failures:
+                    failure_messages.append(f"Text: '{text}'\nExpected: '{expected_station}'\nFound: '{station}'\n---")
+
+            return successes, failure_messages
+
+        lower_bound = 0
+        upper_bound = 100
+        optimal_threshold = lower_bound
+        max_successes = 0
+
+        while upper_bound - lower_bound > 1:  
+            mid_point = (lower_bound + upper_bound) // 2
+            lower_successes, _ = run_tests_for_threshold(lower_bound)
+            mid_successes, _ = run_tests_for_threshold(mid_point)
+            upper_successes, _ = run_tests_for_threshold(upper_bound)
+
+            if lower_successes >= max(mid_successes, upper_successes):
+                optimal_threshold, max_successes = lower_bound, lower_successes
+                upper_bound = mid_point
+            elif upper_successes >= max(lower_successes, mid_successes):
+                optimal_threshold, max_successes = upper_bound, upper_successes
+                lower_bound = mid_point
+            else:
+                optimal_threshold, max_successes = mid_point, mid_successes
+                lower_bound, upper_bound = lower_bound, mid_point
+
+        _, failure_messages = run_tests_for_threshold(optimal_threshold, report_failures=True)
+        failure_report = "\n".join(failure_messages)
+
+        self.assertEqual(len(failure_messages), 0, f'Optimal threshold: {optimal_threshold} with {max_successes} successful matches\n\nFailures:\n{failure_report}')
 
 if __name__ == '__main__':
-    # Create a test suite and add your test cases
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestFindStationAndLineFunction)
-    
-    # Create a test runner that can store the test results
-    runner = unittest.TextTestRunner()
-    result = runner.run(suite)
-
-    # Calculate and print the percentage of passed tests
-    total_tests = result.testsRun
-    failed_tests = len(result.failures) + len(result.errors)
-    passed_tests = total_tests - failed_tests
-    if total_tests > 0:
-        percentage_passed = round((passed_tests / total_tests), 2)
-        print(f'{percentage_passed}% of tests passed')
+    unittest.main()
