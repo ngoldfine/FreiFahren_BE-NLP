@@ -9,7 +9,7 @@ class TicketInspector:
         #self.time = time
         self.train = train
         self.station = station
-        #self.direction = direction
+        self.direction = direction
         
 
 ubahn_lines = ['U1', 'U2', 'U3', 'U4', 'U5', 'U6', 'U7', 'U8', 'U9']
@@ -53,6 +53,30 @@ def find_station(text, threshold=46):
                     return station
     return None
 
+def find_direction(text):
+    text = format_text(text)
+
+    direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
+    for keyword in direction_keywords:
+        if keyword in text:
+            # Split the text at the keyword
+            parts = text.split(keyword, 1)
+            if len(parts) > 1:
+                after_keyword = parts[1].strip()
+
+                # Split the text after keyword into words
+                words_after_keyword = after_keyword.split()
+
+                # Find the first station name in the text after the keyword
+                for word in words_after_keyword:
+                    found_direction = find_station(word)
+                    if found_direction:
+                        # Replace the word that was identified as a station, not the found direction
+                        replace_segment = keyword + ' ' + word
+                        text_without_direction = text.replace(replace_segment, keyword, 1).strip()
+                        return found_direction, text_without_direction
+
+    return None, text
 
 if __name__ == "__main__":
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
@@ -64,12 +88,15 @@ if __name__ == "__main__":
     def get_info(message):
         text = message.text
         found_line = find_line(text, ubahn_lines + sbahn_lines)
-        found_station = find_station(text)
-        if found_line or found_station:
+        result = find_direction(text)
+        found_direction = result[0]
+        text_without_direction = result[1]
+        found_station = find_station(text_without_direction)
+        if found_line or found_station or found_direction:
             print(f'Found station: {found_station}')
             print(f'Found line: {found_line}')
             # create a TicketInspector object
-            ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=None)
+            ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
             print(ticket_inspector.__dict__)
         else:
             print('No valuable information found')
