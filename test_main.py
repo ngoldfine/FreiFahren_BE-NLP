@@ -1,7 +1,3 @@
-"""
-
-"""
-
 import unittest
 from main import find_station, find_line, ubahn_lines, sbahn_lines
 
@@ -118,11 +114,17 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                 self.assertEqual(line, expected_line, f"Failed at '{text}': Expected line {expected_line}, found {line}")
 
 if __name__ == '__main__':
-    unittest.main()
-    #print the percentage of passed tests
-    total_tests = 0
-    failed_tests = 0
-    for test in unittest.TestResult().failures:
-        total_tests += 1
-        failed_tests += 1
-    print(f'{round((100 - (failed_tests / total_tests) * 100), 2)}% of tests passed')
+    # Create a test suite and add your test cases
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFindStationAndLineFunction)
+    
+    # Create a test runner that can store the test results
+    runner = unittest.TextTestRunner()
+    result = runner.run(suite)
+
+    # Calculate and print the percentage of passed tests
+    total_tests = result.testsRun
+    failed_tests = len(result.failures) + len(result.errors)
+    passed_tests = total_tests - failed_tests
+    if total_tests > 0:
+        percentage_passed = round((passed_tests / total_tests), 2)
+        print(f'{percentage_passed}% of tests passed')
