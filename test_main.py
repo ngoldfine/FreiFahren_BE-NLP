@@ -110,11 +110,10 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         def run_tests_for_threshold(threshold, report_failures=False):
             successes = 0
             failure_messages = []
-
+            
             for text, expected_station, expected_line, expected_direction in test_cases:
                 line = find_line(text, ubahn_lines + sbahn_lines)
                 result = find_direction(text)
-                print(result)
                 direction = result[0]
                 text_without_direction = result[1]
                 station = find_station(text_without_direction, threshold)
@@ -131,6 +130,8 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                     failure_message += "\n------"
                     failure_messages.append(failure_message)
 
+            print('Testing for threshold:', threshold)
+            print('With sucessrate of: ',successes, '/', len(test_cases))
             return successes, failure_messages
 
         lower_bound = 0
@@ -138,21 +139,34 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         optimal_threshold = lower_bound
         max_successes = 0
 
-        while upper_bound - lower_bound > 1:  
+        while upper_bound - lower_bound > 1:
             mid_point = (lower_bound + upper_bound) // 2
             lower_successes, _ = run_tests_for_threshold(lower_bound)
             mid_successes, _ = run_tests_for_threshold(mid_point)
             upper_successes, _ = run_tests_for_threshold(upper_bound)
 
-            if lower_successes >= max(mid_successes, upper_successes):
-                optimal_threshold, max_successes = lower_bound, lower_successes
-                upper_bound = mid_point
-            elif upper_successes >= max(lower_successes, mid_successes):
-                optimal_threshold, max_successes = upper_bound, upper_successes
-                lower_bound = mid_point
+            max_current_success = max(lower_successes, mid_successes, upper_successes)
+
+            # Update the optimal threshold if the current midpoint has the highest success count.
+            if mid_successes == max_current_success:
+                optimal_threshold = mid_point
+
+            # Adjust bounds
+            if lower_successes == max_current_success:
+                if mid_point - lower_bound > 1:
+                    upper_bound = mid_point
+                else:
+                    upper_bound -= 1
+            elif upper_successes == max_current_success:
+                if upper_bound - mid_point > 1:
+                    lower_bound = mid_point
+                else:
+                    lower_bound += 1
             else:
-                optimal_threshold, max_successes = mid_point, mid_successes
-                lower_bound, upper_bound = lower_bound, mid_point
+                lower_bound += 1
+                upper_bound -= 1
+
+            max_successes = max_current_success
 
         _, failure_messages = run_tests_for_threshold(optimal_threshold, report_failures=True)
         failure_report = "\n".join(failure_messages)
