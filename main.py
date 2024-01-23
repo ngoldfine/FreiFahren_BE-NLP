@@ -3,6 +3,7 @@ import re
 from fuzzywuzzy import process
 import telebot
 import json
+from dotenv import load_dotenv
 
 class TicketInspector:
     def __init__(self, time, train, station, direction):
@@ -34,7 +35,7 @@ def format_text(text):
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
-def find_station(text, threshold=46):
+def find_station(text, threshold=0):
     text = format_text(text)
     all_stations = []
 
@@ -78,8 +79,16 @@ def find_direction(text):
 
     return None, text
 
+def verify_direction(ticket_inspector):
+    # Set the Ringbahn to always be directionless
+    if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
+        ticket_inspector.direction = None
+    return ticket_inspector
+    
+
 if __name__ == "__main__":
-    BOT_TOKEN = os.environ.get('BOT_TOKEN')
+    load_dotenv()  # take environment variables from .env.
+    BOT_TOKEN = os.getenv('BOT_TOKEN')
     bot = telebot.TeleBot(BOT_TOKEN)
 
     print('Bot is running... 🏃‍♂️')
@@ -91,13 +100,15 @@ if __name__ == "__main__":
         result = find_direction(text)
         found_direction = result[0]
         text_without_direction = result[1]
+        print('Passed text without direction: ' + text_without_direction)
         found_station = find_station(text_without_direction)
         if found_line or found_station or found_direction:
             print(f'Found station: {found_station}')
             print(f'Found line: {found_line}')
             # create a TicketInspector object
             ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
-            print(ticket_inspector.__dict__)
+            verified_ticket_inspector = verify_direction(ticket_inspector)
+            print(verified_ticket_inspector.__dict__)
         else:
             print('No valuable information found')
             return
