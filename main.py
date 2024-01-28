@@ -118,7 +118,7 @@ if __name__ == "__main__":
         found_station = find_station(text_without_direction)
         if found_line or found_station or found_direction:
             print(f'Found station: {found_station}')
-            print(f'Found line: {found_line}')
+            #print(f'Found line: {found_line}')
             
             # create a TicketInspector object
             ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
