@@ -30,13 +30,12 @@ with open('data.json', 'r') as f:
 
 def format_text(text):
     # Replace all '-' with whitespaces and convert to lowercase
-    text = text.lower().replace('-', ' ')
+    text = text.lower().replace(('-', '.', ','), ' ')
     # Remove all isolated 's' and 'u' 
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
 def find_station(text, threshold=0):
-    text = format_text(text)
     all_stations = []
 
     # Add all stations and synonyms to the list
@@ -79,13 +78,25 @@ def find_direction(text):
 
     return None, text
 
-def verify_direction(ticket_inspector):
+def handle_get_off(text):
+    getting_off_keywords = ['ausgestiegen', 'raus', 'aussteigen', 'got off', 'get off', 'getting off', 'steigen aus']
+    
+    # if any of the keywords are in the text return True
+    for keyword in getting_off_keywords:
+        if keyword in text:
+            return True
+
+def verify_direction(ticket_inspector, text):
     # Set the Ringbahn to always be directionless
     if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
         ticket_inspector.direction = None
+        
+    # if mentioned of getting off, set direction to None
+    if handle_get_off(text):
+        ticket_inspector.direction = None
+        
     return ticket_inspector
     
-
 if __name__ == "__main__":
     load_dotenv()  # take environment variables from .env.
     BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -97,17 +108,24 @@ if __name__ == "__main__":
     def get_info(message):
         text = message.text
         found_line = find_line(text, ubahn_lines + sbahn_lines)
+        # remove ',', '.', '-' and isolated u + s from the text
+        text = format_text(text)
         result = find_direction(text)
         found_direction = result[0]
         text_without_direction = result[1]
         print('Passed text without direction: ' + text_without_direction)
+        # Passing text without direction to not confuse the direction with a station
         found_station = find_station(text_without_direction)
         if found_line or found_station or found_direction:
             print(f'Found station: {found_station}')
             print(f'Found line: {found_line}')
+            
             # create a TicketInspector object
             ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
-            verified_ticket_inspector = verify_direction(ticket_inspector)
+            # verify direction by checking if:
+            # 1. The train is a Ringbahn
+            # 2. The ticket inspector got off the train
+            verified_ticket_inspector = verify_direction(ticket_inspector, text)
             print(verified_ticket_inspector.__dict__)
         else:
             print('No valuable information found')
