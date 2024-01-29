@@ -4,6 +4,7 @@ from fuzzywuzzy import process
 import telebot
 import json
 from dotenv import load_dotenv
+import requests
 
 class TicketInspector:
     def __init__(self, time, train, station, direction):
@@ -128,14 +129,38 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
             return True
     return False
 
+def fetch_stops(line_name):
+    url = f'https://v6.vbb.transport.rest/lines?name={line_name}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        if data and isinstance(data, list) and len(data) > 0:
+            # Assuming the stops are in the 'variants' of the first line response
+            stops = [variant['stops'] for variant in data[0].get('variants', [])]
+            return stops
+    return None
+
 def correct_direction(ticket_inspector, lines_with_final_station):
-    if ticket_inspector.train in lines_with_final_station:
+    print('Correcting direction')
+    if ticket_inspector.train in lines_with_final_station.keys():
+        print('Train is in lines_with_final_station')
         if ticket_inspector.direction in lines_with_final_station[ticket_inspector.train]:
+            print('Direction is in final stations')
             return ticket_inspector 
+        elif ticket_inspector.direction and ticket_inspector.station and ticket_inspector.train:
+            # Get the stops of the line
+            stops = fetch_stops(ticket_inspector.train)
+            if stops:
+                print(stops)
+                pass
+            else:
+                print('Could not fetch stops')
+                pass
         else:
-            # Get line and direction of the ticket inspector and check what the final station is for that direction, by checking in what direction the train is going 
-            print('Direction is not correct')
+            print('Not enough information to correct direction')
+            ticket_inspector.direction = None
             return ticket_inspector
+            
 
     
 def verify_direction(ticket_inspector, text, unformatted_text):
@@ -152,6 +177,7 @@ def verify_direction(ticket_inspector, text, unformatted_text):
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
         
+    # Check if the directiion is the final station of the line and correct it if it is not
     ticket_inspector = correct_direction(ticket_inspector, merged_lines)
     return ticket_inspector
     
