@@ -64,7 +64,7 @@ def format_text(text):
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
-def find_station(text, threshold=0):
+def find_station(text, threshold=80):
     all_stations = []
 
     # Add all stations and synonyms to the list
@@ -116,18 +116,31 @@ def handle_get_off(text):
             return True
 
 def check_if_station_is_actually_direction(text, ticket_inspector):
-    line = ticket_inspector.train
+    line = ticket_inspector.train.lower()
+    text = text.lower()
     
     # get the word after the line
-    line_index = text.find(line)
+    line_index = text.rfind(line)
     after_line = text[line_index + len(line):].strip()
     after_line_words = after_line.split()
+    print(f'After line: {after_line_words}') 
     if len(after_line_words) > 0:
         # check if the word after the line is a station
         found_station = find_station(after_line_words[0])
+        print(f'Word after the line: {after_line_words[0]}')
+        print(f'Station after the train: {found_station}')
         if found_station:
             return True
     return False
+
+def fetch_station_name(station_id):
+    url = f'https://v6.vbb.transport.rest/stations/{station_id}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        station_data = response.json()
+        return station_data.get('name', 'Unknown Station')
+    else:
+        return 'Unknown Station'
 
 def fetch_stops(line_name):
     url = f'https://v6.vbb.transport.rest/lines?name={line_name}'
@@ -135,10 +148,12 @@ def fetch_stops(line_name):
     if response.status_code == 200:
         data = response.json()
         if data and isinstance(data, list) and len(data) > 0:
-            # Assuming the stops are in the 'variants' of the first line response
-            stops = [variant['stops'] for variant in data[0].get('variants', [])]
-            return stops
+            stops_ids = [stop for variant in data[0].get('variants', []) for stop in variant['stops']]
+            # Fetch station names for each stop ID
+            station_names = [fetch_station_name(stop_id) for stop_id in stops_ids]
+            return station_names
     return None
+
 
 def correct_direction(ticket_inspector, lines_with_final_station):
     print('Correcting direction')
@@ -152,17 +167,17 @@ def correct_direction(ticket_inspector, lines_with_final_station):
             stops = fetch_stops(ticket_inspector.train)
             if stops:
                 print(stops)
-                pass
+                return ticket_inspector
             else:
                 print('Could not fetch stops')
-                pass
+                ticket_inspector.direction = None
+                return ticket_inspector
         else:
             print('Not enough information to correct direction')
             ticket_inspector.direction = None
             return ticket_inspector
-            
-
-    
+        
+                
 def verify_direction(ticket_inspector, text, unformatted_text):
     # Set the Ringbahn to always be directionless
     if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
@@ -174,6 +189,7 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
     # if station is mentioned directly after the line, it is the direction, for example "U8 Hermannstraße" is most likely "U8 Richtung Hermannstraße"
     if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
+        print('Station is actually direction')
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
         
