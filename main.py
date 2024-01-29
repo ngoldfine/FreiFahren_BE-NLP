@@ -13,15 +13,42 @@ class TicketInspector:
         self.direction = direction
         
 
-ubahn_lines = ['U1', 'U2', 'U3', 'U4', 'U5', 'U6', 'U7', 'U8', 'U9']
-sbahn_lines = ['S1', 'S2', 'S3', 'S5', 'S7', 'S8' 'S9', 'S25', 'S26', 'S41', 'S42', 'S45', 'S46', 'S75', 'S47', 'S85']
+ubahn_lines = {
+'U1': ['Warschauer Straße', 'Uhland Straße'], 
+'U2': ['Pankow', 'Ruhleben'], 
+'U3': ['Krumme Lanke', 'Warschauer Straße'],
+'U4': ['Innsbrucker Platz', 'Nollendorfplatz'],
+'U5': ['Hauptbahnhof', 'Hönow'],
+'U6': ['Alt-Tegel', 'Alt-Mariendorf'],
+'U7': ['Rathaus Spandau', 'Rudow'], 
+'U8': ['Wittenau', 'Hermannstraße'],
+'U9': ['Osloer Straße', 'Rathaus Steglitz'],
+}
+sbahn_lines = {
+'S1': ['Oranienburg', 'Wannsee'],
+'S2': ['Bernau', 'Blankenfelde'], 
+'S3': ['Erkner', 'Spandau'],
+'S5': ['Strausberg Nord', 'Westkreuz'],
+'S7': ['Potsdam Hauptbahnhof', 'Ahrensfelde'],
+'S8': ['Wildau', 'Birkenwerder'], 
+'S9': ['Flughafen BER', 'Spandau'],
+'S25': ['Teltow Stadt', 'Hennigsdorf'],
+'S26': ['Waidmannslust', 'Teltow Stadt'],
+'S41': [None, None],
+'S42': [None, None],
+'S45': ['Flughafen BER', 'Südkreuz'],
+'S46': ['Königs Wusterhausen', 'Westend'],
+'S75': ['Wartenberg', 'Warschauer Straße'], 
+'S47': ['Spindlersfeld', 'Hermannstraße'], 
+'S85': ['Grünau', 'Pankow'],
+}
 
 def find_line(text, lines):
     # remove all whitespaces from the text
     text = text.replace(' ', '')
-    for line in lines:
-        if line.lower() in text.lower():
-            return line
+    for key in lines.keys():
+        if key.lower() in text.lower():
+            return key
     return None
 
 # get station_data from json file
@@ -127,6 +154,7 @@ if __name__ == "__main__":
     def get_info(message):
         text = message.text
         found_line = find_line(text, ubahn_lines + sbahn_lines)
+
         # remove ',', '.', '-' and isolated u + s from the text
         text = format_text(text)
         result = find_direction(text)
