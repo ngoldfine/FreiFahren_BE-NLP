@@ -86,14 +86,33 @@ def handle_get_off(text):
         if keyword in text:
             return True
 
-def verify_direction(ticket_inspector, text):
+def check_station_is_direction(text, ticket_inspector):
+    line = ticket_inspector.train
+    
+    # get the word after the line
+    line_index = text.find(line)
+    after_line = text[line_index + len(line):].strip()
+    after_line_words = after_line.split()
+    if len(after_line_words) > 0:
+        # check if the word after the line is a station
+        found_station = find_station(after_line_words[0])
+        if found_station:
+            return True
+    return False
+
+def verify_direction(ticket_inspector, text, unformatted_text):
     # Set the Ringbahn to always be directionless
     if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
         ticket_inspector.direction = None
         
-    # if mentioned of getting off, set direction to None
+    # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
         ticket_inspector.direction = None
+
+    # if station is mentioned directly after the line, it is the direction, for example "U8 Hermannstraße" is most likely "U8 Richtung Hermannstraße"
+    if check_station_is_direction(unformatted_text, ticket_inspector):
+        ticket_inspector.direction = ticket_inspector.station
+        ticket_inspector.station = None
         
     return ticket_inspector
     
@@ -118,14 +137,13 @@ if __name__ == "__main__":
         found_station = find_station(text_without_direction)
         if found_line or found_station or found_direction:
             print(f'Found station: {found_station}')
-            #print(f'Found line: {found_line}')
-            
-            # create a TicketInspector object
+            print(f'Found line: {found_line}')
             ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
+
             # verify direction by checking if:
             # 1. The train is a Ringbahn
             # 2. The ticket inspector got off the train
-            verified_ticket_inspector = verify_direction(ticket_inspector, text)
+            verified_ticket_inspector = verify_direction(ticket_inspector, text, message.text)
             print(verified_ticket_inspector.__dict__)
         else:
             print('No valuable information found')
