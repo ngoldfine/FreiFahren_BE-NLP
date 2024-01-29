@@ -42,6 +42,7 @@ sbahn_lines = {
 'S47': ['Spindlersfeld', 'Hermannstraße'], 
 'S85': ['Grünau', 'Pankow'],
 }
+merged_lines = {**ubahn_lines, **sbahn_lines}
 
 def find_line(text, lines):
     # remove all whitespaces from the text
@@ -113,7 +114,7 @@ def handle_get_off(text):
         if keyword in text:
             return True
 
-def check_station_is_direction(text, ticket_inspector):
+def check_if_station_is_actually_direction(text, ticket_inspector):
     line = ticket_inspector.train
     
     # get the word after the line
@@ -127,6 +128,16 @@ def check_station_is_direction(text, ticket_inspector):
             return True
     return False
 
+def correct_direction(ticket_inspector, lines_with_final_station):
+    if ticket_inspector.train in lines_with_final_station:
+        if ticket_inspector.direction in lines_with_final_station[ticket_inspector.train]:
+            return ticket_inspector 
+        else:
+            # Get line and direction of the ticket inspector and check what the final station is for that direction, by checking in what direction the train is going 
+            print('Direction is not correct')
+            return ticket_inspector
+
+    
 def verify_direction(ticket_inspector, text, unformatted_text):
     # Set the Ringbahn to always be directionless
     if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
@@ -137,10 +148,11 @@ def verify_direction(ticket_inspector, text, unformatted_text):
         ticket_inspector.direction = None
 
     # if station is mentioned directly after the line, it is the direction, for example "U8 Hermannstraße" is most likely "U8 Richtung Hermannstraße"
-    if check_station_is_direction(unformatted_text, ticket_inspector):
+    if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
         
+    ticket_inspector = correct_direction(ticket_inspector, merged_lines)
     return ticket_inspector
     
 if __name__ == "__main__":
@@ -153,7 +165,7 @@ if __name__ == "__main__":
     @bot.message_handler(func=lambda msg: True)
     def get_info(message):
         text = message.text
-        found_line = find_line(text, ubahn_lines + sbahn_lines)
+        found_line = find_line(text, merged_lines)
 
         # remove ',', '.', '-' and isolated u + s from the text
         text = format_text(text)
