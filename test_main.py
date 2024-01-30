@@ -1,5 +1,6 @@
 import unittest
-from main import find_station, find_line, ubahn_lines, sbahn_lines, find_direction
+import json
+from main import find_station, find_line, find_direction
 
 class TestFindStationAndLineFunction(unittest.TestCase):
     def test_find_station_and_line_dynamic_threshold(self):
@@ -111,8 +112,12 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             successes = 0
             failure_messages = []
             
+            # Get lines and their stations       
+            with open('stations_and_lines.json', 'r') as f:
+                merged_lines = json.load(f)  
+            
             for text, expected_station, expected_line, expected_direction in test_cases:
-                line = find_line(text, ubahn_lines + sbahn_lines)
+                line = find_line(text, merged_lines)
                 result = find_direction(text)
                 direction = result[0]
                 text_without_direction = result[1]
@@ -168,7 +173,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
 
             max_successes = max_current_success
 
-        _, failure_messages = run_tests_for_threshold(optimal_threshold, report_failures=True)
+        _, failure_messages = run_tests_for_threshold(80, report_failures=True)
         failure_report = "\n".join(failure_messages)
 
         self.assertEqual(len(failure_messages), 0, f'Optimal threshold: {optimal_threshold} with {max_successes} successful matches\n\nFailures:\n{failure_report}')

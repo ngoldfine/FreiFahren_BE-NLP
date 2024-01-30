@@ -15,7 +15,6 @@ class TicketInspector:
 # Get lines and their stations       
 with open('stations_and_lines.json', 'r') as f:
     merged_lines = json.load(f)    
-    print(merged_lines)
 
 def find_line(text, lines):
     # remove all whitespaces from the text
@@ -99,12 +98,20 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
     if len(after_line_words) > 0:
         # check if the word after the line is a station
         found_station = find_station(after_line_words[0])
-        print(f'Word after the line: {after_line_words[0]}')
-        print(f'Station after the train: {found_station}')
-        if found_station:
+        
+        all_final_stations = []
+        for line, stations in merged_lines.items():
+            all_final_stations.append(stations[0])
+            all_final_stations.append(stations[-1])
+            
+        if ticket_inspector.train and found_station:
+            # check if the station is in the line
+            if found_station == merged_lines[ticket_inspector.train][0] or found_station == merged_lines[ticket_inspector.train][-1]:
+                return True
+        elif found_station and found_station in all_final_stations:
             return True
+        
     return False
-
 
 def correct_direction(ticket_inspector, lines_with_final_station):
     print('Correcting direction')
@@ -132,15 +139,13 @@ def correct_direction(ticket_inspector, lines_with_final_station):
             print('Not enough information to correct direction')
             ticket_inspector.direction = None
             return ticket_inspector
-        
-                
+                 
 def verify_direction(ticket_inspector, text, unformatted_text):
+    # Check if the direction is the final station of the line and correct it 
+    ticket_inspector = correct_direction(ticket_inspector, merged_lines)
+    
     # Set the Ringbahn to always be directionless
     if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
-        ticket_inspector.direction = None
-        
-    # direction should be None if the ticket inspector got off the train
-    if handle_get_off(text):
         ticket_inspector.direction = None
 
     # if station is mentioned directly after the line, it is the direction, for example "U8 Hermannstraße" is most likely "U8 Richtung Hermannstraße"
@@ -149,8 +154,11 @@ def verify_direction(ticket_inspector, text, unformatted_text):
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
         
-    # Check if the directiion is the final station of the line and correct it if it is not
-    ticket_inspector = correct_direction(ticket_inspector, merged_lines)
+    # direction should be None if the ticket inspector got off the train
+    if handle_get_off(text):
+        print('Ticket inspector got off the train')
+        ticket_inspector.direction = None
+    
     return ticket_inspector
     
 if __name__ == "__main__":
