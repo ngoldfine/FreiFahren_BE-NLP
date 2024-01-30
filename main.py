@@ -13,37 +13,8 @@ class TicketInspector:
         self.station = station
         self.direction = direction
         
-
-ubahn_lines = {
-'U1': ['Warschauer Straße', 'Uhlandstraße'], 
-'U2': ['Pankow', 'Ruhleben'], 
-'U3': ['Krumme Lanke', 'Warschauerstraße'],
-'U4': ['Innsbrucker Platz', 'Nollendorfplatz'],
-'U5': ['Hauptbahnhof', 'Hönow'],
-'U6': ['Alt-Tegel', 'Alt-Mariendorf'],
-'U7': ['Rathaus Spandau', 'Rudow'], 
-'U8': ['Wittenau', 'Hermannstraße'],
-'U9': ['Osloer Straße', 'Rathaus Steglitz'],
-}
-sbahn_lines = {
-'S1': ['Wannsee','Nikolassee','Schlachtensee', 'Mexikoplatz', 'Zehlendorf', 'Sundgauerstraße', 'Lichterfelde West', 'Botanischer Garten', 'Rathaus Steglitz', 'Feuerbachstraße', 'Friedenau', 'Schöneberg', 'Julius-Leber-Brücke', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamerplatz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Wollkanstraße', 'Schönholz', 'Wilhelmsruh', 'Wittenau', 'Waidmannslust', 'Hermsdorf', 'Frohnau', 'Hohen Neuendorf', 'Birkenwerder', 'Hohen Neuendorf', 'Borgsdorf', 'Lehnitz', 'Oranienburg'],
-'S2': ['Blankenfelde', 'Mahlow', 'Lichtenrade', 'Schichauweg', 'Buckower Chaussee', 'Marienfelde', 'Attilastraße', 'Priesterweg', 'Südkreuz', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamerplatz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Pankow', 'Pankow-Heinersdorf', 'Blankenburg', 'Karow', 'Buch', 'Röntgental', 'Zepernick', 'Bernau-Friedenstal', 'Bernau'], 
-'S3': ['Erkner', 'Wilhelmshagen', 'Rahnsdorf', 'Friedrichshagen', 'Hirschgarten', 'Köpenick', 'Wuhlheide', 'Karlshorst', 'Betriebsbahnhof Rummelsburg', 'Rummelsburg', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Messe Süd', 'Heerstraße', 'Olympiastadion', 'Pichelsberg', 'Stresow', 'Spandau'],
-'S5': ['Strausberg Nord', 'Strausberg Stadt', 'Hegermühle', 'Strausberg', 'Petershagen Nord', 'Fredersdorf', 'Neuenhagen', 'Hoppegarten', 'Birkenstein', 'Mahlsdorf', 'Kaulsdorf', 'Wuhletal', 'Biesdorf', 'Friedrichsfelde Ost', 'Lichtenberg', 'Nöldnerplatz', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Grunewald'],
-'S7': ['Ahrensfelde', 'Mehrower Allee', 'Raoul-Wallenberg-Straße', 'Marzahn', 'Poelchaustraße', 'Springpfuhl', 'Friedrichsfelde Ost', 'Lichtenberg', 'Nöldnerplatz', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Grunewald', 'Nikolassee', 'Wannsee', 'Griebnitzsee', 'Babelsberg', 'Potsdam Hauptbahnhof'],
-'S8': ['Wildau', 'Zeuthen', 'Eichwalde', 'Grünau', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Plänterwald', 'Treptowerpark', 'Ostkreuz', 'Frankfurter Allee', 'Storkowerstraße', 'Landsberger Allee', 'Greifswalderstraße', 'Prenzlauer Allee', 'Schönhauser Allee', 'Bornholmerstraße', 'Pankow', 'Pankow-Heinersdorf', 'Blankenburg', 'Mühlenbeck-Mönchmühle', 'Schönfließ', 'Bergfelde', 'Hohen Neuendorf', 'Birkenwerder'], 
-'S9': ['Flughafen BER', 'Waßmannsdorf', 'Schönefeld', 'Grünbergallee', 'Altglienicke', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Plänterwald', 'Treptower Park', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Grunewald', 'Messe Süd', 'Heerstraße', 'Olympiastadion', 'Pichelsberg', 'Stresow', 'Spandau'],
-'S25': ['Teltow Stadt', 'Lichterfelde Süd', 'Osdorferstraße', 'Lichterfelde Ost', 'Lankwitz', 'Südende', 'Priesterweg', 'Südkreuz', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamerplatz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Wollkanstraße', 'Schönholz', 'Alt-Reinickendorf', 'Karl-Boenhoeffer-Nervenklinik', 'Eichborndamm', 'Tegel', 'Schulzendorf', 'Heiligensee', 'Henningsdorf'],
-'S26': ['Teltow Stadt', 'Lichterfelde Süd', 'Osdorferstraße', 'Lichterfelde Ost', 'Lankwitz', 'Südende', 'Priesterweg', 'Südkreuz', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamerplatz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Pankow', 'Pankow-Heinersdorf', 'Blankenburg'],
-'S41': ['Beusselstraße', 'Westhafen', 'Wedding', 'Gesundbrunnen', 'Schönhauser Allee', 'Prenzlauer Allee', 'Greifswalderstraße', 'Landsberger Allee', 'Storkowerstraße', 'Frankfurter Allee', 'Ostkreuz', 'Treptower Park', 'Sonnenallee', 'Neukölln', 'Hermannstraße', 'Tempelhof', 'Südkreuz', 'Schöneberg', 'Innsbruckerplatz', 'Bundesplatz', 'Heidelbergerplatz', 'Hohenzollerndamm', 'Halensee', 'Westkreuz', 'Messe Nord/ICC', 'Westend', 'Jungfernheide'],
-'S42': ['Beusselstraße', 'Jungfernheide', 'Westend', 'Messe Nord', 'Westkreuz', 'Halensee', 'Hohenzollerndamm', 'Heidelbergerplatz', 'Bundesplatz', 'Innsbruckerplatz', 'Schöneberg', 'Südkreuz', 'Tempelhof', 'Hermannstraße', 'Neukölln', 'Sonnenallee', 'Treptower Park', 'Ostkreuz', 'Frankfurter Allee', 'Storkowerstraße', 'Landsberger Allee', 'Greifswalderstraße', 'Prenzlauer Allee', 'Schönhauser Allee', 'Gesundbrunnen', 'Wedding', 'Westhafen'],
-'S45': ['Flughafen BER', 'Waßmannsdorf', 'Schönefeld', 'Grünbergallee', 'Altglienicke', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Köllnische Heide', 'Neuköln', 'Hermannstraße', 'Tempelhof', 'Südkreuz', 'Schöneberg', 'Innsbruckerplatz', 'Bundesplatz', 'Heidelbergerplatz', 'Hohenzollerndamm', 'Halensee', 'Charlottenburg'],
-'S46': ['Königs Wusterhausen', 'Wildau', 'Zeuthen', 'Eichwalde', 'Grünau', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baummschulenweg', 'Köllnische Heide', 'Neuköln', 'Hermannstraße', 'Tempelhof', 'Südkreuz', 'Schöneberg', 'Innsbruckerplatz', 'Bundesplatz', 'Heidelbergerplatz', 'Hohenzollerndamm', 'Halensee', 'Westkreuz', 'Messe Nord/ICC', 'Westend'],
-'S75': ['Wartenberg', 'Hohenschönhausen', 'Gehrenseestraße', 'Springpfuhl', 'Friedrichsfelde Ost', 'Lichtenberg', 'Nöldnerplatz', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof'], 
-'S47': ['Spindlersfeld', 'Oberspree', 'Schöneweide', 'Baumschulenweg', 'Köllnische Heide', 'Neuköln', 'Hermannstraße'], 
-'S85': ['Grünau', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Plänterwald', 'Treptower Park', 'Ostkreuz', 'Frankfurter Allee', 'Storkowerstraße', 'Landsberger Allee', 'Greifswalderstraße', 'Prenzlauer Allee', 'Schönhauser Allee', 'Bornholmerstraße', 'Wollkanstraße', 'Schönholz', 'Wilhelmsruh', 'Wittenau', 'Waidmannslust', 'Hermsdorf', 'Frohnau'],
-}
-merged_lines = {**ubahn_lines, **sbahn_lines}
+with open('lines.json', 'r') as f:
+    merged_lines = json.load(f)    
 
 def find_line(text, lines):
     # remove all whitespaces from the text
