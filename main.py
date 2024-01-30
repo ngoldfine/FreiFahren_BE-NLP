@@ -15,9 +15,9 @@ class TicketInspector:
         
 
 ubahn_lines = {
-'U1': ['Warschauer Straße', 'Uhland Straße'], 
+'U1': ['Warschauer Straße', 'Uhlandstraße'], 
 'U2': ['Pankow', 'Ruhleben'], 
-'U3': ['Krumme Lanke', 'Warschauer Straße'],
+'U3': ['Krumme Lanke', 'Warschauerstraße'],
 'U4': ['Innsbrucker Platz', 'Nollendorfplatz'],
 'U5': ['Hauptbahnhof', 'Hönow'],
 'U6': ['Alt-Tegel', 'Alt-Mariendorf'],
@@ -26,22 +26,22 @@ ubahn_lines = {
 'U9': ['Osloer Straße', 'Rathaus Steglitz'],
 }
 sbahn_lines = {
-'S1': ['Oranienburg', 'Wannsee'],
-'S2': ['Bernau', 'Blankenfelde'], 
-'S3': ['Erkner', 'Spandau'],
-'S5': ['Strausberg Nord', 'Westkreuz'],
-'S7': ['Potsdam Hauptbahnhof', 'Ahrensfelde'],
-'S8': ['Wildau', 'Birkenwerder'], 
-'S9': ['Flughafen BER', 'Spandau'],
-'S25': ['Teltow Stadt', 'Hennigsdorf'],
-'S26': ['Waidmannslust', 'Teltow Stadt'],
-'S41': [None, None],
-'S42': [None, None],
-'S45': ['Flughafen BER', 'Südkreuz'],
-'S46': ['Königs Wusterhausen', 'Westend'],
-'S75': ['Wartenberg', 'Warschauer Straße'], 
-'S47': ['Spindlersfeld', 'Hermannstraße'], 
-'S85': ['Grünau', 'Pankow'],
+'S1': ['Wannsee','Nikolassee','Schlachtensee', 'Mexikoplatz', 'Zehlendorf', 'Sundgauerstraße', 'Lichterfelde West', 'Botanischer Garten', 'Rathaus Steglitz', 'Feuerbachstraße', 'Friedenau', 'Schöneberg', 'Julius-Leber-Brücke', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamer Platz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Wollkanstraße', 'Schönholz', 'Wilhelmsruh', 'Wittenau', 'Waidmannslust', 'Hermsdorf', 'Frohnau', 'Hohen Neuendorf', 'Birkenwerder', 'Hohen Neuendorf', 'Borgsdorf', 'Lehnitz', 'Oranienburg'],
+'S2': ['Blankenfelde', 'Mahlow', 'Lichtenrade', 'Schichauweg', 'Buckower Chaussee', 'Marienfelde', 'Attilastraße', 'Priesterweg', 'Südkreuz', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamer Platz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Pankow', 'Pankow-Heinersdorf', 'Blankenburg', 'Karow', 'Buch', 'Röntgental', 'Zepernick', 'Bernau-Friedenstal', 'Bernau'], 
+'S3': ['Erkner', 'Wilhelmshagen', 'Rahnsdorf', 'Friedrichshagen', 'Hirschgarten', 'Köpenick', 'Wuhlheide', 'Karlshorst', 'Betriebsbahnhof Rummelsburg', 'Rummelsburg', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Messe Süd', 'Heerstraße', 'Olympiastadion', 'Pichelsberg', 'Stresow', 'Spandau'],
+'S5': ['Strausberg Nord', 'Strausberg Stadt', 'Hegermühle', 'Strausberg', 'Petershagen Nord', 'Fredersdorf', 'Neuenhagen', 'Hoppegarten', 'Birkenstein', 'Mahlsdorf', 'Kaulsdorf', 'Wuhletal', 'Biesdorf', 'Friedrichsfelde Ost', 'Lichtenberg', 'Nöldnerplatz', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Grunewald'],
+'S7': ['Ahrensfelde', 'Mehrower Allee', 'Raoul-Wallenberg-Straße', 'Marzahn', 'Poelchaustraße', 'Springpfuhl', 'Friedrichsfelde Ost', 'Lichtenberg', 'Nöldnerplatz', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Grunewald', 'Nikolassee', 'Wannsee', 'Griebnitzsee', 'Babelsberg', 'Potsdam Hauptbahnhof'],
+'S8': ['Wildau', 'Zeuthen', 'Eichwalde', 'Grünau', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Plänterwald', 'Treptowerpark', 'Ostkreuz', 'Frankfurter Allee', 'Storkowerstraße', 'Landsberger Allee', 'Greifswalderstraße', 'Prenzlauer Allee', 'Schönhauser Allee', 'Bornholmerstraße', 'Pankow', 'Pankow-Heinersdorf', 'Blankenburg', 'Mühlenbeck-Mönchmühle', 'Schönfließ', 'Bergfelde', 'Hohen Neuendorf', 'Birkenwerder'], 
+'S9': ['Flughafen BER', 'Waßmannsdorf', 'Schönefeld', 'Grünbergallee', 'Altglienicke', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Plänterwald', 'Treptower Park', 'Warschauerstraße', 'Ostbahnhof', 'Jannowitzbrücke', 'Alexanderplatz', 'Hackescher Markt', 'Friedrichstraße', 'Hauptbahnhof', 'Bellevue', 'Tiergarten', 'Zoologischer Garten', 'Savignyplatz', 'Charlottenburg', 'Westkreuz', 'Grunewald', 'Messe Süd', 'Heerstraße', 'Olympiastadion', 'Pichelsberg', 'Stresow', 'Spandau'],
+'S25': ['Teltow Stadt', 'Lichterfelde Süd', 'Osdorferstraße', 'Lichterfelde Ost', 'Lankwitz', 'Südende', 'Priesterweg', 'Südkreuz', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamer Platz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Wollkanstraße', 'Schönholz', 'Alt-Reinickendorf', 'Karl-Boenhoeffer-Nervenklinik', 'Eichborndamm', 'Tegel', 'Schulzendorf', 'Heiligensee', 'Henningsdorf'],
+'S26': ['Teltow Stadt', 'Lichterfelde Süd', 'Osdorferstraße', 'Lichterfelde Ost', 'Lankwitz', 'Südende', 'Priesterweg', 'Südkreuz', 'Yorckstraße', 'Anhalter Bahnhof', 'Potsdamer Platz', 'Brandenburger Tor', 'Friedrichstraße', 'Oranienburgerstraße', 'Nordbahnhof', 'Humbolthain', 'Gesundbrunnen', 'Bornholmerstraße', 'Pankow', 'Pankow-Heinersdorf', 'Blankenburg'],
+'S41': ['Beusselstraße', 'Westhafen', 'Wedding', 'Gesundbrunnen', 'Schönhauser Allee', 'Prenzlauer Allee', 'Greifswalder Straße', 'Landsberger Allee', 'Storkower Straße', 'Frankfurter Allee', 'Ostkreuz', 'Treptower Park', 'Sonnenallee', 'Neukölln', 'Hermannstraße', 'Tempelhof', 'Südkreuz', 'Schöneberg', 'Innsbrucker Platz', 'Bundesplatz', 'Heidelberger Platz', 'Hohenzollerndamm', 'Halensee', 'Westkreuz', 'Messe Nord/ICC', 'Westend', 'Jungfernheide'],
+'S42': ['Beusselstraße', 'Jungfernheide', 'Westend', 'Messe Nord', 'Westkreuz', 'Halensee', 'Hohenzollerndamm', 'Heidelberger Platz', 'Bundesplatz', 'Innsbrucker Platz', 'Schöneberg', 'Südkreuz', 'Tempelhof', 'Hermannstraße', 'Neukölln', 'Sonnenallee', 'Treptower Park', 'Ostkreuz', 'Frankfurter Allee', 'Storkower Straße', 'Landsberger Allee', 'Greifswalder Straße', 'Prenzlauer Allee', 'Schönhauser Allee', 'Gesundbrunnen', 'Wedding', 'Westhafen'],
+'S45': ['Flughafen BER', 'Waßmannsdorf', 'Schönefeld', 'Grünbergallee', 'Altglienicke', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Köllnische Heide', 'Neuköln', 'Hermannstraße', 'Tempelhof', 'Südkreuz', 'Schöneberg', 'Innsbrucker Platz', 'Bundesplatz', 'Heidelberger Platz', 'Hohenzollerndamm', 'Halensee', 'Charlottenburg'],
+'S46': ['Königs Wusterhausen', 'Wildau', 'Zeuthen', 'Eichwalde', 'Grünau', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baummschulenweg', 'Köllnische Heide', 'Neuköln', 'Hermannstraße', 'Tempelhof', 'Südkreuz', 'Schöneberg', 'Innsbrucker Platz', 'Bundesplatz', 'Heidelberger Platz', 'Hohenzollerndamm', 'Halensee', 'Westkreuz', 'Messe Nord/ICC', 'Westend'],
+'S75': ['Wartenberg', 'Hohenschönhausen', 'Gehrenseestraße', 'Springpfuhl', 'Friedrichsfelde Ost', 'Lichtenberg', 'Nöldnerplatz', 'Ostkreuz', 'Warschauerstraße', 'Ostbahnhof'], 
+'S47': ['Spindlersfeld', 'Oberspree', 'Schöneweide', 'Baumschulenweg', 'Köllnische Heide', 'Neuköln', 'Hermannstraße'], 
+'S85': ['Grünau', 'Adlershof', 'Johannisthal', 'Schöneweide', 'Baumschulenweg', 'Plänterwald', 'Treptower Park', 'Ostkreuz', 'Frankfurter Allee', 'Storkower Straße', 'Landsberger Allee', 'Greifswalder Straße', 'Prenzlauer Allee', 'Schönhauser Allee', 'Bornholmerstraße', 'Wollkanstraße', 'Schönholz', 'Wilhelmsruh', 'Wittenau', 'Waidmannslust', 'Hermsdorf', 'Frohnau'],
 }
 merged_lines = {**ubahn_lines, **sbahn_lines}
 
@@ -146,6 +146,10 @@ def fetch_station_id(station):
     else:
         print("No data found for station:", station)
         return None
+    
+def fetch_route(station_ids):
+    url = f'https://v6.vbb.transport.rest/journeys?from={station_ids[0]}&to={station_ids[1]}'
+    print(url)
 
 
 def correct_direction(ticket_inspector, lines_with_final_station):
@@ -162,7 +166,11 @@ def correct_direction(ticket_inspector, lines_with_final_station):
             
             # Get the ids of the final stations
             station_ids = [fetch_station_id(station) for station in final_stations]
-            print('IDs of the final stations: ',station_ids)
+            
+            # Get the route of the train
+            route = fetch_route(station_ids)
+            print(route)
+            
             return ticket_inspector
 
         else:
