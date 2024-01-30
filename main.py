@@ -4,7 +4,6 @@ from fuzzywuzzy import process
 import telebot
 import json
 from dotenv import load_dotenv
-import requests
 
 class TicketInspector:
     def __init__(self, time, train, station, direction):
@@ -12,9 +11,11 @@ class TicketInspector:
         self.train = train
         self.station = station
         self.direction = direction
-        
-with open('lines.json', 'r') as f:
+      
+# Get lines and their stations       
+with open('stations_and_lines.json', 'r') as f:
     merged_lines = json.load(f)    
+    print(merged_lines)
 
 def find_line(text, lines):
     # remove all whitespaces from the text
@@ -24,7 +25,7 @@ def find_line(text, lines):
             return key
     return None
 
-# get station_data from json file
+# get all stations and their synonyms
 with open('data.json', 'r') as f:
     stations_data = json.load(f)
 
