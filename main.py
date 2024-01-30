@@ -133,26 +133,19 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
             return True
     return False
 
-def fetch_station_name(station_id):
-    url = f'https://v6.vbb.transport.rest/stations/{station_id}'
+def fetch_station_id(station):
+    url = f'https://v6.vbb.transport.rest/stations?query={station}'
+    print(url)
     response = requests.get(url)
-    if response.status_code == 200:
-        station_data = response.json()
-        return station_data.get('name', 'Unknown Station')
-    else:
-        return 'Unknown Station'
+    data = response.json()
 
-def fetch_stops(line_name):
-    url = f'https://v6.vbb.transport.rest/lines?name={line_name}'
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        if data and isinstance(data, list) and len(data) > 0:
-            stops_ids = [stop for variant in data[0].get('variants', []) for stop in variant['stops']]
-            # Fetch station names for each stop ID
-            station_names = [fetch_station_name(stop_id) for stop_id in stops_ids]
-            return station_names
-    return None
+    if data:
+        first_key = list(data.keys())[0]  # Get the first key in the dictionary
+        station_id = data[first_key]['id']  # Use the first key to access the ID
+        return station_id
+    else:
+        print("No data found for station:", station)
+        return None
 
 
 def correct_direction(ticket_inspector, lines_with_final_station):
@@ -163,15 +156,15 @@ def correct_direction(ticket_inspector, lines_with_final_station):
             print('Direction is in final stations')
             return ticket_inspector 
         elif ticket_inspector.direction and ticket_inspector.station and ticket_inspector.train:
-            # Get the stops of the line
-            stops = fetch_stops(ticket_inspector.train)
-            if stops:
-                print(stops)
-                return ticket_inspector
-            else:
-                print('Could not fetch stops')
-                ticket_inspector.direction = None
-                return ticket_inspector
+            # Get final stations of the line
+            final_stations = lines_with_final_station[ticket_inspector.train]
+            final_stations = [station.replace(' ', '') for station in final_stations]
+            
+            # Get the ids of the final stations
+            station_ids = [fetch_station_id(station) for station in final_stations]
+            print('IDs of the final stations: ',station_ids)
+            return ticket_inspector
+
         else:
             print('Not enough information to correct direction')
             ticket_inspector.direction = None
