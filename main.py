@@ -133,46 +133,29 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
             return True
     return False
 
-def fetch_station_id(station):
-    url = f'https://v6.vbb.transport.rest/stations?query={station}'
-    print(url)
-    response = requests.get(url)
-    data = response.json()
-
-    if data:
-        first_key = list(data.keys())[0]  # Get the first key in the dictionary
-        station_id = data[first_key]['id']  # Use the first key to access the ID
-        return station_id
-    else:
-        print("No data found for station:", station)
-        return None
-    
-def fetch_route(station_ids):
-    url = f'https://v6.vbb.transport.rest/journeys?from={station_ids[0]}&to={station_ids[1]}'
-    print(url)
-
 
 def correct_direction(ticket_inspector, lines_with_final_station):
     print('Correcting direction')
     if ticket_inspector.train in lines_with_final_station.keys():
         print('Train is in lines_with_final_station')
-        if ticket_inspector.direction in lines_with_final_station[ticket_inspector.train]:
+        train_stations = lines_with_final_station[ticket_inspector.train]
+        if ticket_inspector.direction in [train_stations[0], train_stations[-1]]:
             print('Direction is in final stations')
             return ticket_inspector 
         elif ticket_inspector.direction and ticket_inspector.station and ticket_inspector.train:
-            # Get final stations of the line
-            final_stations = lines_with_final_station[ticket_inspector.train]
-            final_stations = [station.replace(' ', '') for station in final_stations]
+            # Get index of the station and direction in the list of stations
+            station_index = lines_with_final_station[ticket_inspector.train].index(ticket_inspector.station)
+            direction_index = lines_with_final_station[ticket_inspector.train].index(ticket_inspector.direction)
             
-            # Get the ids of the final stations
-            station_ids = [fetch_station_id(station) for station in final_stations]
-            
-            # Get the route of the train
-            route = fetch_route(station_ids)
-            print(route)
+            # If the station is before the direction set the final station as the direction
+            if station_index < direction_index:
+                print('Station is before direction')
+                ticket_inspector.direction = lines_with_final_station[ticket_inspector.train][-1]
+            else:
+                print('Station is after direction')
+                ticket_inspector.direction = lines_with_final_station[ticket_inspector.train][0]
             
             return ticket_inspector
-
         else:
             print('Not enough information to correct direction')
             ticket_inspector.direction = None
