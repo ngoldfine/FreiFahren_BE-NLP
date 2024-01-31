@@ -95,8 +95,7 @@ def handle_get_off(text):
         "aussteigen",
         "got off",
         "get off",
-        "getting off",
-        "steigen aus",
+        "getting off","steigen aus",
     ]
 
     # if any of the keywords are in the text return True
