@@ -1,4 +1,8 @@
 pyTelegramBotAPI
 fuzzywuzzy 
 python-Levenshtein
-ruff
+flake8
+flake8-quotes
+pep8-naming
+flake8-unused-arguments
+flake8-bugbear
