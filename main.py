@@ -1,9 +1,9 @@
 import os
 import re
 from fuzzywuzzy import process
-import telebot
+#import telebot
 import json
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 class TicketInspector:
     def __init__(self, time, train, station, direction):
@@ -37,6 +37,8 @@ def format_text(text):
 
 def find_station(text, threshold=80):
     all_stations = []
+    
+
 
     # Add all stations and synonyms to the list
     for station_type in stations_data.values():
@@ -45,13 +47,16 @@ def find_station(text, threshold=80):
             all_stations.extend([syn.lower() for syn in synonyms])
 
     best_match, score = process.extractOne(text, all_stations)
+       
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_data.values():
             for station, synonyms in station_type.items():
+                
                 if best_match in [station.lower()] + [syn.lower() for syn in synonyms]:
                     return station
     return None
+                
 
 def find_direction(text):
     text = format_text(text)
