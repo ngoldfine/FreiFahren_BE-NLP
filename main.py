@@ -1,9 +1,9 @@
 import os
 import re
 from fuzzywuzzy import process
-#import telebot
+# import telebot
 import json
-#from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 class TicketInspector:
     def __init__(self, time, train, station, direction):
@@ -194,20 +194,20 @@ def extract_ticket_inspector_info(unformatted_text):
     else:
         return None
     
-if __name__ == "__main__":
-    load_dotenv()  # take environment variables from .env.
-    BOT_TOKEN = os.getenv('BOT_TOKEN')
-    bot = telebot.TeleBot(BOT_TOKEN)
+# if __name__ == "__main__":
+#     load_dotenv()  # take environment variables from .env.
+#     BOT_TOKEN = os.getenv('BOT_TOKEN')
+#     bot = telebot.TeleBot(BOT_TOKEN)
 
-    print('Bot is running...🏃‍♂️')
+#     print('Bot is running...🏃‍♂️')
 
-    @bot.message_handler(func=lambda msg: True)
-    def get_info(message):
-        info = extract_ticket_inspector_info(message.text)
-        if info:
-            print(info)
-        else:
-            print('No valuable information found')
-            return None
+#     @bot.message_handler(func=lambda msg: True)
+#     def get_info(message):
+#         info = extract_ticket_inspector_info(message.text)
+#         if info:
+#             print(info)
+#         else:
+#             print('No valuable information found')
+#             return None
             
-    bot.infinity_polling()
+#     bot.infinity_polling()

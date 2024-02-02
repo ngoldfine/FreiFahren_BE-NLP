@@ -11,10 +11,13 @@ N = 10000
 
 DIRECTORY = "hypervector"
 
-lines = [
-        "U1", "U2", "U3", "U4", "U5", "U6", "U7", "U8", "U9", 
-        "S1", "S2", "S3", "S5", "S7", "S8", "S9", "S25", "S26", "S41", "S42", "S45", "S46", "S47", "S75", "S85"
-    ]
+with open('stations_and_lines.json', 'r') as f:
+    data = json.load(f)
+    f.close()
+lines = []
+
+for line in data:
+    lines.append(line)
 
 
 def encodeAlphabet():
@@ -260,8 +263,8 @@ test_cases = [
             ("S8 Ostkreuz", "Ostkreuz", "S8", None),
             ("Controller in S7 Richtung Alexanderplatz Was just checked in jannowitzbrucke", "Jannowitzbrücke", "S7", "Ahrensfelde"),
             ("S42 Landsberger Alle, 2m, schwarze Jacke, schwarze Mütze. 2 m mit Gelber Weste begleiten.", "Landsberger Allee", "S42", None),
-            ("3 Kontrolleure s Greifswalder", "Greifswalder Straße", None, None),
-            ("S8 Greifswalder Straße", "Greifswalder Straße", "S8", None),
+            ("3 Kontrolleure s Greifswalder", "Greifswalderstraße", None, None),
+            ("S8 Greifswalder Straße", "Greifswalderstraße", "S8", None),
             ("S41 Ringbahn Landsberger allee big group of kontrolettis", "Landsberger Allee", "S41", None),
             ("Ring 41-> Landsberger Allee, glaube mehrere männer die auch Minderjährige hochnehmen", "Landsberger Allee", "S41", None),
             ("S42, 3x agressiv männlich, gerade Schönhauser ausgestiegen", "Schönhauser Allee", None, None),
@@ -273,7 +276,7 @@ test_cases = [
             ("2x Blauwesten u8 Heinrich Heine straße Richtung Hermannstraße", "Heinrich-Heine-Straße", "U8", "Hermannstraße"),
             ("Bitte hier keine Fragen, ob diese oder jene Linie gerade frei ist, sondern stattdessen die Suchfunktion (das Lupensymbol) nutzen. Danke! Nachricht gelöscht.", None, None, None),
             ("Two men wearing normal clothes in M5, checking tickets, just got off at alexanderplatz", "Alexanderplatz", "M5", None),
-            ("U1 at hallesches tor towards warschauer str.  2 maybe 3 blue wests giving fines", "Hallesches Tor", "U1", "Warschauer Straße"),
+            ("U1 at hallesches tor towards warschauer str.  2 maybe 3 blue wests giving fines", "Hallesches Tor", "U1", "Warschauerstraße"),
             ("Wenn mein Infopost über die Demo am Sonntag Nachmittag gegen Rechts als Spam gewertet wird (über die ja auch im Bild der Gruppe informiert wird) würde ich mir eine kurze Rückmeldung von euch darüber wünschen", None, None, None),
             ("No basically this is the decision of the admins who run this group because we share certain values and leftist politics. If you happen to dislike actions against fascists, it's you who might not belong in this group. Like Spam.", None, None, None),
             ("S41 Treptower Park, 2 Männer", "Treptower Park", "S41", None),
@@ -332,4 +335,6 @@ def test():
     print(f"Accuracy: {accuracy}")
 
 
+encodeAlphabet()
 encodeStations()
+test()
