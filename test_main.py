@@ -641,7 +641,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             ),
         ]
 
-        for text, expected_station, expected_train, expected_direction in test_cases:
+        for text, expected_station, expected_line, expected_direction in test_cases:
             with self.subTest(text=text):
                 result = extract_ticket_inspector_info(text)
 
@@ -660,16 +660,16 @@ class TestFindStationAndLineFunction(unittest.TestCase):
 
                 # Check and print only if there's a mismatch for train
                 if result is not None:
-                    actual_train = result.get('train')
+                    actual_line = result.get('line')
                 else:
-                    actual_train = None
-                if actual_train != expected_train:
-                    train_msg = (
+                    actual_line = None
+                if actual_line != expected_line:
+                    line_msg = (
                         f'Text: "{text}"\n'
-                        f'Expected Train: "{expected_train}"\n'
-                        f'Actual Train: "{actual_train}"'
+                        f'Expected line: "{expected_line}"\n'
+                        f'Actual line: "{actual_line}"'
                     )
-                    self.assertEqual(actual_train, expected_train, train_msg)
+                    self.assertEqual(actual_line, expected_line, line_msg)
 
                 # Check and print only if there's a mismatch for direction
                 actual_direction = result.get('direction')
