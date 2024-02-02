@@ -76,9 +76,9 @@ def find_direction(text):
                 for word in words_after_keyword:
                     found_direction = find_station(word)
                     if found_direction:
-                        # Replace the word that was identified as a station, not the found direction
+                        # Remove the entire phrase that includes the direction keyword and the found direction
                         replace_segment = keyword + ' ' + word
-                        text_without_direction = text.replace(replace_segment, keyword, 1).strip()
+                        text_without_direction = text.replace(replace_segment, '').strip()
                         return found_direction, text_without_direction
 
     return None, text
@@ -92,6 +92,9 @@ def handle_get_off(text):
             return True
 
 def check_if_station_is_actually_direction(text, ticket_inspector):
+    if ticket_inspector.train == None:
+        return False
+    
     line = ticket_inspector.train.lower()
     text = text.lower()
     
@@ -120,13 +123,15 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
 
 def correct_direction(ticket_inspector, lines_with_final_station):
     print('Correcting direction')
+    print(ticket_inspector.__dict__)
     if ticket_inspector.train in lines_with_final_station.keys():
         print('Train is in lines_with_final_station')
         train_stations = lines_with_final_station[ticket_inspector.train]
         if ticket_inspector.direction in [train_stations[0], train_stations[-1]]:
             print('Direction is in final stations')
             return ticket_inspector 
-        elif ticket_inspector.direction and ticket_inspector.station and ticket_inspector.train:
+        elif ticket_inspector.station in lines_with_final_station[ticket_inspector.train] and ticket_inspector.train and ticket_inspector.direction in lines_with_final_station[ticket_inspector.train]:
+            print('Direction is in stations')
             # Get index of the station and direction in the list of stations
             station_index = lines_with_final_station[ticket_inspector.train].index(ticket_inspector.station)
             direction_index = lines_with_final_station[ticket_inspector.train].index(ticket_inspector.direction)
@@ -144,8 +149,12 @@ def correct_direction(ticket_inspector, lines_with_final_station):
             print('Not enough information to correct direction')
             ticket_inspector.direction = None
             return ticket_inspector
+          
+    else: 
+        print('Train is not in lines_with_final_station')
+        return ticket_inspector
                  
-def verify_direction(ticket_inspector, text, unformatted_text):
+def verify_direction(ticket_inspector, text, unformatted_text):    
     # Check if the direction is the final station of the line and correct it 
     ticket_inspector = correct_direction(ticket_inspector, merged_lines)
     
@@ -163,41 +172,42 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     if handle_get_off(text):
         print('Ticket inspector got off the train')
         ticket_inspector.direction = None
+        ticket_inspector.train = None
     
     return ticket_inspector
+
+def extract_ticket_inspector_info(unformatted_text):
+    found_line = find_line(unformatted_text, merged_lines)
+    
+    text = format_text(unformatted_text)
+    result = find_direction(text)
+    found_direction = result[0]
+    text_without_direction = result[1]
+
+    print(f'Text without direction: {text_without_direction}')
+    found_station = find_station(text_without_direction)
+    
+    if found_line or found_station or found_direction:
+        ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
+        verified_ticket_inspector = verify_direction(ticket_inspector, text, unformatted_text)
+        return verified_ticket_inspector.__dict__
+    else:
+        return None
     
 if __name__ == "__main__":
     load_dotenv()  # take environment variables from .env.
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     bot = telebot.TeleBot(BOT_TOKEN)
 
-    print('Bot is running... 🏃‍♂️')
+    print('Bot is running...🏃‍♂️')
 
     @bot.message_handler(func=lambda msg: True)
     def get_info(message):
-        text = message.text
-        found_line = find_line(text, merged_lines)
-
-        # remove ',', '.', '-' and isolated u + s from the text
-        text = format_text(text)
-        result = find_direction(text)
-        found_direction = result[0]
-        text_without_direction = result[1]
-        print('Passed text without direction: ' + text_without_direction)
-        # Passing text without direction to not confuse the direction with a station
-        found_station = find_station(text_without_direction)
-        if found_line or found_station or found_direction:
-            print(f'Found station: {found_station}')
-            print(f'Found line: {found_line}')
-            ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
-
-            # verify direction by checking if:
-            # 1. The train is a Ringbahn
-            # 2. The ticket inspector got off the train
-            verified_ticket_inspector = verify_direction(ticket_inspector, text, message.text)
-            print(verified_ticket_inspector.__dict__)
+        info = extract_ticket_inspector_info(message.text)
+        if info:
+            print(info)
         else:
             print('No valuable information found')
-            return
-
+            return None
+            
     bot.infinity_polling()
