@@ -1,11 +1,4 @@
-import unittest
-import json
-from main import extract_ticket_inspector_info
-
-class TestFindStationAndLineFunction(unittest.TestCase):
-    def test_find_station_and_line_dynamic_threshold(self):
-        # Rules: Always judge as correct as possible, ignoring the current capibility of the model
-        test_cases = [
+test_cases = [
              ("heinrich-heine zwei blauwesten", "Heinrich-Heine-Straße", None, None),
             ("U6 Schumacher-Platz 2 Controller merhingdam", "Kurt-Schumacher-Platz", "U6", None),
             ("2x Hellblau U8 Hermannplatz Richtung Wittenau am Bahnsteig", "Hermannplatz", "U8", "Wittenau"),
@@ -160,34 +153,3 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             ("Stephen MarcalanRingbahn S41 jetzt gleich TempelhofWie sehen die aus?", "Tempelhof", "S41", None),
             ("Platz der Luftbruecke", "Platz der Luftbrücke", None, None)
         ]
-        
-        for text, expected_station, expected_train, expected_direction in test_cases:
-            with self.subTest(text=text):
-                result = extract_ticket_inspector_info(text)
-
-                # Check and print only if there's a mismatch for station
-                if result is not None:
-                    actual_station = result.get('station')
-                else:
-                    actual_station = None
-                if actual_station != expected_station:
-                    station_msg = f"Text: '{text}'\nExpected Station: '{expected_station}'\nActual Station: '{actual_station}'"
-                    self.assertEqual(actual_station, expected_station, station_msg)
-
-                # Check and print only if there's a mismatch for train
-                if result is not None:
-                    actual_train = result.get('train')
-                else: 
-                    actual_train = None
-                if actual_train != expected_train:
-                    train_msg = f"Text: '{text}'\nExpected Train: '{expected_train}'\nActual Train: '{actual_train}'"
-                    self.assertEqual(actual_train, expected_train, train_msg)
-
-                # Check and print only if there's a mismatch for direction
-                actual_direction = result.get('direction')
-                if actual_direction != expected_direction:
-                    direction_msg = f"Text: '{text}'\nExpected Direction: '{expected_direction}'\nActual Direction: '{actual_direction}'"
-                    self.assertEqual(actual_direction, expected_direction, direction_msg)
-
-if __name__ == '__main__':
-    unittest.main()

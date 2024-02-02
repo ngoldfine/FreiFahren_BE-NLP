@@ -4,6 +4,7 @@ from fuzzywuzzy import process
 # import telebot
 import json
 # from dotenv import load_dotenv
+from nlpvec import findStationVec
 
 class TicketInspector:
     def __init__(self, time, train, station, direction):
@@ -56,7 +57,11 @@ def find_station(text, threshold=80):
                 if best_match in [station.lower()] + [syn.lower() for syn in synonyms]:
                     return station
     return None
-                
+
+# def find_station(text, threshold=80):
+#     station = findStationVec(text)[0]
+#     print(f'Found station: {station}')
+#     return station
 
 def find_direction(text):
     text = format_text(text)
