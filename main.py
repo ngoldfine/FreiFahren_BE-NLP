@@ -73,7 +73,8 @@ def find_station(text, line=None, threshold=80):
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():
             for station, synonyms in station_type.items():
-                if best_match in [station.lower()] + [synonym.lower() for synonym in synonyms]:
+                if best_match in [station.lower()] + \
+                        [synonym.lower() for synonym in synonyms]:
                     return station
     return None
 
