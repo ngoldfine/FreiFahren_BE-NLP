@@ -202,7 +202,7 @@ def findStationVec(message):
                     nearest_station = similarity
                     station_name = station
                 
-    if nearest_station < 0.17:
+    if nearest_station < 0.40:
         station_name = None
     return [station_name, nearest_station]
 
@@ -217,21 +217,20 @@ def test():
         message = test[0]
         prediction = findStationVec(message)
         
-        if (test[1] == prediction[0] or test[3] == prediction[0]):
+        if (test[1] == prediction[0]):
             correct += 1
-            #print("\n Correct: ")
+            print("\n Correct: ")
         else:
             print("\n False: ")
         
-            print(f"Message:    {message} ")
-            print(f"Predicted:  {prediction[0]}")
-            print(f"Similarity: {prediction[1]}")
-            print(f"Expected:   {test[1]}")
-            print("")
+        print(f"Message:    {message} ")
+        print(f"Predicted:  {prediction[0]}")
+        print(f"Similarity: {prediction[1]}")
+        print(f"Expected:   {test[1]}")
+        print("")
  
     accuracy = correct/len(test_cases)
 
     print(f"Accuracy: {accuracy}")
 
-
-
+test()

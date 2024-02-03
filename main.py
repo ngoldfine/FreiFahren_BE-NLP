@@ -36,32 +36,32 @@ def format_text(text):
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
-def find_station(text, threshold=80):
-    all_stations = []
+# def find_station(text, threshold=80):
+#     all_stations = []
     
 
 
-    # Add all stations and synonyms to the list
-    for station_type in stations_data.values():
-        for station, synonyms in station_type.items():
-            all_stations.append(station.lower())
-            all_stations.extend([syn.lower() for syn in synonyms])
+#     # Add all stations and synonyms to the list
+#     for station_type in stations_data.values():
+#         for station, synonyms in station_type.items():
+#             all_stations.append(station.lower())
+#             all_stations.extend([syn.lower() for syn in synonyms])
 
-    best_match, score = process.extractOne(text, all_stations)
+#     best_match, score = process.extractOne(text, all_stations)
        
-    if score >= threshold:
-        # Find the station that matches the best match
-        for station_type in stations_data.values():
-            for station, synonyms in station_type.items():
+#     if score >= threshold:
+#         # Find the station that matches the best match
+#         for station_type in stations_data.values():
+#             for station, synonyms in station_type.items():
                 
-                if best_match in [station.lower()] + [syn.lower() for syn in synonyms]:
-                    return station
-    return None
+#                 if best_match in [station.lower()] + [syn.lower() for syn in synonyms]:
+#                     return station
+#     return None
 
-# def find_station(text, threshold=80):
-#     station = findStationVec(text)[0]
-#     print(f'Found station: {station}')
-#     return station
+def find_station(text, threshold=80):
+    station = findStationVec(text)[0]
+    print(f'Found station: {station}')
+    return station
 
 def find_direction(text):
     text = format_text(text)
@@ -108,6 +108,7 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
     after_line = text[line_index + len(line):].strip()
     after_line_words = after_line.split()
     print(f'After line: {after_line_words}') 
+
     if len(after_line_words) > 0:
         # check if the word after the line is a station
         found_station = find_station(after_line_words[0])
@@ -127,6 +128,7 @@ def check_if_station_is_actually_direction(text, ticket_inspector):
     return False
 
 def correct_direction(ticket_inspector, lines_with_final_station):
+    print('')
     print('Correcting direction')
     print(ticket_inspector.__dict__)
     if ticket_inspector.train in lines_with_final_station.keys():

@@ -142,7 +142,7 @@ test_cases = [
             ("Polizei boddinstrasse", "Boddinstraße", None, None), 
             ("U5 Alexanderplatz am Gleis richtung HBF 2 Blauwesten", "Alexanderplatz", "U5", "Hauptbahnhof"), 
             ("U6 Seetr. Richtung Alt. Mariendorf : Bullen und BVG Security stressen Obdachlose", "Seestraße", "U6", "Alt-Mariendorf"),
-            ("Ring Neukölln, two man with yellow shirt. S41 right now", "Neukoelln", "S41", None),
+            ("Ring Neukölln, two man with yellow shirt. S41 right now", "Neukölln", "S41", None),
             ("Osloer Str U9", "Osloerstraße", "U9", None),
             ("nuxU5 Alexanderplatz am Gleis richtung HBF 2 BlauwestenUff-Basse !", "Alexanderplatz", "U5", "Hauptbahnhof"),
             ("U7 Wilmersdorfer str richtung Rudow", "Wilmersdorferstraße", "U7", "Rudow"),
