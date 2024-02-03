@@ -21,7 +21,7 @@ def label_data(messages):
     for message in messages[:5]:  # Only label the first 5 messages for testing
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4-0125-preview",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant. Your task is to label the given data with station, line, and direction."},
                     {"role": "user", "content": f"""
