@@ -37,29 +37,37 @@ def format_text(text):
 
 with open('data.json', 'r') as f:
     stations_with_synonyms = json.load(f)
-print(stations_with_synonyms)
 
-def find_station(text, line=None, threshold=80):
+
+def get_all_stations(line=None):
     all_stations = []
 
     if line is not None:
+        # If a specific line is provided, add stations and synonyms from that line
         stations_of_line = lines_with_stations.get(line, [])
         all_stations.extend([station.lower() for station in stations_of_line])
-        # Add all synonyms of the stations of the line to the list
+        
+        # Add synonyms for the stations on the specified line
         for station in stations_of_line:
-            for station_type in stations_with_synonyms.values():  # Iterate over sBahn and uBahn
-                if station in station_type:  # Check if the station is in this station type
+            for station_type in stations_with_synonyms.values():
+                if station in station_type:
                     synonyms = station_type[station]
                     all_stations.extend([synonym.lower() for synonym in synonyms])
-                    break  # Stop searching once synonyms are found
-        print('Stations to choose from: ', all_stations)
+                    break
     else:
-        # Add all stations and synonyms to the list
+        # If no line is specified, add all stations and synonyms
         for station_type in stations_with_synonyms.values():
             for station, synonyms in station_type.items():
                 all_stations.append(station.lower())
                 all_stations.extend([synonym.lower() for synonym in synonyms])
 
+    return all_stations
+
+
+def find_station(text, line=None, threshold=80):
+    all_stations = get_all_stations(line)
+
+    # Perform the fuzzy matching with the gathered list of stations
     best_match, score = process.extractOne(text, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
@@ -216,13 +224,10 @@ def extract_ticket_inspector_info(unformatted_text):
     result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
     ticket_inspector.direction = found_direction
-    print(f'Found DIRECTION: {found_direction}')
     text_without_direction = result[1]
 
-    print(f'Text without direction: {text_without_direction}')
     found_station = find_station(text_without_direction, ticket_inspector.line)
     ticket_inspector.station = found_station
-    print(f'Found STATION: {found_station}')
 
     if found_line or found_station or found_direction:
         verified_ticket_inspector = verify_direction(
