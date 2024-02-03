@@ -37,29 +37,40 @@ def format_text(text):
 
 with open('data.json', 'r') as f:
     stations_with_synonyms = json.load(f)
+print(stations_with_synonyms)
 
-
-def find_station(text, threshold=80):
+def find_station(text, line=None, threshold=80):
     all_stations = []
 
-    # Add all stations and synonyms to the list
-    for station_type in stations_with_synonyms.values():
-        for station, synonyms in station_type.items():
-            all_stations.append(station.lower())
-            all_stations.extend([synonym.lower() for synonym in synonyms])
+    if line is not None:
+        stations_of_line = lines_with_stations.get(line, [])
+        all_stations.extend([station.lower() for station in stations_of_line])
+        # Add all synonyms of the stations of the line to the list
+        for station in stations_of_line:
+            for station_type in stations_with_synonyms.values():  # Iterate over sBahn and uBahn
+                if station in station_type:  # Check if the station is in this station type
+                    synonyms = station_type[station]
+                    all_stations.extend([synonym.lower() for synonym in synonyms])
+                    break  # Stop searching once synonyms are found
+        print('Stations to choose from: ', all_stations)
+    else:
+        # Add all stations and synonyms to the list
+        for station_type in stations_with_synonyms.values():
+            for station, synonyms in station_type.items():
+                all_stations.append(station.lower())
+                all_stations.extend([synonym.lower() for synonym in synonyms])
 
     best_match, score = process.extractOne(text, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():
             for station, synonyms in station_type.items():
-                if best_match == station.lower() or best_match in [
-                   synonym.lower() for synonym in synonyms]:
+                if best_match in [station.lower()] + [synonym.lower() for synonym in synonyms]:
                     return station
     return None
 
 
-def find_direction(text):
+def find_direction(text, line):
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
 
     for keyword in direction_keywords:
@@ -74,7 +85,7 @@ def find_direction(text):
 
                 # Find the first station name in the text after the keyword
                 for word in words_after_keyword:
-                    found_direction = find_station(word)
+                    found_direction = find_station(word, line)
                     if found_direction:
                         # Remove the direction and the keyword from the text
                         replace_segment = keyword + ' ' + word
@@ -116,7 +127,7 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
     print(f'After line: {after_line_words}')
     if len(after_line_words) > 0:
         # check if the word after the line is a station
-        found_station = find_station(after_line_words[0])
+        found_station = find_station(after_line_words[0], ticket_inspector.line)
 
         all_final_stations = []
         for stations in lines_with_stations.items():
@@ -208,23 +219,21 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
 def extract_ticket_inspector_info(unformatted_text):
     found_line = find_line(unformatted_text, lines_with_stations)
+    ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
     text = format_text(unformatted_text)
-    result = find_direction(text)
+    result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
+    ticket_inspector.direction = found_direction
     print(f'Found DIRECTION: {found_direction}')
     text_without_direction = result[1]
 
     print(f'Text without direction: {text_without_direction}')
-    found_station = find_station(text_without_direction)
+    found_station = find_station(text_without_direction, ticket_inspector.line)
+    ticket_inspector.station = found_station
     print(f'Found STATION: {found_station}')
 
     if found_line or found_station or found_direction:
-        ticket_inspector = TicketInspector(
-            line=found_line,
-            station=found_station,
-            direction=found_direction,
-        )
         verified_ticket_inspector = verify_direction(
             ticket_inspector, text, unformatted_text
         )

@@ -14,7 +14,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             ),
             (
                 'U6 Schumacher-Platz 2 Controller merhingdam',
-                'Schumacherplatz',
+                'Kurt-Schumacher-Platz',
                 'U6',
                 None,
             ),
