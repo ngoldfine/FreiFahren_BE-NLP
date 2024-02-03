@@ -643,26 +643,12 @@ class TestFindStationAndLineFunction(unittest.TestCase):
 
         for text, expected_station, expected_line, expected_direction in test_cases:
             with self.subTest(text=text):
+                print(f'Testing with input: "{text}"')
                 result = extract_ticket_inspector_info(text)
-
-                # Check and print only if there's a mismatch for station
-                if result is not None:
-                    actual_station = result.get('station')
-                else:
-                    actual_station = None
-                if actual_station != expected_station:
-                    station_msg = (
-                        f'Text: "{text}"\n'
-                        f'Expected Station: "{expected_station}"\n'
-                        f'Actual Station: "{actual_station}"'
-                    )
-                    self.assertEqual(actual_station, expected_station, station_msg)
+                print(f'Result: {result}')
 
                 # Check and print only if there's a mismatch for train
-                if result is not None:
-                    actual_line = result.get('line')
-                else:
-                    actual_line = None
+                actual_line = result.get('line')
                 if actual_line != expected_line:
                     line_msg = (
                         f'Text: "{text}"\n'
@@ -682,6 +668,16 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                     self.assertEqual(
                         actual_direction, expected_direction, direction_msg
                     )
+
+                # Check and print only if there's a mismatch for station
+                actual_station = result.get('station')
+                if actual_station != expected_station:
+                    station_msg = (
+                        f'Text: "{text}"\n'
+                        f'Expected Station: "{expected_station}"\n'
+                        f'Actual Station: "{actual_station}"'
+                    )
+                    self.assertEqual(actual_station, expected_station, station_msg)
 
 
 if __name__ == '__main__':
