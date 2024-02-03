@@ -1,0 +1,12 @@
+Message,Label
+"Station: Friedrichstrasse
+Line: S-Bahn
+Direction: Not specified"
+"Station: 4 Kontrolleur*innen
+Line: S85
+Direction: Buch"
+"The provided data does not contain any information about a station, line, or direction."
+"Station: U5
+Line: U-Bahn
+Direction: Hönow"
+"The provided data is insufficient to label with station, line, and direction. Please provide more details."

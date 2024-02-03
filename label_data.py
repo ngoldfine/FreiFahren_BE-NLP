@@ -1,18 +1,49 @@
-# A ChatGPT Query that is supposed to label the data. The message is inputted to the model and the output is the station, line, and direction.
-# The input messages are taken from messages_and_times.json and the output is supposed to be saved as a csv file.
-
 import json
-import requests
+import csv
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=api_key)
 
 
 def get_input_messages():
     with open('messages_and_times.json', 'r') as f:
         messages = json.load(f)
-    # traverse through the messages to get the text
     input_messages = [message['message'] for message in messages]
     return input_messages
 
 
+def label_data(messages):
+    labeled_data = []
+    for message in messages[:5]:  # Only label the first 5 messages for testing
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant. Your task is to label the given data with station, line, and direction."},
+                    {"role": "user", "content": message}
+                ],
+                temperature=0.25
+            )
+            labeled_data.append(response.choices[0].message.content)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            labeled_data.append("Error processing message")
+    return labeled_data
+
+
+def save_to_csv(labeled_data):
+    with open('labeled_data.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Message", "Label"])
+        for label in labeled_data:
+            writer.writerow([label])
+
+
 if __name__ == "__main__":
     input_messages = get_input_messages()
-    print(input_messages)
+    labeled_data = label_data(input_messages)
+    save_to_csv(labeled_data)

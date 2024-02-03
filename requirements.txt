@@ -2,3 +2,4 @@ pyTelegramBotAPI
 fuzzywuzzy 
 python-Levenshtein
 watchdog
+openai
