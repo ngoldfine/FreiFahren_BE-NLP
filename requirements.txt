@@ -1,8 +1,13 @@
 pyTelegramBotAPI
 fuzzywuzzy 
 python-Levenshtein
+
 flake8
 flake8-quotes
 pep8-naming
 flake8-unused-arguments
 flake8-bugbear
+
+watchdog
+openai
+
