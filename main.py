@@ -5,58 +5,83 @@ import telebot
 import json
 from dotenv import load_dotenv
 
+
 class TicketInspector:
-    def __init__(self, time, train, station, direction):
-        #self.time = time
-        self.train = train
+    def __init__(self, line, station, direction):
+        # self.time = time
+        self.line = line
         self.station = station
         self.direction = direction
-      
-# Get lines and their stations       
+
+
 with open('stations_and_lines.json', 'r') as f:
-    merged_lines = json.load(f)    
+    lines_with_stations = json.load(f)
+
 
 def find_line(text, lines):
-    # remove all whitespaces from the text
+    # Remove all whitespaces from the text
     text = text.replace(' ', '')
-    for key in lines.keys():
-        if key.lower() in text.lower():
-            return key
+    for line in lines.keys():
+        if line.lower() in text.lower():
+            return line
     return None
 
-# get all stations and their synonyms
-with open('data.json', 'r') as f:
-    stations_data = json.load(f)
 
 def format_text(text):
     # Replace all '-' with whitespaces and convert to lowercase
     text = text.lower().replace('-', ' ').replace('.', ' ').replace(',', ' ')
-    # Remove all isolated 's' and 'u' 
+    # Remove all isolated 's' and 'u'
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
-def find_station(text, threshold=80):
+
+with open('data.json', 'r') as f:
+    stations_with_synonyms = json.load(f)
+
+
+def get_all_stations(line=None):
     all_stations = []
 
-    # Add all stations and synonyms to the list
-    for station_type in stations_data.values():
-        for station, synonyms in station_type.items():
-            all_stations.append(station.lower())
-            all_stations.extend([syn.lower() for syn in synonyms])
+    if line is not None:
+        # If a specific line is provided, add stations and synonyms from that line
+        stations_of_line = lines_with_stations.get(line, [])
+        all_stations.extend([station.lower() for station in stations_of_line])
+        
+        # Add synonyms for the stations on the specified line
+        for station in stations_of_line:
+            for station_type in stations_with_synonyms.values():
+                if station in station_type:
+                    synonyms = station_type[station]
+                    all_stations.extend([synonym.lower() for synonym in synonyms])
+                    break
+    else:
+        # If no line is specified, add all stations and synonyms
+        for station_type in stations_with_synonyms.values():
+            for station, synonyms in station_type.items():
+                all_stations.append(station.lower())
+                all_stations.extend([synonym.lower() for synonym in synonyms])
 
+    return all_stations
+
+
+def find_station(text, line=None, threshold=80):
+    all_stations = get_all_stations(line)
+
+    # Perform the fuzzy matching with the gathered list of stations
     best_match, score = process.extractOne(text, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
-        for station_type in stations_data.values():
+        for station_type in stations_with_synonyms.values():
             for station, synonyms in station_type.items():
-                if best_match in [station.lower()] + [syn.lower() for syn in synonyms]:
+                if best_match in [station.lower()] + \
+                        [synonym.lower() for synonym in synonyms]:
                     return station
     return None
 
-def find_direction(text):
-    text = format_text(text)
 
+def find_direction(text, line):
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
+
     for keyword in direction_keywords:
         if keyword in text:
             # Split the text at the keyword
@@ -69,134 +94,160 @@ def find_direction(text):
 
                 # Find the first station name in the text after the keyword
                 for word in words_after_keyword:
-                    found_direction = find_station(word)
+                    found_direction = find_station(word, line)
                     if found_direction:
-                        # Remove the entire phrase that includes the direction keyword and the found direction
+                        # Remove the direction and the keyword from the text
                         replace_segment = keyword + ' ' + word
-                        text_without_direction = text.replace(replace_segment, '').strip()
+                        text_without_direction = text.replace(
+                            replace_segment, ''
+                        ).strip()
                         return found_direction, text_without_direction
 
     return None, text
 
+
 def handle_get_off(text):
-    getting_off_keywords = ['ausgestiegen', 'raus', 'aussteigen', 'got off', 'get off', 'getting off', 'steigen aus']
-    
+    getting_off_keywords = [
+        'ausgestiegen',
+        'raus',
+        'aussteigen',
+        'got off',
+        'get off',
+        'getting off',
+        'steigen aus',
+    ]
+
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
             return True
 
-def check_if_station_is_actually_direction(text, ticket_inspector):
-    if ticket_inspector.train == None:
+
+def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
+    if ticket_inspector.line is None:
         return False
-    
-    line = ticket_inspector.train.lower()
-    text = text.lower()
-    
+
+    line = ticket_inspector.line.lower()
+    text = unformatted_text.lower()
+
     # get the word after the line
     line_index = text.rfind(line)
-    after_line = text[line_index + len(line):].strip()
+    after_line = text[line_index + len(line) :].strip()
     after_line_words = after_line.split()
-    print(f'After line: {after_line_words}') 
     if len(after_line_words) > 0:
         # check if the word after the line is a station
-        found_station = find_station(after_line_words[0])
-        
+        found_station = find_station(after_line_words[0], ticket_inspector.line)
+
         all_final_stations = []
-        for line, stations in merged_lines.items():
+        for stations in lines_with_stations.items():
             all_final_stations.append(stations[0])
             all_final_stations.append(stations[-1])
-            
-        if ticket_inspector.train and found_station:
+
+        if ticket_inspector.line and found_station:
             # check if the station is in the line
-            if found_station == merged_lines[ticket_inspector.train][0] or found_station == merged_lines[ticket_inspector.train][-1]:
+            if (
+                found_station == lines_with_stations[ticket_inspector.line][0]
+                or found_station == lines_with_stations[ticket_inspector.line][-1]
+            ):
                 return True
-        elif found_station and found_station in all_final_stations:
-            return True
-        
+
     return False
 
+
 def correct_direction(ticket_inspector, lines_with_final_station):
-    print('Correcting direction')
-    print(ticket_inspector.__dict__)
-    if ticket_inspector.train in lines_with_final_station.keys():
-        print('Train is in lines_with_final_station')
-        train_stations = lines_with_final_station[ticket_inspector.train]
-        if ticket_inspector.direction in [train_stations[0], train_stations[-1]]:
-            print('Direction is in final stations')
-            return ticket_inspector 
-        elif ticket_inspector.station in lines_with_final_station[ticket_inspector.train] and ticket_inspector.train and ticket_inspector.direction in lines_with_final_station[ticket_inspector.train]:
-            print('Direction is in stations')
+    if ticket_inspector.line in lines_with_final_station.keys():
+        stations_of_line = lines_with_final_station[ticket_inspector.line]
+        if ticket_inspector.direction in [stations_of_line[0], stations_of_line[-1]]:
+            return ticket_inspector
+        elif (
+            ticket_inspector.station in lines_with_final_station[ticket_inspector.line]
+            and ticket_inspector.line
+            and ticket_inspector.direction
+            in lines_with_final_station[ticket_inspector.line]
+        ):
             # Get index of the station and direction in the list of stations
-            station_index = lines_with_final_station[ticket_inspector.train].index(ticket_inspector.station)
-            direction_index = lines_with_final_station[ticket_inspector.train].index(ticket_inspector.direction)
-            
-            # If the station is before the direction set the final station as the direction
+            station_index = lines_with_final_station[ticket_inspector.line].index(
+                ticket_inspector.station
+            )
+            direction_index = lines_with_final_station[ticket_inspector.line].index(
+                ticket_inspector.direction
+            )
+
+            # Check if the station is before or after the direction to correct it
+            # example: 'S7 jetzt Warschauer nach Ostkreuz' should be S7 to Ahrensfelde
             if station_index < direction_index:
-                print('Station is before direction')
-                ticket_inspector.direction = lines_with_final_station[ticket_inspector.train][-1]
+                ticket_inspector.direction = lines_with_final_station[
+                    ticket_inspector.line
+                ][-1]
             else:
-                print('Station is after direction')
-                ticket_inspector.direction = lines_with_final_station[ticket_inspector.train][0]
-            
+                ticket_inspector.direction = lines_with_final_station[
+                    ticket_inspector.line
+                ][0]
+
             return ticket_inspector
         else:
             print('Not enough information to correct direction')
             ticket_inspector.direction = None
             return ticket_inspector
-          
-    else: 
+
+    else:
         print('Train is not in lines_with_final_station')
         return ticket_inspector
-                 
-def verify_direction(ticket_inspector, text, unformatted_text):    
-    # Check if the direction is the final station of the line and correct it 
-    ticket_inspector = correct_direction(ticket_inspector, merged_lines)
-    
+
+
+def verify_direction(ticket_inspector, text, unformatted_text):
+    # Check if the direction is the final station of the line and correct it
+    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
+
     # Set the Ringbahn to always be directionless
-    if ticket_inspector.train == 'S41' or ticket_inspector.train == 'S42':
+    if ticket_inspector.line == 'S41' or ticket_inspector.line == 'S42':
         ticket_inspector.direction = None
 
-    # if station is mentioned directly after the line, it is the direction, for example "U8 Hermannstraße" is most likely "U8 Richtung Hermannstraße"
+    # if station is mentioned directly after the line, it is the direction
+    # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
     if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
-        print('Station is actually direction')
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
-        
+
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
-        print('Ticket inspector got off the train')
         ticket_inspector.direction = None
-        ticket_inspector.train = None
-    
+        ticket_inspector.line = None
+
     return ticket_inspector
 
+
 def extract_ticket_inspector_info(unformatted_text):
-    found_line = find_line(unformatted_text, merged_lines)
-    
+    found_line = find_line(unformatted_text, lines_with_stations)
+    ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
+
     text = format_text(unformatted_text)
-    result = find_direction(text)
+    result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
+    ticket_inspector.direction = found_direction
     text_without_direction = result[1]
 
-    print(f'Text without direction: {text_without_direction}')
-    found_station = find_station(text_without_direction)
-    
+    found_station = find_station(text_without_direction, ticket_inspector.line)
+    ticket_inspector.station = found_station
+
     if found_line or found_station or found_direction:
-        ticket_inspector = TicketInspector(time=None, train=found_line, station=found_station, direction=found_direction)
-        verified_ticket_inspector = verify_direction(ticket_inspector, text, unformatted_text)
+        verified_ticket_inspector = verify_direction(
+            ticket_inspector, text, unformatted_text
+        )
         return verified_ticket_inspector.__dict__
     else:
         return None
-    
-if __name__ == "__main__":
+
+
+if __name__ == '__main__':
     load_dotenv()  # take environment variables from .env.
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     bot = telebot.TeleBot(BOT_TOKEN)
 
     print('Bot is running...🏃‍♂️')
 
-    @bot.message_handler(func=lambda msg: True)
+    # Messages set to private for testing purposes
+    @bot.message_handler(func=lambda message: message.chat.type == 'private')
     def get_info(message):
         info = extract_ticket_inspector_info(message.text)
         if info:
@@ -204,5 +255,5 @@ if __name__ == "__main__":
         else:
             print('No valuable information found')
             return None
-            
+
     bot.infinity_polling()
