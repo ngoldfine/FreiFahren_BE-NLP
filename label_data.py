@@ -53,7 +53,7 @@ def label_data(messages):
                         2x Hellblau U8 Hermannplatz Richtung Wittenau am
                         Bahnsteig"
 
-                        Beispiel Antwort: 
+                        Beispiel Antwort:
                         """
                         Direction: "Wittenau",
                         Station: "Hermannplatz",
