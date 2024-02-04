@@ -173,15 +173,15 @@ def label_data(messages):
                     '''},
                  
                     {'role': 'user',
-                     'content': f"""
+                     'content': f'''
                         Atme tief durch und label diese Nachricht
                         nach deinen Anweisungen.
 
                         Nachricht:
                         {message}
-                    """}
+                    '''}
                 ],
-                temperature=0.25
+                temperature=0
             )
             # Parse the response to extract station, line, and direction
             content = response.choices[0].message.content
