@@ -1,6 +1,7 @@
 # flake8: noqa
 
 from os import pipe
+import os
 import spacy
 from spacy.tokens import Doc
 from spacy.training import Example
@@ -14,8 +15,18 @@ from tqdm import tqdm
 import random
 import json
 
+nlp = spacy.load('de_core_news_sm')
+STATION_NAMES = []
+
+with open('data/stations_and_lines.json', 'r') as f:
+    stations_and_lines = json.load(f)
+
+for lines in stations_and_lines:
+    for station in stations_and_lines[lines]:
+        STATION_NAMES.append(station)
+
 RENDERING_OPTIONS = {"ents": ["STATION"], "colors": {"STATION": "linear-gradient(90deg, #aa9cfc, #fc9ce7)"}}
-EPOCHS = 1
+EPOCHS = 200
 
 def train(nlp: Language, train_data: list, EPOCHS: int = EPOCHS):
     optimizer = nlp.create_optimizer()
@@ -26,6 +37,10 @@ def train(nlp: Language, train_data: list, EPOCHS: int = EPOCHS):
             doc = nlp.make_doc(raw_text)
             example = Example.from_dict(doc, {"entities": entity_offsets})
             nlp.update([example], sgd=optimizer)
+
+    if not os.path.exists('data/models/ner_model'):
+        os.makedirs('data/models/ner_model')
+    nlp.to_disk('data/models/ner_model')
 
 def pipeline(nlp: Language, text: str):
 
@@ -62,7 +77,7 @@ def fuzzy_match_stations(recognized_entities, station_names):
     matches = []
     for entity in recognized_entities:
         match, score, _ = process.extractOne(entity, station_names, scorer=fuzz.token_set_ratio)
-        if score > 10:
+        if score > 50:
             matches.append((entity, match, score))
     return matches
 
@@ -73,24 +88,3 @@ def identify_stations(text, nlp: Language, station_names: list):
     recognized_stations = pipeline(nlp, text)
     matches = fuzzy_match_stations(recognized_stations, station_names)
     return matches
-
-def main():
-    nlp = spacy.load('en_core_web_sm')
-    STATION_NAMES = []
-
-    with open('data/stations_and_lines.json', 'r') as f:
-        stations_and_lines = json.load(f)
-
-    for lines in stations_and_lines:
-        for station in stations_and_lines[lines]:
-            STATION_NAMES.append(station)
-
-    matches = identify_stations('I need a taxi to Meringdam. Deutsche Oper. Krumme Lanke', nlp, STATION_NAMES)
-
-    print(matches)
-
-
-if __name__ == '__main__':
-    main()
-
-    # displacy.serve(doc, style='ent', auto_select_port=True, options=RENDERING_OPTIONS)
