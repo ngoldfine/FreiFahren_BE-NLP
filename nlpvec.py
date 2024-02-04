@@ -1,10 +1,10 @@
-from hdclib import generate_random_vector
-from hdclib import shift, bind, bundle, normalize, cosine_similarity
+from lib.hdclib import generate_random_vector
+from lib.hdclib import shift, bind, bundle, normalize, cosine_similarity
 import os
 import json
 import random 
 import numpy as np
-from test_cases import test_cases
+from data.test_cases import test_cases
 
 # SETTINGS 
 
@@ -12,7 +12,7 @@ N = 10000
 
 DIRECTORY = "hypervector"
 
-with open('stations_and_lines.json', 'r') as f:
+with open('data/stations_and_lines.json', 'r') as f:
     data = json.load(f)
     f.close()
 lines = []
@@ -148,7 +148,7 @@ def encodeMessage(message, num_words=None):
 def encodeStations():
     vars = loadAlphabet()
 
-    with open('stations_and_lines.json', 'r') as file:
+    with open('data/stations_and_lines.json', 'r') as file:
         data = json.load(file)
 
     for line in range(0,25):
@@ -183,7 +183,7 @@ def encodeStations():
 
 def findStationVec(message):
     message_encoded = encodeMessage(message)
-    with open('stations_and_lines.json', 'r') as file:
+    with open('data/stations_and_lines.json', 'r') as file:
         dataStations = json.load(file)
 
         nearest_station = 0.0

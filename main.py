@@ -14,7 +14,7 @@ class TicketInspector:
         self.direction = direction
       
 # Get lines and their stations       
-with open('stations_and_lines.json', 'r') as f:
+with open('data/stations_and_lines.json', 'r') as f:
     merged_lines = json.load(f)    
 
 def find_line(text, lines):
