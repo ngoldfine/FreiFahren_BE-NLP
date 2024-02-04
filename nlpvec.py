@@ -26,9 +26,8 @@ def encodeAlphabet():
 
     # from a to z and space using ascii code
     # from a to z, A to Z, and special characters using ascii code
-    for letter in list(map(chr, range(ord('a'), ord('z')+1))) + list(map(chr, range(ord('A'), ord('Z')+1))) + ['ö', 'ä', 'ü', 'ß', '.', '-', '(', ')', '/'] + list(map(str, range(0, 10))):        
+    for letter in list(map(chr, range(ord('a'), ord('z') +1))) + list(map(chr, range(ord('A'), ord('Z')+1))) + ['ö', 'ä', 'ü', 'ß', '.', '-', '(', ')', '/'] + list(map(str, range(0, 10))):        
         vars[letter] = generate_random_vector(N, empty=False)
-
 
     vars[' '] = generate_random_vector(N)
     
@@ -47,7 +46,8 @@ def loadAlphabet():
     alphabet = np.loadtxt(f'{DIRECTORY}/alphabet.txt')
     vars = {}
     i = 0
-    for letter in list(map(chr, range(ord('a'), ord('z')+1))) + list(map(chr, range(ord('A'), ord('Z')+1))) + ['ö', 'ä', 'ü', 'ß', '.', '-', '(', ')', '/'] + list(map(str, range(0, 10))):        
+
+    for letter in list(map(chr, range(ord('a'), ord('z') + 1))) + list(map(chr, range(ord('A'), ord('Z')+1))) + ['ö', 'ä', 'ü', 'ß', '.', '-', '(', ')', '/'] + list(map(str, range(0, 10))):        
        
         vars[letter] = alphabet[i]
         i += 1

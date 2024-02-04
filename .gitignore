@@ -4,3 +4,4 @@
 .DS_Store
 /hypervector
 /models
+.vscode/settings.json

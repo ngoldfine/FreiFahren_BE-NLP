@@ -648,7 +648,8 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                 print(f'Result: {result}')
 
                 # Check and print only if there's a mismatch for train
-                actual_line = result.get('line')
+                actual_line = result['line'] if result else None
+
                 if actual_line != expected_line:
                     line_msg = (
                         f'Text: "{text}"\n'
@@ -658,7 +659,8 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                     self.assertEqual(actual_line, expected_line, line_msg)
 
                 # Check and print only if there's a mismatch for direction
-                actual_direction = result.get('direction')
+                actual_direction = result['direction'] if result else None
+
                 if actual_direction != expected_direction:
                     direction_msg = (
                         f'Text: "{text}"\n'
@@ -670,7 +672,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                     )
 
                 # Check and print only if there's a mismatch for station
-                actual_station = result.get('station')
+                actual_station = result['stations'] if result else None
                 if actual_station != expected_station:
                     station_msg = (
                         f'Text: "{text}"\n'

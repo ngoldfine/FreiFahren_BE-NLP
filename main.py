@@ -1,9 +1,9 @@
-import os
+# import os
 import re
 from fuzzywuzzy import process
-import telebot
+# import telebot
 import json
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 
 class TicketInspector:
@@ -14,7 +14,7 @@ class TicketInspector:
         self.direction = direction
 
 
-with open('stations_and_lines.json', 'r') as f:
+with open('data/stations_and_lines.json', 'r') as f:
     lines_with_stations = json.load(f)
 
 
@@ -35,7 +35,7 @@ def format_text(text):
     return text
 
 
-with open('data.json', 'r') as f:
+with open('data/data.json', 'r') as f:
     stations_with_synonyms = json.load(f)
 
 
@@ -68,7 +68,7 @@ def find_station(text, line=None, threshold=80):
     all_stations = get_all_stations(line)
 
     # Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(text, all_stations)
+    best_match, score = process.extractOne(text, all_stations)  # type: ignore
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():
@@ -239,21 +239,21 @@ def extract_ticket_inspector_info(unformatted_text):
         return None
 
 
-if __name__ == '__main__':
-    load_dotenv()  # take environment variables from .env.
-    BOT_TOKEN = os.getenv('BOT_TOKEN')
-    bot = telebot.TeleBot(BOT_TOKEN)
+# if __name__ == '__main__':
+#     load_dotenv()  # take environment variables from .env.
+#     BOT_TOKEN = os.getenv('BOT_TOKEN')
+#     bot = telebot.TeleBot(BOT_TOKEN)
 
-    print('Bot is running...🏃‍♂️')
+#     print('Bot is running...🏃‍♂️')
 
-    # Messages set to private for testing purposes
-    @bot.message_handler(func=lambda message: message.chat.type == 'private')
-    def get_info(message):
-        info = extract_ticket_inspector_info(message.text)
-        if info:
-            print(info)
-        else:
-            print('No valuable information found')
-            return None
+#     # Messages set to private for testing purposes
+#     @bot.message_handler(func=lambda message: message.chat.type == 'private')
+#     def get_info(message):
+#         info = extract_ticket_inspector_info(message.text)
+#         if info:
+#             print(info)
+#         else:
+#             print('No valuable information found')
+#             return None
 
-    bot.infinity_polling()
+#     bot.infinity_polling()
