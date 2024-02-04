@@ -26,8 +26,8 @@ def label_data(messages):
                     {'role': 'system',
                      'content': '''
                         Du bist ein Experte des Berliner Öffentlichen
-                        Nahverkehrs und musst dem Nutzer helfen Daten zu
-                        labeln.
+                        Nahverkehrs und musst dem Nutzer helfen Daten
+                        zu labeln.
 
                         Der Nutzer wird dir eine Nachricht, aus einem Telegram
                         Chat geben, indem der der Standort von Kontrolleuren
@@ -53,7 +53,7 @@ def label_data(messages):
                         2x Hellblau U8 Hermannplatz Richtung Wittenau am
                         Bahnsteig"
 
-                        Beispiel Antwort:
+                        Beispiel Antwort: 
                         """
                         Direction: "Wittenau",
                         Station: "Hermannplatz",
@@ -61,10 +61,10 @@ def label_data(messages):
                         """
 
                         Wenn die Nachricht in einem Punkt keine Relevanten
-                        Infos enthält, setze ein leere Zeichenkette ein. Falls
-                        sie gar keine Relevanten Infos enthält, setzte bei
-                        Direction, Station und Line eine leere Zeichenkette
-                        ein.
+                        Infos enthält, setze ein leere Zeichenkette ein.
+                        Falls sie gar keine Relevanten Infos enthält, setzte
+                        bei Direction, Station und Line eine leere
+                        Zeichenkette ein.
 
                         Beispiel Nachricht:
                         "U 8 Heinrich Heine str"
@@ -80,18 +80,36 @@ def label_data(messages):
                         Format ist, da sie geparsed wird von einem Programm
                         welches dieses Format erwartet.
 
-                        Es gibt ein paar extra Regeln,
-                        die du beachten solltest:
+                        Es gibt ein paar extra Regeln, die du beachten
+                        solltest:
                         1. Die Bahnen S41 und S42 sollten nie eine Richtung
                         haben, also sollte immer eine leere Zeichenkette für
-                        Direction eingesetzt werden.
+                        Direction eingesetzt werden. Ebenfalls kannst du "Ring"
+                        immer als S41 oder S42 behandeln.
                         2. Wenn erwähnt wurde, dass die Kontrolleure die Bahn
                         verlassen haben sollte die Line und Direction auf eine
-                        leere Zeichenkette gesetzt werden.
+                        leere Zeichenkette gesetzt werden. Auch wenn erwähnt
+                        wird, dass die Kontrolleure die Bahn verlassen, gilt
+                        diese Regel.
                         3. Straßenbahnen können ignoriert werden.
                         4. Manchmal geben Nutzer eine Richtung an die nicht
                         die Endhaltestelle der Bahn ist. Dafür solltest die
-                        Endhaltestellen der Bahn im Kopf behalten.
+                        Endhaltestellen der Bahn im Kopf behalten und
+                        korrigieren falls es notwendig ist. Ebenfalls wenn
+                        eine Falsche Richtung angegeben wurde die nicht
+                        Endhaltestelle der Line ist, kannst du dir aus den
+                        Infos der Station, Line und gegebener Direction die
+                        korrekte Direction zusammen puzzeln.
+
+                        Beispiel Nachricht: "Controller in S7 Richtung
+                        Alexanderplatz Was just checked in jannowitzbrucke",
+                        "Jannowitzbrücke"
+
+                        Korrekte Antwort: """
+                        Direction: "Potsdam Hauptbahnhof",
+                        Station: "Jannowitzbrücke",
+                        Linie: "S7"
+                        """
 
                         Dies sind die Endhaltestellen der Linien:
 
@@ -122,9 +140,36 @@ def label_data(messages):
                         vor der Station zurück gibst und dass du Straßen und
                         Plätze immer zusammen schreibst.
 
-                        Beispielsweise statt "S + U Hauptbahnhof",
-                        nur "Hauptbahnhof" oder statt "S Insbrucker Platz"
-                        nur "Insbruckerplatz".
+                        Beispielsweise statt "S + U Hauptbahnhof", nur
+                        "Hauptbahnhof" oder statt "S Insbrucker Platz" nur
+                        "Insbruckerplatz".
+
+                        Es ist extrem wichtig, dass du keine Synonyme für die
+                        Station und Direction verwendest wie bspw. Zoo und
+                        Alex sondern immer den vollen Namen der Station
+                        wiedergibst bswp. Zoologischer Garten und
+                        Alexanderplatz.
+                        Ebenfalls ist es wichtig, dass du bei Line nur die
+                        zulässigen Linien die ich geben habe ausgibst. Etwas
+                        wie einfach nur S oder U ist nicht zulässig, die
+                        Linien müssen immer ein Buchstabe gefolgt von einer
+                        Zahl sein.
+
+                        Bevor du also eine Station, Direction oder Line
+                        labelst solltest du überlegen, ob es der korrekte Name
+                        für diese Station, Direction oder Line ist. Falls du
+                        feststellst, dass die Richtung kein korrekter Name ist,
+                        dann korrigiere es mit dem richtigen Namen.
+
+                        Beispielsweise bei dieser Nachricht: "S Alexanderplatz
+                        west direction at least one ticket" ist das korrekte
+                        label:
+
+                        """
+                        Direction: "",
+                        Station: "Alexanderplatz",
+                        Line: ""
+                        """
                     '''},
                  
                     {'role': 'user',
