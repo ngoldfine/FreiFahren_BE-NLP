@@ -24,13 +24,13 @@ def label_data(messages):
                 model='gpt-4-0125-preview',
                 messages=[
                     {'role': 'system',
-                     'content': """
+                     'content': '''
                      You are a helpful assistant. Your task is to label the
                      given data with station, line, and direction.
-                    """},
+                    '''},
                  
                     {'role': 'user',
-                     'content': f"""
+                     'content': f'''
                     I will give you the message and you will have to label it.
                     The format should be like this:
                     Direction: 'example direction',
@@ -39,7 +39,7 @@ def label_data(messages):
 
                     Now, here is the message:
                     {message}
-                    """}
+                    '''}
                 ],
                 temperature=0.25
             )
