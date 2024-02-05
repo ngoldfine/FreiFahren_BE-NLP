@@ -4,7 +4,8 @@ from fuzzywuzzy import process
 # import telebot
 import json
 # from dotenv import load_dotenv
-
+from NER import identify_stations  # type: ignore
+# from fuzzy import getSimilar  # type: ignore
 
 class TicketInspector:
     def __init__(self, line, station, direction):
@@ -39,6 +40,8 @@ with open('data/data.json', 'r') as f:
     stations_with_synonyms = json.load(f)
 
 
+
+
 def get_all_stations(line=None):
     all_stations = []
 
@@ -64,20 +67,23 @@ def get_all_stations(line=None):
     return all_stations
 
 
+# def find_station(text, line=None, threshold=80):
+#     all_stations = get_all_stations(line)
+
+#     # Perform the fuzzy matching with the gathered list of stations
+#     best_match, score = process.extractOne(text, all_stations)  # type: ignore
+#     if score >= threshold:
+#         # Find the station that matches the best match
+#         for station_type in stations_with_synonyms.values():
+#             for station, synonyms in station_type.items():
+#                 if best_match in [station.lower()] + \
+#                         [synonym.lower() for synonym in synonyms]:
+#                     return station
+#     return None
+
+
 def find_station(text, line=None, threshold=80):
-    all_stations = get_all_stations(line)
-
-    # Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(text, all_stations)  # type: ignore
-    if score >= threshold:
-        # Find the station that matches the best match
-        for station_type in stations_with_synonyms.values():
-            for station, synonyms in station_type.items():
-                if best_match in [station.lower()] + \
-                        [synonym.lower() for synonym in synonyms]:
-                    return station
-    return None
-
+    return identify_stations(text)
 
 def find_direction(text, line):
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
