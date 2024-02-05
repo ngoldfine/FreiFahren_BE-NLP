@@ -4,7 +4,7 @@ from fuzzywuzzy import process
 # import telebot
 import json
 # from dotenv import load_dotenv
-from NER import identify_stations  # type: ignore
+from ner_lstm import identify_stations  # type: ignore
 # from fuzzy import getSimilar  # type: ignore
 
 class TicketInspector:

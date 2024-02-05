@@ -7,4 +7,5 @@
 
 ## Missklassifiziert oder gar nicht klassifiziert
 
-* 
+* Nur linie als anfang, meldungen basierend auf der Linie
+* Wahrscheinlichkeiten darstellen,

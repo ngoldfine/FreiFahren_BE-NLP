@@ -31,8 +31,7 @@ def fuzzy(text):
     doc = nlp(text)
     matches = matcher(doc)
     
-    
-        
+
     matchList = []
 
     for match_id, start, end in matches:
@@ -48,6 +47,7 @@ def fuzzy_stations(recognized_stations):
     matches = []
     for stations in recognized_stations:
         matches.append(fuzzy(stations))
+    
     
     return matches
         
