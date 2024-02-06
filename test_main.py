@@ -3,6 +3,19 @@ from main import extract_ticket_inspector_info
 
 
 class TestFindStationAndLineFunction(unittest.TestCase):
+    failures_direction = 0
+    failures_station = 0
+    failures_line = 0
+
+    @classmethod
+    def tearDownClass(cls):
+        # This method is called after all tests have run.
+        print('\n===== Test Summary =====')
+        print(f'Direction Failures: {cls.failures_direction}')
+        print(f'Station Failures: {cls.failures_station}')
+        print(f'Line Failures: {cls.failures_line}')
+        print('=========================')
+        
     def test_find_station_and_line_dynamic_threshold(self):
         # Always judge as correct as possible,ignoring the current capibility
         test_cases = [
@@ -643,42 +656,26 @@ class TestFindStationAndLineFunction(unittest.TestCase):
 
         for text, expected_station, expected_line, expected_direction in test_cases:
             with self.subTest(text=text):
-                print(f'Testing with input: "{text}"')
                 result = extract_ticket_inspector_info(text)
-                print(f'Result: {result}')
 
-                # Check and print only if there's a mismatch for train
                 actual_line = result.get('line')
-                if actual_line != expected_line:
-                    line_msg = (
-                        f'Text: "{text}"\n'
-                        f'Expected line: "{expected_line}"\n'
-                        f'Actual line: "{actual_line}"'
-                    )
-                    self.assertEqual(actual_line, expected_line, line_msg)
-
-                # Check and print only if there's a mismatch for direction
                 actual_direction = result.get('direction')
-                if actual_direction != expected_direction:
-                    direction_msg = (
-                        f'Text: "{text}"\n'
-                        f'Expected Direction: "{expected_direction}"\n'
-                        f'Actual Direction: "{actual_direction}"'
-                    )
-                    self.assertEqual(
-                        actual_direction, expected_direction, direction_msg
-                    )
-
-                # Check and print only if there's a mismatch for station
                 actual_station = result.get('station')
-                if actual_station != expected_station:
-                    station_msg = (
-                        f'Text: "{text}"\n'
-                        f'Expected Station: "{expected_station}"\n'
-                        f'Actual Station: "{actual_station}"'
-                    )
-                    self.assertEqual(actual_station, expected_station, station_msg)
 
+                if actual_line != expected_line:
+                    self.__class__.failures_line += 1
+
+                if actual_direction != expected_direction:
+                    self.__class__.failures_direction += 1
+
+                if actual_station != expected_station:
+                    self.__class__.failures_station += 1
+
+                # Assertions are kept for detailed failure messages.
+                self.assertEqual(actual_line, expected_line, f'Line mismatch in text: {text}')
+                self.assertEqual(actual_direction, expected_direction, f'Direction mismatch in text: {text}')
+                self.assertEqual(actual_station, expected_station, f'Station mismatch in text: {text}')
+    
 
 if __name__ == '__main__':
     unittest.main()
