@@ -1,18 +1,20 @@
 import unittest
 from collections import defaultdict
-from main import extract_ticket_inspector_info  # Ensure correct import
-from test_cases import test_cases  # Ensure test_cases are defined
+from main import extract_ticket_inspector_info
+from test_cases import test_cases
+
+red = '\033[91m'
+reset = '\033[0m'
+gray = '\033[90m'
 
 
 def format_mismatch(expected, actual, label):
-    red = '\033[91m'
-    reset = '\033[0m'
     if expected != actual:
         # Highlight mismatch in red
-        return f'{label} Found: {red}{actual}{reset} Expected: {red}{expected}{reset}'
+        return f'{red}{label} Found: {actual} | Expected: {expected}{reset}'
     else:
         # No color for matches
-        return f'{label} Found: {actual} Expected: {expected}'
+        return f'{label} Found: {actual} | Expected: {expected}'
 
 
 class TestFindStationAndLineFunction(unittest.TestCase):
@@ -37,7 +39,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        print('\n===== Custom Test Failures Summary =====\n')
+        print('\n===== Failures Summary =====\n')
         if cls.failures:
             for failure in cls.failures:
                 print(failure)
@@ -46,26 +48,26 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             print('All tests passed successfully!')
 
         print('\n===== Detailed Analysis =====\n')
-        print(f'Direction Failures: {sum(cls.failures_direction.values())}')
-        print(f'Number of directions not found when expected: '
+        print(f'{red}Direction Failures: {sum(cls.failures_direction.values())}{reset}')
+        print(f'Number of not found directions: '
               f'{cls.direction_none_when_expected}\n')
-        print('Missclassification summary for Direction:\n' +
+        print('Missclassifications (expected -> found):\n' +
               cls.analyze_failures(cls.failures_direction))
           
         print('\n-------------------------\n')
           
-        print(f'Station Failures: {sum(cls.failures_station.values())}')
-        print(f'Number of stations not found when expected: '
+        print(f'{red}Station Failures: {sum(cls.failures_station.values())}{reset}')
+        print(f'Number of not found station: '
               f'{cls.station_none_when_expected}\n')
-        print('Missclassification summary for Station:\n' +
+        print('Missclassifications (expected -> found):\n' +
               cls.analyze_failures(cls.failures_station))
           
         print('\n-------------------------\n')
           
-        print(f'Line Failures: {sum(cls.failures_line.values())}')
-        print(f'Number of lines not found when expected: '
+        print(f'{red}Line Failures: {sum(cls.failures_line.values())}{reset}')
+        print(f'Number of lines not found: '
               f'{cls.line_none_when_expected}\n')
-        print('Missclassification summary for Line:\n' +
+        print('Missclassifications (expected -> found):\n' +
               cls.analyze_failures(cls.failures_line))
         print('=========================\n')
 
@@ -105,8 +107,11 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                                                 ] += 1
 
                 if has_mismatch:
-                    self.__class__.failures.append(f'\nInput text: {text}\n' +
-                                                   '\n'.join(messages))
+                    self.__class__.failures.append(f'''{gray}Input text: {text}
+                                                   {reset}\n''' +
+                                                   '\n'.join(messages) +
+                                                   '\n\n-----------------------------\n'
+                                                   )
 
 
 if __name__ == '__main__':
