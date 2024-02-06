@@ -1,3 +1,4 @@
+
 # flake8: noqa
 import spacy
 from spacy import displacy
@@ -50,9 +51,23 @@ TEST_DATA = [["s-bahn kontrolleure friedrichstrasse 2mal weiblich eine kräftig 
     ["S7 Richtung potsdam Hbf, 3 w gelesen, gleich griebnitzsee",
         {"entities":[(0,2,"LINE"),(12,23,"STATION"),(45,57,"STATION")]}]]
 
-# GETTING DATA
+# GETTING MESSAGES DATA
 for data in ANNOTATED_DATA['annotations']:
     TRAIN_DATA.append(data)
+
+# GETTING ALL THE SYNONYMS
+with open('data/data.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+for station in data['sBahn_stations_with_synomyms']:
+    for synonyms in data['sBahn_stations_with_synomyms'][f'{station}']:
+       TRAIN_DATA.append([synonyms, {'entities': [[0, len(synonyms), "STATION"]]}])
+
+for station in data['uBahn_stations_with_synomyms']:
+    for synonyms in data['uBahn_stations_with_synomyms'][f'{station}']:
+       TRAIN_DATA.append([synonyms, {'entities': [[0, len(synonyms), "STATION"]]}])
+
+# GETTING ALL THE FORMAL LINES AND STATIONS
 
 with open('data/stations_and_lines.json', 'r', encoding='utf-8') as file:
    stations_and_lines = json.load(file)
@@ -69,17 +84,15 @@ ner = nlp.create_pipe("ner")
 nlp.add_pipe('ner')
 
 
-
-print(nlp.pipe_names)
 # Add your specific labels to the NER component
 for _, annotations in TRAIN_DATA:
     for ent in annotations.get("entities"):
         ner.add_label(ent[2])
 
-
 def train(EPOCHS=5, until_loss=10, DATASET=TRAIN_DATA, suffix=""):
     # Assuming TRAIN_DATA is a list of tuples, each containing a text and a dictionary of annotations
     examples = [Example.from_dict(nlp.make_doc(text), annotations) for text, annotations in DATASET]
+
     epoch_count = 0
     # Train the model
     optimizer = nlp.initialize()
@@ -109,40 +122,30 @@ def train(EPOCHS=5, until_loss=10, DATASET=TRAIN_DATA, suffix=""):
     return MODEL_PATH
 
         
-def identify_stations(text, testing=False, MODEL_PATH='models/06-02-2024___00.34.51_EPOCHS_100'):
-  nlp.from_disk(MODEL_PATH)
-  match = nlp(text)
-  matches = []
-  for ent in match.ents:
-      if testing == True:
-        matches.append(ent.label_)
-      else:
-        matches.append(ent)
+def identify_stations(text, testing=False, MODEL_PATH=None, serve=False, return_doc=False):
+    if MODEL_PATH == None:
+        return print('Please add a model_path')
+    
+    nlp.from_disk(MODEL_PATH)
+    match = nlp(text)
+    matches = []
+    for ent in match.ents:
+        if testing == True:
+            matches.append(ent.label_)
+        else:
+            matches.append(ent)
+            
+    if serve == True:
+        displacy.serve(match, 'ent', auto_select_port=True)
+    if return_doc == True:
+        return match
+    
+    return matches
 
-  
-  return matches
 
-
-
-def testANNOTS():
-    tagCount = 0
-    correctCount = 0
-    for dataset in ANNOTATED_DATA['annotations']:
-        for data in dataset:
-            test = []
-            if type(data) == str:
-              print(f"Message: {data}")
-              test_message = identify_stations(data)
-        
-            if type(data) == dict:
-              for item in data['entities']:
-                  tagCount += 1
-                  if item[2] in test_message:
-                      correctCount += 1
-          
-    print(f"\nResult: {correctCount/tagCount} Tags: {tagCount} Correct annots: {correctCount}" )
-
-def test(DATASET=TEST_DATA, MODEL_PATH='models/06-02-2024___01.07.45_EPOCHS_500_with_station_names'):
+def testANNOTS(DATASET=TEST_DATA, MODEL_PATH=None):
+    if MODEL_PATH == None:
+        return print('Please add a model_path')
     tagCount = 0
     correctCount = 0
     for dataset in DATASET:
@@ -160,5 +163,16 @@ def test(DATASET=TEST_DATA, MODEL_PATH='models/06-02-2024___01.07.45_EPOCHS_500_
           
     print(f"\nResult: {correctCount/tagCount} Tags: {tagCount} Correct annots: {correctCount}" )
 
+def testMessages(DATASET='data/messages.txt', MODEL_PATH=None):
+    if MODEL_PATH == None:
+        return print('Please add a model_path')
+    with open(DATASET) as file:
+        messages = file.read().split('\n')
 
+    docs = []
+    for message in messages:
+        matches = identify_stations(message, MODEL_PATH=MODEL_PATH, return_doc=True)
+        docs.append(matches)
+
+    displacy.serve(docs, style='ent', auto_select_port=True)
 
