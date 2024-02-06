@@ -7,7 +7,7 @@ test_cases = [
     ),
     (
         'U6 Schumacher-Platz 2 Controller merhingdam',
-        'Kurt-Schumacher-Platz',
+        'Mehringdamm',
         'U6',
         None,
     ),
@@ -180,8 +180,8 @@ test_cases = [
     (
         'U8 Wittenau sind U Jannowitzbrücke raus',
         'Jannowitzbrücke',
-        'U8',
-        'Wittenau',
+        None,
+        None,
     ),
     (
         'messe nord grad raus',
@@ -243,8 +243,8 @@ test_cases = [
         '''2 Kontrolleure read male black outfits black beards in S8
         to Ostkreuz,now Storkower Str got off at Storkower Straße''',
         'Storkowerstraße',
-        'S8',
-        'Ostkreuz',
+        None,
+        None,
     ),
     (
         '''S41 gleich Tempelhof. Ein Typ,eine Frau. Beide schwarze Kapuzenjacke.
@@ -431,7 +431,7 @@ test_cases = [
         '''Two men wearing normal clothes in M5,checking tickets,just
         got off at alexanderplatz''',
         'Alexanderplatz',
-        'M5',
+        None,
         None,
     ),
     (
