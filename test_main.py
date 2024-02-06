@@ -3,6 +3,7 @@ from collections import defaultdict
 from main import extract_ticket_inspector_info  # Ensure correct import
 from test_cases import test_cases  # Ensure test_cases are defined
 
+
 def format_mismatch(expected, actual, label):
     red = '\033[91m'
     reset = '\033[0m'
@@ -26,16 +27,17 @@ class TestFindStationAndLineFunction(unittest.TestCase):
     @classmethod
     def analyze_failures(cls, failures_dict):
         sorted_failures = sorted(
-            failures_dict.items(), 
-            key=lambda item: item[1], 
+            failures_dict.items(),
+            key=lambda item: item[1],
             reverse=True
         )
-        failure_summary = '\n'.join([f'{failure}: {count} times' for failure, count in sorted_failures])
+        failure_summary = '\n'.join(
+            [f'{failure}: {count} times' for failure, count in sorted_failures])
         return failure_summary if failure_summary else 'No data'
 
     @classmethod
     def tearDownClass(cls):
-        print(f'\n===== Custom Test Failures Summary =====\n')
+        print('\n===== Custom Test Failures Summary =====\n')
         if cls.failures:
             for failure in cls.failures:
                 print(failure)
@@ -45,20 +47,26 @@ class TestFindStationAndLineFunction(unittest.TestCase):
 
         print('\n===== Detailed Analysis =====\n')
         print(f'Direction Failures: {sum(cls.failures_direction.values())}')
-        print(f'Number of directions not found when expected: {cls.direction_none_when_expected}\n')
-        print('Missclassification summary for Direction:\n' + cls.analyze_failures(cls.failures_direction))
-        
+        print(f'Number of directions not found when expected: '
+              f'{cls.direction_none_when_expected}\n')
+        print('Missclassification summary for Direction:\n' +
+              cls.analyze_failures(cls.failures_direction))
+          
         print('\n-------------------------\n')
-        
+          
         print(f'Station Failures: {sum(cls.failures_station.values())}')
-        print(f'Number of stations not found when expected: {cls.station_none_when_expected}\n')
-        print('Missclassification summary for Station:\n' + cls.analyze_failures(cls.failures_station))
-        
+        print(f'Number of stations not found when expected: '
+              f'{cls.station_none_when_expected}\n')
+        print('Missclassification summary for Station:\n' +
+              cls.analyze_failures(cls.failures_station))
+          
         print('\n-------------------------\n')
-        
+          
         print(f'Line Failures: {sum(cls.failures_line.values())}')
-        print(f'Number of lines not found when expected: {cls.line_none_when_expected}\n')
-        print('Missclassification summary for Line:\n' + cls.analyze_failures(cls.failures_line))
+        print(f'Number of lines not found when expected: '
+              f'{cls.line_none_when_expected}\n')
+        print('Missclassification summary for Line:\n' +
+              cls.analyze_failures(cls.failures_line))
         print('=========================\n')
 
     def test_find_station_and_line(self):
@@ -66,7 +74,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
             with self.subTest(text=text):
                 result = extract_ticket_inspector_info(text)
                 if result is None:
-                    print(f"Error processing text: {text}")
+                    print(f'Error processing text: {text}')
                     continue
 
                 actual_line = result.get('line')
@@ -80,16 +88,26 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                     ('direction', actual_direction, expected_direction),
                     ('station', actual_station, expected_station)
                 ]:
-                    messages.append(format_mismatch(expected, actual, prop.capitalize()))
+                    messages.append(format_mismatch(
+                        expected,
+                        actual,
+                        prop.capitalize()
+                    ))
                     if expected is not None and actual is None:
                         getattr(self.__class__, f'{prop}_none_when_expected', 0)
-                        setattr(self.__class__, f'{prop}_none_when_expected', getattr(self.__class__, f'{prop}_none_when_expected') + 1)
+                        setattr(self.__class__, f'{prop}_none_when_expected',
+                                getattr(self.__class__, f'{prop}_none_when_expected')
+                                + 1)
                     if actual != expected:
                         has_mismatch = True
-                        self.__class__.__dict__[f'failures_{prop}'][f'{expected} -> {actual}'] += 1
+                        self.__class__.__dict__[
+                            f'failures_{prop}'][f'{expected} -> {actual}'
+                                                ] += 1
 
                 if has_mismatch:
-                    self.__class__.failures.append(f'\nInput text: {text}\n' + '\n'.join(messages))
+                    self.__class__.failures.append(f'\nInput text: {text}\n' +
+                                                   '\n'.join(messages))
+
 
 if __name__ == '__main__':
     unittest.main()
