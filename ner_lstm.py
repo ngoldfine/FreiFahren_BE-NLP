@@ -77,12 +77,10 @@ for lines in stations_and_lines:
     TRAIN_DATA.append([station, {"entities": [[0, len(station), "STATION"]]}])  
 
 # Load a blank English model
-nlp = spacy.blank("de")
+nlp = spacy.load("models/epoch10")
 
 # Add the NER component to the pipeline
-ner = nlp.create_pipe("ner")
-nlp.add_pipe('ner')
-
+ner = nlp.get_pipe('ner')
 
 # Add your specific labels to the NER component
 for _, annotations in TRAIN_DATA:
@@ -150,18 +148,19 @@ def testANNOTS(DATASET=TEST_DATA, MODEL_PATH=None):
     correctCount = 0
     for dataset in DATASET:
         for data in dataset:
-            test = []
             if type(data) == str:
               print(f"Message: {data}")
-              test_message = identify_stations(data, testing=True)
+              test_message = identify_stations(data, testing=True, MODEL_PATH=MODEL_PATH)
         
             if type(data) == dict:
               for item in data['entities']:
-                  tagCount += 1
-                  if item[2] in test_message:
-                      correctCount += 1
+                tagCount += 1
+                if item[2] in test_message:
+                    correctCount += 1
+                
           
     print(f"\nResult: {correctCount/tagCount} Tags: {tagCount} Correct annots: {correctCount}" )
+
 
 def testMessages(DATASET='data/messages.txt', MODEL_PATH=None):
     if MODEL_PATH == None:
@@ -176,3 +175,34 @@ def testMessages(DATASET='data/messages.txt', MODEL_PATH=None):
 
     displacy.serve(docs, style='ent', auto_select_port=True)
 
+# from spacy.matcher import Matcher
+# from spacy.tokens import Span
+# import spacy
+
+
+print(identify_stations("3 kontroletti in s2 nach bernau nächste haltestellte frankfurter allee", MODEL_PATH='models/epoch10', return_doc=True).ents)
+
+
+# nlp.from_disk('models/06-02-2024___14.29.53_EPOCHS_10_')
+# # Add the Matcher with station patterns
+# matcher = Matcher(nlp.vocab)
+# patterns = [[{"LOWER": "alex"}], [{"LOWER": "alexanderplatz"}]]  # Example patterns
+# matcher.add("STATION", patterns)
+
+# # Process a document
+# doc = nlp("Let's meet at Alex. It's busy at platz der luftbrucke")
+
+# # Apply the matcher
+# matches = matcher(doc)
+
+# # Combine NER and Matcher results
+# for match_id, start, end in matches:
+#     span = Span(doc, start, end, label="STATION")
+#     print(span)
+#     print(doc.ents)
+#     doc.ents = list(doc.ents) + [span]
+
+# # Display entities
+# for ent in doc.ents:
+#     if ent.label_ == "STATION":
+#         print("Found station:", ent.text)
