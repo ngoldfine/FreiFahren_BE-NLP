@@ -1,15 +1,17 @@
 # flake8: noqa
 import spacy
+from spacy import displacy
 import random
 import os
 from datetime import datetime
 from spacy.training import Example
 from data.ANNOTATED_MESSAGES_LSTM import ANNOTATED_DATA
-from fuzzywuzzy import process, fuzz
+
 import json
 
-TRAIN_DATA = [
-    ["s-bahn kontrolleure friedrichstrasse 2mal weiblich eine kräftig und blonde haare lang andere dünner grüne jacke",
+TRAIN_DATA = []
+
+TEST_DATA = [["s-bahn kontrolleure friedrichstrasse 2mal weiblich eine kräftig und blonde haare lang andere dünner grüne jacke",
         {"entities":[(20,36,"STATION")]}],
     ["4 Kontrolleur*innen S85 nach Buch",
         {"entities":[(20,23,"LINE"),(29,33,"STATION")]}],
@@ -46,16 +48,19 @@ TRAIN_DATA = [
     ["2 Männer mit blauen Westen stiegen in die U8 Richtung Witteneu @ Henrich-Heine-Straße ein",
         {"entities":[(42,44,"LINE"),(54,62,"STATION"),(65,85,"STATION")]}],
     ["S7 Richtung potsdam Hbf, 3 w gelesen, gleich griebnitzsee",
-        {"entities":[(0,2,"LINE"),(12,23,"STATION"),(45,57,"STATION")]}]
-    ]
+        {"entities":[(0,2,"LINE"),(12,23,"STATION"),(45,57,"STATION")]}]]
 
-
+# GETTING DATA
 for data in ANNOTATED_DATA['annotations']:
     TRAIN_DATA.append(data)
 
-# for data in TRAIN_DATA:
-#     print(data)
-    
+with open('data/stations_and_lines.json', 'r', encoding='utf-8') as file:
+   stations_and_lines = json.load(file)
+
+for lines in stations_and_lines:
+  for station in stations_and_lines[f'{lines}']:
+    TRAIN_DATA.append([station, {"entities": [[0, len(station), "STATION"]]}])  
+
 # Load a blank English model
 nlp = spacy.blank("de")
 
@@ -63,16 +68,19 @@ nlp = spacy.blank("de")
 ner = nlp.create_pipe("ner")
 nlp.add_pipe('ner')
 
+
+
+print(nlp.pipe_names)
 # Add your specific labels to the NER component
 for _, annotations in TRAIN_DATA:
     for ent in annotations.get("entities"):
         ner.add_label(ent[2])
 
-# Assuming TRAIN_DATA is a list of tuples, each containing a text and a dictionary of annotations
-examples = [Example.from_dict(nlp.make_doc(text), annotations) for text, annotations in TRAIN_DATA]
 
-def train(EPOCHS=1):
-
+def train(EPOCHS=5, until_loss=10, DATASET=TRAIN_DATA, suffix=""):
+    # Assuming TRAIN_DATA is a list of tuples, each containing a text and a dictionary of annotations
+    examples = [Example.from_dict(nlp.make_doc(text), annotations) for text, annotations in DATASET]
+    epoch_count = 0
     # Train the model
     optimizer = nlp.initialize()
     for itn in range(EPOCHS):
@@ -80,45 +88,36 @@ def train(EPOCHS=1):
         losses = {}
         for example in examples:
             nlp.update([example], sgd=optimizer, drop=0.35, losses=losses)
+        
+        if losses['ner'] < until_loss:
+          print("stopping at: ", losses)
+          break
+        epoch_count +=1
         print(losses)
+        
     
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y___%H.%M.%S")
+    MODEL_PATH = f'models/{dt_string}_EPOCHS_{epoch_count}_{suffix}'
 
-    if not os.path.exists(f'models/{dt_string}_EPOCHS_{EPOCHS}'):
-        os.makedirs(f'models/{dt_string}_EPOCHS_{EPOCHS}')
+    if not os.path.exists(f'models/{dt_string}_EPOCHS_{epoch_count}_{suffix}'):
+        os.makedirs(f'models/{dt_string}_EPOCHS_{epoch_count}_{suffix}')
     
-    nlp.to_disk(f'models/{dt_string}_EPOCHS_{EPOCHS}')
-    print(f'saved model to models/{dt_string}_EPOCHS_{EPOCHS}')
-    
+    nlp.to_disk(f'models/{dt_string}_EPOCHS_{epoch_count}_{suffix}')
+    print(f'saved model to models/{dt_string}_EPOCHS_{epoch_count}_{suffix}')
 
-# Use the Scorer class to score the train examples
-# scorer = nlp.evaluate(examples)
-STATION_NAMES = []
+    return MODEL_PATH
 
-with open('data/stations_and_lines.json', 'r') as f:
-    stations_and_lines = json.load(f)
-
-for lines in stations_and_lines:
-    for station in stations_and_lines[lines]:
-        STATION_NAMES.append(station)
-
-def fuzzy_match_stations(recognized_entities):
-    matches = []
-    for entity in recognized_entities:
-        match, score = process.extractOne(entity, STATION_NAMES, scorer=fuzz.token_set_ratio)
-        if score > 10:
-            matches.append(match)
-            # print(f"Matched '{entity}' to '{match}' with a score of {score}")
-    
-    return matches
         
-def identify_stations(text):
-  nlp.from_disk('models/05-02-2024___23.32.17_EPOCHS1')
+def identify_stations(text, testing=False, MODEL_PATH='models/06-02-2024___00.34.51_EPOCHS_100'):
+  nlp.from_disk(MODEL_PATH)
   match = nlp(text)
   matches = []
   for ent in match.ents:
-      matches.append(ent.label_)
+      if testing == True:
+        matches.append(ent.label_)
+      else:
+        matches.append(ent)
 
   
   return matches
@@ -143,15 +142,15 @@ def testANNOTS():
           
     print(f"\nResult: {correctCount/tagCount} Tags: {tagCount} Correct annots: {correctCount}" )
 
-def testTrain():
+def test(DATASET=TEST_DATA, MODEL_PATH='models/06-02-2024___01.07.45_EPOCHS_500_with_station_names'):
     tagCount = 0
     correctCount = 0
-    for dataset in TRAIN_DATA:
+    for dataset in DATASET:
         for data in dataset:
             test = []
             if type(data) == str:
               print(f"Message: {data}")
-              test_message = identify_stations(data)
+              test_message = identify_stations(data, testing=True)
         
             if type(data) == dict:
               for item in data['entities']:
@@ -162,4 +161,4 @@ def testTrain():
     print(f"\nResult: {correctCount/tagCount} Tags: {tagCount} Correct annots: {correctCount}" )
 
 
-testTrain()
+
