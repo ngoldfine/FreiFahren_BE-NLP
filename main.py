@@ -24,9 +24,13 @@ def find_line(text, lines):
 
     # Sort lines by length in descending order to prioritize longer matches
     sorted_lines = sorted(lines.keys(), key=len, reverse=True)
+    print(sorted_lines)
+    
+    print(text)
 
     for line in sorted_lines:
         if line.lower() in text.lower():
+            print(line)
             return line
     return None
 
@@ -120,7 +124,7 @@ def handle_get_off(text):
         'getting off',
         'steigen aus',
     ]
-
+    
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
@@ -215,6 +219,7 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
+        print('Ticket inspector got off the train')
         ticket_inspector.direction = None
         ticket_inspector.line = None
 
