@@ -21,7 +21,11 @@ with open('stations_and_lines.json', 'r') as f:
 def find_line(text, lines):
     # Remove all whitespaces from the text
     text = text.replace(' ', '')
-    for line in lines.keys():
+
+    # Sort lines by length in descending order to prioritize longer matches
+    sorted_lines = sorted(lines.keys(), key=len, reverse=True)
+
+    for line in sorted_lines:
         if line.lower() in text.lower():
             return line
     return None
