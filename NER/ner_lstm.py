@@ -3,13 +3,24 @@
 import spacy
 from spacy.training import Example
 from spacy import displacy
+from spacy.tokens import Doc
 from data.ANNOTATED_MESSAGES_LSTM import ANNOTATED_DATA
-from data_parser import TRAIN_DATA, patterns_for_match
 from datetime import datetime
 import os
 import random
 
-# TODO: create a Model class, or maybe utils/tools and separate everything, so we can easily and intuitively create models and test them
+import sys
+import os
+
+# So we can import data_parser.py based on the current directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
+
+# Add the current directory to sys.path
+current_dir = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, current_dir)
+
+from data_parser import TRAIN_DATA, patterns_for_match
 
 
 class Model:
@@ -33,16 +44,16 @@ class Model:
             print(f'model from {self.model_path} loaded')
 
 
-    def train(self, EPOCHS=5, until_loss=1, DATASET=TRAIN_DATA):
+    def train(self, epochs=5, until_loss=1, dataset=TRAIN_DATA):
         # Assuming TRAIN_DATA is a list of tuples, each containing a text and a dictionary of annotations
-        examples = [Example.from_dict(self.nlp.make_doc(text), annotations) for text, annotations in DATASET]
+        examples = [Example.from_dict(self.nlp.make_doc(text), annotations) for text, annotations in dataset]
 
         epoch_count = 0
 
         # Train the model
         optimizer = self.nlp.initialize()
 
-        for itn in range(EPOCHS):
+        for itn in range(epochs):
             random.shuffle(examples)
             losses = {}
 
@@ -63,7 +74,7 @@ class Model:
         print(f'saved model to {self.model_path}')
     
 
-    def identify_stations(self, text, testing=False, serve=False, return_doc=False):
+    def identify_stations(self, text, testing=False, return_doc=False):
         
         match = self.nlp(text)
         matches = []
@@ -73,17 +84,25 @@ class Model:
             else:
                 matches.append(ent)
                 
-        if serve == True:
-            displacy.serve(match, 'ent', auto_select_port=True)
         if return_doc == True:
             return match
         
         return matches
 
+    def text(self, text):
+
+        doc = self.nlp(text)
+        ents = []
+        words = []
+        tags = []
+
+        for ent in doc.ents:
+            ents.append(ent)
+            words.append(ent.text)
+            tags.append(ent.label_)
+
+        newDoc = Doc(self.nlp.vocab, words=words, ents=ents, tags=tags)
+        return newDoc.text
 
 
-
-
-
-
-
+M1 = Model('NER/models/loss17')

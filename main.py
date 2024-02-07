@@ -4,8 +4,9 @@ from fuzzywuzzy import process
 # import telebot
 import json
 # from dotenv import load_dotenv
-from ner_lstm import identify_stations  # type: ignore
+from NER.ner_lstm import M1
 # from fuzzy import getSimilar  # type: ignore
+
 
 class TicketInspector:
     def __init__(self, line, station, direction):
@@ -52,10 +53,8 @@ def format_text(text):
     return text
 
 
-with open('data/data.json', 'r') as f:
+with open('data/synonyms.json', 'r') as f:
     stations_with_synonyms = json.load(f)
-
-
 
 
 def get_all_stations(line=None):
@@ -83,26 +82,11 @@ def get_all_stations(line=None):
     return all_stations
 
 
-# def find_station(text, line=None, threshold=80):
-#     all_stations = get_all_stations(line)
-
-#     # Perform the fuzzy matching with the gathered list of stations
-#     best_match, score = process.extractOne(text, all_stations)  # type: ignore
-#     if score >= threshold:
-#         # Find the station that matches the best match
-#         for station_type in stations_with_synonyms.values():
-#             for station, synonyms in station_type.items():
-#                 if best_match in [station.lower()] + \
-#                         [synonym.lower() for synonym in synonyms]:
-#                     return station
-#     return None
-
-
 def find_station(text, line=None, threshold=90):
     all_stations = get_all_stations(line)
-
+    text_ner = M1.text(text)
     # Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(text, all_stations)
+    best_match, score = process.extractOne(text_ner, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():

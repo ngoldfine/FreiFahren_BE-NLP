@@ -34,5 +34,5 @@ def testMessages(Model: Model, DATASET='data/messages.txt'):
 
     displacy.serve(docs, style='ent', auto_select_port=True)
 
-M1 = Model('NER/models/06-02-2024___17.26.46')
+M1 = Model('NER/models/loss17')
 testMessages(M1)
