@@ -40,10 +40,11 @@ class TestFindStationAndLineFunction(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         print('\n===== Failures Summary =====\n')
+        total_tests = 356
         if cls.failures:
             for failure in cls.failures:
                 print(failure)
-            print(f'\nTotal Failures: {len(cls.failures)}')
+            print(f'\nTotal Failures: {len(cls.failures)/total_tests * 100}%')
         else:
             print('All tests passed successfully!')
 
@@ -70,6 +71,11 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         print('Missclassifications (expected -> found):\n' +
               cls.analyze_failures(cls.failures_line))
         print('=========================\n')
+        total_tests = 356
+        failed_tests = len(TestFindStationAndLineFunction.failures)
+
+        percentage_failed = (failed_tests / total_tests) * 100
+        print(f'Percentage of failed tests: {percentage_failed}%')
 
     def test_find_station_and_line(self):
         for text, expected_station, expected_line, expected_direction in test_cases:
