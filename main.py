@@ -217,6 +217,27 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     return ticket_inspector
 
 
+def handle_ringbahn(text):
+    ring_keywords = ['ring', 'ringbahn']
+    # remove commas and dots from the text
+    text = text.replace(',', '').replace('.', '')
+    # split the text into individual words
+    words = text.lower().split()
+    # check if any word in the text matches the ring keywords
+    for word in words:
+        if word in ring_keywords:
+            return True
+    return False
+
+    
+def verify_line(ticket_inspector, text):
+    # If it the ring set to S41
+    if handle_ringbahn(text.lower()) and ticket_inspector.line is None:
+        ticket_inspector.line = 'S41'
+        
+    return ticket_inspector
+        
+
 def extract_ticket_inspector_info(unformatted_text):
     found_line = find_line(unformatted_text, lines_with_stations)
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
@@ -231,10 +252,10 @@ def extract_ticket_inspector_info(unformatted_text):
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
-        verified_ticket_inspector = verify_direction(
-            ticket_inspector, text, unformatted_text
-        )
-        return verified_ticket_inspector.__dict__
+        verify_direction(ticket_inspector, text, unformatted_text)
+        verify_line(ticket_inspector, unformatted_text)
+        
+        return ticket_inspector.__dict__
     else:
         return None
 

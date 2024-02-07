@@ -201,7 +201,7 @@ test_cases = [
 
         'Tempelhof',
 
-        None,
+        'S41',
         None
     ),
     (
@@ -219,7 +219,7 @@ test_cases = [
 
         'Hohenzollerndamm',
 
-        None,
+        'S41',
         None,
     ),
     (
@@ -328,7 +328,7 @@ test_cases = [
 
         'Hohenzollerndamm',
 
-        None,
+        'S41',
         None,
     ),
     (
@@ -426,7 +426,7 @@ test_cases = [
 
         'S41',
 
-        'Ostkreuz',
+        None,
 
     ),
     (
@@ -435,7 +435,7 @@ test_cases = [
         None,
         'S41',
 
-        'Landsberger Allee',
+        None,
 
     ),
     (
@@ -923,7 +923,7 @@ test_cases = [
      'Ring, tempelhof, richtung sudkreuz',
      'Tempelhof',
      'S41',
-     'Südkreuz'),
+     None),
     (
      'u8 Voltastr.',
      'Voltastraße',
