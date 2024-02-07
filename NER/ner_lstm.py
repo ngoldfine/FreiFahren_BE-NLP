@@ -82,42 +82,8 @@ class Model:
 
 
 
-M1 = Model('models/06-02-2024___17.26.46')
 
 
-
-
-# from spacy.matcher import Matcher
-# from spacy.tokens import Span, Doc
-# import spacy
-
-# # Process a document
-# doc = M1.nlp("Mon2 Blauwesten gerade in der U8, sind Voltastrss. drin geblieben. Richtung Wittenau.Jetzt noch 2 andere ohne Westen an der U8 Pankstr.")
-
-
-
-# words = []
-# tags = []
-# for ent in doc.ents:
-#     words.append(ent.text)
-#     tags.append(ent.label_)
-# doc = Doc(M1.nlp.vocab, words=words, ents=doc.ents, tags=tags)
-
-# for token in doc:
-#     print(token.text, token.ent_type_)
-# # Add the Matcher with station patterns
-# matcher = Matcher(M1.nlp.vocab)
-
-# for patterns in patterns_for_match:
-#     matcher.add(patterns[0], [patterns[1]])
-
-
-# matches = matcher(doc)
-
-# for match_id, start, end in matches:
-#     string_id = M1.nlp.vocab.strings[match_id]  # Get string representation
-#     span = doc[start:end]  # The matched span
-#     print(string_id, 'test', span)
 
 
 

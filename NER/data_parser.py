@@ -51,7 +51,7 @@ for data in ANNOTATED_DATA['annotations']:
 
 
 # GETTING ALL THE SYNONYMS for the NER
-with open('data/data.json', 'r', encoding='utf-8') as file:
+with open('data/synonyms.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 for station in data['sBahn_stations_with_synomyms']:
@@ -91,54 +91,3 @@ for lines in stations_and_lines:
   for station in stations_and_lines[f'{lines}']:
         patterns_for_match.append([f'{station}', [{'LOWER' : { 'FUZZY1': station.lower() } }]])
         
-
-# import spacy
-# from spacy.tokens import DocBin
-
-# nlp = spacy.load('models/epoch10')
-
-# # the DocBin will store the example documents
-# count = 0
-
-# db = DocBin()
-# for text, annotations in TRAIN_DATA:
-#     doc = nlp(text)
-#     ents = []
-#     for start, end, label in annotations['entities']:
-#         span = doc.char_span(start, end, label=label)
-#         ents.append(span)
-    
-#     if doc.text != "":
-#        doc.ents = ents
-#     else:
-#        doc.ents = []
-    
-#     db.add(doc)
-#     if count == len(TRAIN_DATA)/2:
-#        break
-#     else:
-#        count += 1
-# db.to_disk("./train.spacy")
-
-
-# count = len(TRAIN_DATA)/2
-
-# db = DocBin()
-# for text, annotations in TRAIN_DATA:
-#     doc = nlp(text)
-#     ents = []
-#     for start, end, label in annotations['entities']:
-#         span = doc.char_span(start, end, label=label)
-#         ents.append(span)
-    
-#     if doc.text != "":
-#        doc.ents = ents
-#     else:
-#        doc.ents = []
-    
-#     db.add(doc)
-#     if count == len(TRAIN_DATA):
-#        break
-#     else:
-#        count += 1
-# db.to_disk("./dev.spacy")
