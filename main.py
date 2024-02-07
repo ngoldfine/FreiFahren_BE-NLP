@@ -82,8 +82,20 @@ def get_all_stations(line=None):
 #     return None
 
 
-def find_station(text, line=None, threshold=80):
-    return identify_stations(text)
+def find_station(text, line=None, threshold=90):
+    all_stations = get_all_stations(line)
+
+    # Perform the fuzzy matching with the gathered list of stations
+    best_match, score = process.extractOne(text, all_stations)
+    if score >= threshold:
+        # Find the station that matches the best match
+        for station_type in stations_with_synonyms.values():
+            for station, synonyms in station_type.items():
+                if best_match in [station.lower()] + \
+                        [synonym.lower() for synonym in synonyms]:
+                    return station
+    return None
+
 
 def find_direction(text, line):
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
