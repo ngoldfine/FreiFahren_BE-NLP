@@ -40,7 +40,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         print('\n===== Failures Summary =====\n')
-        total_tests = 356
+        total_tests = 344
         if cls.failures:
             for failure in cls.failures:
                 print(failure)

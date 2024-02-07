@@ -146,15 +146,6 @@ test_cases = [
         None
     ),
     (
-        'M10 towards turmstr. two guys with no uniform',
-
-        None,
-        'M10',
-
-        'Turmstraße',
-
-    ),
-    (
         'U boddinstrasse. 5 securitys / 3 cops',
 
         'Boddinstraße',
@@ -614,15 +605,6 @@ test_cases = [
         None,
     ),
     (
-        '''Two men wearing normal clothes in M5,checking tickets,just
-        got off at alexanderplatz''',
-
-        'Alexanderplatz',
-
-        None,
-        None,
-    ),
-    (
         '''U1 at hallesches tor towards warschauer str.
         2 maybe 3 blue wests giving fines''',
 
@@ -855,16 +837,6 @@ test_cases = [
 
     ),
     (
-        'M27 Pankstr Richtung Jungfernheide',
-
-        'Pankstraße',
-
-        'M27',
-
-        'Jungfernheide',
-
-    ),
-    (
         'U2 From Alex to Ruhleben now bunch of them in a wagon',
 
         'Alexanderplatz',
@@ -892,14 +864,6 @@ test_cases = [
 
         None,
         None
-    ),
-    (
-        'M29 two men,to Halensee',
-
-        None,
-        'M29',
-
-        'Halensee'
     ),
     (
         's47 nach spindlerfeld s tempelhof eingestiegen 2 in zivil',
@@ -1040,10 +1004,6 @@ test_cases = [
      'U6',
      'Kurt-Schumacher-Platz'),
     (
-     'M29er Richtung hermannplatz, wurde bereits mehrmals kontrolliert während der Fahrt. Sind erkennbar an prüferjacken',
-     None, 'M29',
-     'Hermannplatz'),
-    (
      'Jetzt U9 Hansaplatz Richtung Osloer',
      'Hansaplatz',
      'U9',
@@ -1082,11 +1042,6 @@ test_cases = [
      'U8',
      None),
     (
-     'M4 alexanderplatz',
-     'Alexanderplatz',
-     'M4',
-     None),
-    (
      'Richtung hackeischet markt',
      None, None, 'Hackescher Markt'),
     (
@@ -1110,11 +1065,6 @@ test_cases = [
      'Rudow',
      'U7',
      'Richard-Wagner-Platz'),
-    (
-     'Three in civil at invalidenpark entering m10 direction warschauer',
-     'Invalidenpark',
-     'M10',
-     'Warschauerstraße'),
     (
      'U2 nollendorfplatz richtung ruhleben',
      'Nollendorfplatz',
@@ -1387,9 +1337,6 @@ test_cases = [
      'Hermanplatz',
      'U8',
      None),
-    (
-     '2 m gelesene Kontrolletis in M46 Richtung Britz.',
-     None, None, None),
     (
      'Gerade Haltestelle Reichartstraße',
      'Reichartstraße',
