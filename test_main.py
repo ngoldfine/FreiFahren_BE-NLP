@@ -7,6 +7,8 @@ red = '\033[91m'
 reset = '\033[0m'
 gray = '\033[90m'
 
+total_tests = 344
+
 
 def format_mismatch(expected, actual, label):
     if expected != actual:
@@ -25,6 +27,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
     station_none_when_expected = 0
     line_none_when_expected = 0
     direction_none_when_expected = 0
+    total_mismatches = 0
 
     @classmethod
     def analyze_failures(cls, failures_dict):
@@ -40,7 +43,6 @@ class TestFindStationAndLineFunction(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         print('\n===== Failures Summary =====\n')
-        total_tests = 344
         if cls.failures:
             for failure in cls.failures:
                 print(failure)
@@ -71,11 +73,13 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         print('Missclassifications (expected -> found):\n' +
               cls.analyze_failures(cls.failures_line))
         print('=========================\n')
-        total_tests = 356
         failed_tests = len(TestFindStationAndLineFunction.failures)
 
         percentage_failed = (failed_tests / total_tests) * 100
         print(f'Percentage of failed tests: {percentage_failed}%')
+        
+        # print average mismatches per test
+        print(f'Average mismatches per test: {cls.total_mismatches / failed_tests}')
 
     def test_find_station_and_line(self):
         for text, expected_station, expected_line, expected_direction in test_cases:
@@ -108,6 +112,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                                 + 1)
                     if actual != expected:
                         has_mismatch = True
+                        self.__class__.total_mismatches += 1
                         self.__class__.__dict__[
                             f'failures_{prop}'][f'{expected} -> {actual}'
                                                 ] += 1
