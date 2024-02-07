@@ -84,8 +84,8 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         print(f'Average mismatches per test: {cls.total_mismatches / failed_tests}')
         
         # New code to print out our specific mismatch counts
-        print(f'\nFound station was expected direction: {cls.station_as_direction_count} times')
-        print(f'Found direction was expected station: {cls.direction_as_station_count} times')
+        print(f'\nstation is really direction: {cls.station_as_direction_count} times')
+        print(f'direction is really station: {cls.direction_as_station_count} times')
 
     def test_find_station_and_line(self):
         for text, expected_station, expected_line, expected_direction in test_cases:
