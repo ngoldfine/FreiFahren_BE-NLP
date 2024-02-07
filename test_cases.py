@@ -1131,7 +1131,7 @@ test_cases = [
     (
      'Stephen MarcalanRingbahn S41 jetzt gleich TempelhofWie sehen die aus?',
      'Tempelhof',
-     'S41',
+     None,
      None),
     (
      'U8 Bernauerstr richtung Hermannstr, 3 Blauevesten',
@@ -1150,7 +1150,7 @@ test_cases = [
     (
      '2bos mehringdamm am gleis u7/u6',
      'Mehringdamm',
-     'U6',
+     None,
      None),
     (
      'Diese Leute am Moritzplatz. nicht Kontrolleur(?)',
@@ -1498,7 +1498,7 @@ test_cases = [
     (
      'U1/U3 schlesisches Tor in 3 Kontrolletis in Security Westen',
      'Schlesisches Tor',
-     'U1',
+     None,
      None),
     (
      'Richtung Uhlnd Straße',
@@ -1707,7 +1707,7 @@ test_cases = [
      'Pankow'),
     (
      'MarsPhoto, U8 richtung hermanplatzHaben die kontrolliert? Ne, oder?',
-     None, 'U8',
+     None, None,
      'Hermannplatz'),
     (
      'U8 kotti polizei kontrol..',

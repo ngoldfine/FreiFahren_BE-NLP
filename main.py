@@ -19,9 +19,11 @@ with open('stations_and_lines.json', 'r') as f:
 
 
 def find_line(text, lines):
-    # remove all of the commas and dots from the text
-    text = text.replace(',', ' ')
-    text = text.replace('.', ' ')
+    # If the text contains a question mark, return None
+    if '?' in text:
+        return None
+    # Replace commas and dots with spaces to separate all items
+    text = text.replace(',', ' ').replace('.', ' ').replace('-', ' ').replace('/', ' ')
 
     # Split the text into individual words
     words = text.split()
@@ -29,17 +31,31 @@ def find_line(text, lines):
     # Sort lines by length in descending order to prioritize longer matches
     sorted_lines = sorted(lines.keys(), key=len, reverse=True)
 
-    # Check if the word is 's' or 'u' and combine it with the next word
-    for i, word in enumerate(words):
-        if word.lower() == 's' or word.lower() == 'u':
-            if i + 1 < len(words):
-                words[i + 1] = word.lower() + words[i + 1]
+    # Initialize a dictionary to keep track of matches found for each word
+    matches_per_word = {}
 
-    print(words)
-    for word in words:
+    for i, word in enumerate(words):
+        # Handle cases where 's' or 'u' precede a number, treating them as part of the same word
+        if word.lower() in ['s', 'u'] and i + 1 < len(words):
+            combined_word = word.lower() + words[i + 1]
+            words.append(combined_word)  # Append the combined word to the list for checking
+
+    for word in set(words):  # Use set to avoid duplicate words
         for line in sorted_lines:
             if line.lower() in word.lower():
-                return line
+                if word not in matches_per_word:
+                    matches_per_word[word] = []
+                matches_per_word[word].append(line)
+
+    # Now, decide what to return based on the collected matches
+    if len(matches_per_word) == 1:
+        # If all matches are within the same word, return the first (longest) match
+        return sorted(matches_per_word[list(matches_per_word.keys())[0]], key=len, reverse=True)[0]
+    elif any(len(matches) > 1 for matches in matches_per_word.values()):
+        # If a single word contains multiple matches, return the longest one from that word
+        for matches in matches_per_word.items():
+            if len(matches) > 1:
+                return sorted(matches, key=len, reverse=True)[0]
     return None
 
 
