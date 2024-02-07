@@ -1171,7 +1171,7 @@ test_cases = [
      'Rudow'),
     (
      'JaumeU7 direction Rudow GneisenaustrasseSind auf dem Gleis dort',
-     None, 'Gneisenaustraße',
+     'Gneisenaustraße', 'U7',
      'Rudow'),
     (
      'U7 Gneisenaustr, jetzt Richtung Rudow',
@@ -1181,7 +1181,7 @@ test_cases = [
     (
      'Gelbe Westen S5 Bellevue. Gerade ausgestiegen',
      'Bellevue',
-     'S5',
+     None,
      None),
     (
      'Tram station bersarinplatz/weidenweg 21 stehen ein paar oa und Polizei...keine Ahnung.einfach Augen auf',
@@ -1838,8 +1838,8 @@ test_cases = [
      None, None, None),
     (
      '3 gelbe westen S9 am Trepi Richtung Friedrichstraße',
-     None, 'S9',
-     'Friedrichstraße'),
+     'Treptower Park', 'S9',
+     'Spandau'),
     (
      'U2 zoo richtung Ruhleben',
      'Zoologischer Garten',

@@ -19,19 +19,27 @@ with open('stations_and_lines.json', 'r') as f:
 
 
 def find_line(text, lines):
-    # Remove all whitespaces from the text
-    text = text.replace(' ', '')
+    # remove all of the commas and dots from the text
+    text = text.replace(',', ' ')
+    text = text.replace('.', ' ')
+
+    # Split the text into individual words
+    words = text.split()
 
     # Sort lines by length in descending order to prioritize longer matches
     sorted_lines = sorted(lines.keys(), key=len, reverse=True)
-    print(sorted_lines)
-    
-    print(text)
 
-    for line in sorted_lines:
-        if line.lower() in text.lower():
-            print(line)
-            return line
+    # Check if the word is 's' or 'u' and combine it with the next word
+    for i, word in enumerate(words):
+        if word.lower() == 's' or word.lower() == 'u':
+            if i + 1 < len(words):
+                words[i + 1] = word.lower() + words[i + 1]
+
+    print(words)
+    for word in words:
+        for line in sorted_lines:
+            if line.lower() in word.lower():
+                return line
     return None
 
 
