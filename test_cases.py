@@ -612,7 +612,7 @@ test_cases = [
 
         'U1',
 
-        'Warschauer Straße',
+        'Warschauerstraße',
 
     ),
     (
@@ -1321,7 +1321,7 @@ test_cases = [
      'U9 amrumer Richtung zoo',
      'Amrumerstraße',
      'U9',
-     'Zoo'),
+     'Zoologischer Garten'),
     (
      'U9 Westhafen stehen Blauwesten, konnte beim Rausgehen aber nicht erkennen, was sie genau machen...',
      'Westhafen',
@@ -1440,7 +1440,7 @@ test_cases = [
      'Pankow'),
     (
      'U2 Alex - 2 x Blauwesten',
-     'Alex',
+     'Alexanderplatz',
      'U2',
      None),
     (
@@ -1510,7 +1510,7 @@ test_cases = [
      None),
     (
      'stehn u7 berliner Straße/Richtung Rathaus Spandau, circa 3-4 Leute mit Bos Westen',
-     'Berliner Straße',
+     'Berlinerstraße',
      'U7',
      'Rathaus Spandau'),
     (
@@ -1594,7 +1594,7 @@ test_cases = [
      'Ruhleben'),
     (
      '3 manner  in U bismarkstr  Bos Westen',
-     'Bismarkstraße',
+     'Bismarckstraße',
      None, None),
     (
      'MarisaPhoto, Kontrolleur*innen warten am Ausgang S-MahlsdorfDie sehen eher nach Security aus und nicht nach Kontrolle?',
@@ -1699,7 +1699,7 @@ test_cases = [
     (
      'U8 richtung Hermanplatz',
      None, 'U8',
-     'hermanplatz'),
+     'Hermannplatz'),
     (
      'rosa luxemburg platz u2 pankow direction',
      'Rosa-Luxemburg-Platz',
@@ -1872,7 +1872,7 @@ test_cases = [
      None, None),
     (
      '4 Blauwesten U Bismarckstraße. Richtung Pankow',
-     'Bismarckstraße.',
+     'Bismarckstraße',
      None, 'Pankow'),
     (
      'S Bahn',
