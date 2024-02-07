@@ -28,6 +28,8 @@ class TestFindStationAndLineFunction(unittest.TestCase):
     line_none_when_expected = 0
     direction_none_when_expected = 0
     total_mismatches = 0
+    station_as_direction_count = 0
+    direction_as_station_count = 0
 
     @classmethod
     def analyze_failures(cls, failures_dict):
@@ -80,6 +82,10 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         
         # print average mismatches per test
         print(f'Average mismatches per test: {cls.total_mismatches / failed_tests}')
+        
+        # New code to print out our specific mismatch counts
+        print(f'\nFound station was expected direction: {cls.station_as_direction_count} times')
+        print(f'Found direction was expected station: {cls.direction_as_station_count} times')
 
     def test_find_station_and_line(self):
         for text, expected_station, expected_line, expected_direction in test_cases:
@@ -123,6 +129,11 @@ class TestFindStationAndLineFunction(unittest.TestCase):
                                                    '\n'.join(messages) +
                                                    '\n\n-----------------------------\n'
                                                    )
+        # Check for specific mismatches and increment counters
+            if actual_station == expected_direction:
+                self.__class__.station_as_direction_count += 1
+            if actual_direction == expected_station:
+                self.__class__.direction_as_station_count += 1
 
 
 if __name__ == '__main__':
