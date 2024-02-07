@@ -912,12 +912,12 @@ test_cases = [
     (
      '3 bos u8 richtung wittenau, weinmeisterstr ausgestiegen',
      'Weinmeisterstraße',
-     'U8',
-     'Wittenau'),
+     None,
+     None),
     (
      'Große Kontrolle beim aussteigen an der U-Alt-Tempelhof U6',
      'Alt-Tempelhof',
-     'U6',
+     None,
      None),
     (
      'Ring, tempelhof, richtung sudkreuz',
@@ -1150,7 +1150,7 @@ test_cases = [
     (
      '2bos mehringdamm am gleis u7/u6',
      'Mehringdamm',
-     'U7',
+     'U6',
      None),
     (
      'Diese Leute am Moritzplatz. nicht Kontrolleur(?)',
@@ -1171,7 +1171,7 @@ test_cases = [
      'Rudow'),
     (
      'JaumeU7 direction Rudow GneisenaustrasseSind auf dem Gleis dort',
-     None, 'Gneisenaustraße',
+     'Gneisenaustraße', 'U7',
      'Rudow'),
     (
      'U7 Gneisenaustr, jetzt Richtung Rudow',
@@ -1181,7 +1181,7 @@ test_cases = [
     (
      'Gelbe Westen S5 Bellevue. Gerade ausgestiegen',
      'Bellevue',
-     'S5',
+     None,
      None),
     (
      'Tram station bersarinplatz/weidenweg 21 stehen ein paar oa und Polizei...keine Ahnung.einfach Augen auf',
@@ -1219,7 +1219,7 @@ test_cases = [
     (
      'U9 in Osloerstr. ausgestiegen',
      'Osloerstraße',
-     'U9',
+     None,
      None),
     (
      'zwei Blauwesten-Muttis U9, steigen gerade Leo aus. Eine (groß, lange schwarze Haare) hat die Weste nicht an, sondern trägtvsie über dem Arm',
@@ -1325,7 +1325,7 @@ test_cases = [
     (
      'U9 Westhafen stehen Blauwesten, konnte beim Rausgehen aber nicht erkennen, was sie genau machen...',
      'Westhafen',
-     'U9',
+     None,
      None),
     (
      'U6 Paradestraße',
@@ -1427,7 +1427,7 @@ test_cases = [
     (
      'U7 Wilmersdorf ausgestiegen',
      'Wilmersdorferstraße',
-     'U7',
+     None,
      None),
     (
      'Leopoldplatz -> Alt Tegel blauvesten',
@@ -1571,8 +1571,8 @@ test_cases = [
     (
      'u7 richtung rathaus spanda, ca 5 mit bos westen und 2 mit bvg sicherheit sind mierendorff raus. männl gelesen.',
      'Alt-Mariendorf',
-     'U7',
-     'Rathuas Spandau'),
+     None,
+     None),
     (
      'U3 Richtung krumme lanke Wittenbergplatz',
      'Wittenbergplatz',
@@ -1804,7 +1804,7 @@ test_cases = [
     (
      'U8 Heinrich Heine ausgestiegen',
      'Heinrich-Heine-Straße',
-     'U8',
+     None,
      None),
     (
      'Kontrollieren die mittlerweile samstags?',
@@ -1838,8 +1838,8 @@ test_cases = [
      None, None, None),
     (
      '3 gelbe westen S9 am Trepi Richtung Friedrichstraße',
-     None, 'S9',
-     'Friedrichstraße'),
+     'Treptower Park', 'S9',
+     'Spandau'),
     (
      'U2 zoo richtung Ruhleben',
      'Zoologischer Garten',

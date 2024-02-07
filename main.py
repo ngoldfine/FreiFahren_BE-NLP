@@ -20,15 +20,27 @@ with open('data/stations_and_lines.json', 'r') as f:
 
 
 def find_line(text, lines):
-    # Remove all whitespaces from the text
-    text = text.replace(' ', '')
+    # remove all of the commas and dots from the text
+    text = text.replace(',', ' ')
+    text = text.replace('.', ' ')
+
+    # Split the text into individual words
+    words = text.split()
 
     # Sort lines by length in descending order to prioritize longer matches
     sorted_lines = sorted(lines.keys(), key=len, reverse=True)
 
-    for line in sorted_lines:
-        if line.lower() in text.lower():
-            return line
+    # Check if the word is 's' or 'u' and combine it with the next word
+    for i, word in enumerate(words):
+        if word.lower() == 's' or word.lower() == 'u':
+            if i + 1 < len(words):
+                words[i + 1] = word.lower() + words[i + 1]
+
+    print(words)
+    for word in words:
+        for line in sorted_lines:
+            if line.lower() in word.lower():
+                return line
     return None
 
 
@@ -138,7 +150,7 @@ def handle_get_off(text):
         'getting off',
         'steigen aus',
     ]
-
+    
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
@@ -233,6 +245,7 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
+        print('Ticket inspector got off the train')
         ticket_inspector.direction = None
         ticket_inspector.line = None
 
