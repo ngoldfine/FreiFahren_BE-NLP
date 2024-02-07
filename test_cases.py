@@ -1029,7 +1029,7 @@ test_cases = [
      None),
     (
      'Nicolas Sidiropulos1x Braun lilane North face Jacke, kurze schwarze haare, männlich gelesen',
-     None, None, None),
+     'Nicolassee', 'S1', None),
     (
      '1x schwarze Jacke, schwarze...Waren 3',
      None, None, None),
