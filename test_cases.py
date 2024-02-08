@@ -1130,7 +1130,7 @@ test_cases = [
      'Rudow'),
     (
      'Stephen MarcalanRingbahn S41 jetzt gleich TempelhofWie sehen die aus?',
-     'Tempelhof',
+     None,
      None,
      None),
     (
@@ -1154,7 +1154,7 @@ test_cases = [
      None),
     (
      'Diese Leute am Moritzplatz. nicht Kontrolleur(?)',
-     'Moritzplatz',
+     None,
      None, None),
     (
      'Mehringdamm jetzt viele',
@@ -1162,7 +1162,7 @@ test_cases = [
      None, None),
     (
      'dumbass óskPhoto, Diese Leute am Moritzplatz. nicht Kontrolleur(?)Manchmal ja manchmal nein',
-     'Moritzplatz',
+     None,
      None, None),
     (
      'U7 direction Rudow Gneisenaustrasse',
@@ -1708,7 +1708,7 @@ test_cases = [
     (
      'MarsPhoto, U8 richtung hermanplatzHaben die kontrolliert? Ne, oder?',
      None, None,
-     'Hermannplatz'),
+     None),
     (
      'U8 kotti polizei kontrol..',
      'Kottbusser Tor',

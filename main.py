@@ -12,51 +12,56 @@ class TicketInspector:
         self.line = line
         self.station = station
         self.direction = direction
-
+        
 
 with open('stations_and_lines.json', 'r') as f:
     lines_with_stations = json.load(f)
+   
 
-
-def find_line(text, lines):
-    # If the text contains a question mark, return None
-    if '?' in text:
-        return None
-    # Replace commas and dots with spaces to separate all items
+def format_text_for_line_search(text):
+    # Replace commas, dots, dashes, and slashes with spaces
     text = text.replace(',', ' ').replace('.', ' ').replace('-', ' ').replace('/', ' ')
-
-    # Split the text into individual words
     words = text.split()
 
-    # Sort lines by length in descending order to prioritize longer matches
-    sorted_lines = sorted(lines.keys(), key=len, reverse=True)
-
-    # Initialize a dictionary to keep track of matches found for each word
-    matches_per_word = {}
-
+    # When 's' or 'u' are followed by a number, combine them
+    formatted_words = []
     for i, word in enumerate(words):
-        # Handle cases where 's' or 'u' precede a number, treating them as part of the same word
-        if word.lower() in ['s', 'u'] and i + 1 < len(words):
-            combined_word = word.lower() + words[i + 1]
-            words.append(combined_word)  # Append the combined word to the list for checking
+        lower_word = word.lower()
+        if (lower_word == 's' or lower_word == 'u') and i + 1 < len(words):
+            combined_word = lower_word + words[i + 1]
+            formatted_words.append(combined_word)
+        else:
+            formatted_words.append(word)
 
-    for word in set(words):  # Use set to avoid duplicate words
-        for line in sorted_lines:
-            if line.lower() in word.lower():
-                if word not in matches_per_word:
-                    matches_per_word[word] = []
-                matches_per_word[word].append(line)
+    return ' '.join(formatted_words)
 
-    # Now, decide what to return based on the collected matches
+
+def process_matches(matches_per_word):
+    # Decide what to return based on the collected matches
     if len(matches_per_word) == 1:
-        # If all matches are within the same word, return the first (longest) match
         return sorted(matches_per_word[list(matches_per_word.keys())[0]], key=len, reverse=True)[0]
     elif any(len(matches) > 1 for matches in matches_per_word.values()):
-        # If a single word contains multiple matches, return the longest one from that word
-        for matches in matches_per_word.items():
+        for _word, matches in matches_per_word.items():
             if len(matches) > 1:
                 return sorted(matches, key=len, reverse=True)[0]
     return None
+
+
+def find_line(text, lines):
+    formatted_text = format_text_for_line_search(text)
+    if formatted_text is None:
+        return None
+
+    words = formatted_text.split()
+    sorted_lines = sorted(lines.keys(), key=len, reverse=True)
+    matches_per_word = {}
+
+    for word in set(words):
+        for line in sorted_lines:
+            if line.lower() in word.lower():
+                matches_per_word.setdefault(word, []).append(line)
+
+    return process_matches(matches_per_word)
 
 
 def format_text(text):
@@ -276,6 +281,11 @@ def verify_line(ticket_inspector, text):
         
 
 def extract_ticket_inspector_info(unformatted_text):
+    # If the text contains a question mark, indicate that no processing should occur
+    if '?' in unformatted_text:
+        ticket_inspector = TicketInspector(line=None, station=None, direction=None)
+        return ticket_inspector.__dict__
+    
     found_line = find_line(unformatted_text, lines_with_stations)
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
