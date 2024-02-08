@@ -112,6 +112,10 @@ def find_station(text, line=None, threshold=90):
 
 
 def find_direction(text, line):
+    # It is unlikely that the direction is mentioned when there is no line
+    if line is None:
+        return None, text
+    
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
 
     for keyword in direction_keywords:
