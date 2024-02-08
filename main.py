@@ -12,19 +12,56 @@ class TicketInspector:
         self.line = line
         self.station = station
         self.direction = direction
-
+        
 
 with open('stations_and_lines.json', 'r') as f:
     lines_with_stations = json.load(f)
+   
+
+def format_text_for_line_search(text):
+    # Replace commas, dots, dashes, and slashes with spaces
+    text = text.replace(',', ' ').replace('.', ' ').replace('-', ' ').replace('/', ' ')
+    words = text.split()
+
+    # When 's' or 'u' are followed by a number, combine them
+    formatted_words = []
+    for i, word in enumerate(words):
+        lower_word = word.lower()
+        if (lower_word == 's' or lower_word == 'u') and i + 1 < len(words):
+            combined_word = lower_word + words[i + 1]
+            formatted_words.append(combined_word)
+        else:
+            formatted_words.append(word)
+
+    return ' '.join(formatted_words)
+
+
+def process_matches(matches_per_word):
+    # Decide what to return based on the collected matches
+    if len(matches_per_word) == 1:
+        return sorted(matches_per_word[list(matches_per_word.keys())[0]], key=len, reverse=True)[0]
+    elif any(len(matches) > 1 for matches in matches_per_word.values()):
+        for _word, matches in matches_per_word.items():
+            if len(matches) > 1:
+                return sorted(matches, key=len, reverse=True)[0]
+    return None
 
 
 def find_line(text, lines):
-    # Remove all whitespaces from the text
-    text = text.replace(' ', '')
-    for line in lines.keys():
-        if line.lower() in text.lower():
-            return line
-    return None
+    formatted_text = format_text_for_line_search(text)
+    if formatted_text is None:
+        return None
+
+    words = formatted_text.split()
+    sorted_lines = sorted(lines.keys(), key=len, reverse=True)
+    matches_per_word = {}
+
+    for word in set(words):
+        for line in sorted_lines:
+            if line.lower() in word.lower():
+                matches_per_word.setdefault(word, []).append(line)
+
+    return process_matches(matches_per_word)
 
 
 def format_text(text):
@@ -80,6 +117,10 @@ def find_station(text, line=None, threshold=90):
 
 
 def find_direction(text, line):
+    # It is unlikely that the direction is mentioned when there is no line
+    if line is None:
+        return None, text
+    
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
 
     for keyword in direction_keywords:
@@ -116,7 +157,7 @@ def handle_get_off(text):
         'getting off',
         'steigen aus',
     ]
-
+    
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
@@ -211,13 +252,40 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
+        print('Ticket inspector got off the train')
         ticket_inspector.direction = None
         ticket_inspector.line = None
 
     return ticket_inspector
 
 
+def handle_ringbahn(text):
+    ring_keywords = ['ring', 'ringbahn']
+    # remove commas and dots from the text
+    text = text.replace(',', '').replace('.', '')
+    # split the text into individual words
+    words = text.lower().split()
+    # check if any word in the text matches the ring keywords
+    for word in words:
+        if word in ring_keywords:
+            return True
+    return False
+
+    
+def verify_line(ticket_inspector, text):
+    # If it the ring set to S41
+    if handle_ringbahn(text.lower()) and ticket_inspector.line is None:
+        ticket_inspector.line = 'S41'
+        
+    return ticket_inspector
+        
+
 def extract_ticket_inspector_info(unformatted_text):
+    # If the text contains a question mark, indicate that no processing should occur
+    if '?' in unformatted_text:
+        ticket_inspector = TicketInspector(line=None, station=None, direction=None)
+        return ticket_inspector.__dict__
+    
     found_line = find_line(unformatted_text, lines_with_stations)
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
@@ -231,10 +299,10 @@ def extract_ticket_inspector_info(unformatted_text):
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
-        verified_ticket_inspector = verify_direction(
-            ticket_inspector, text, unformatted_text
-        )
-        return verified_ticket_inspector.__dict__
+        verify_direction(ticket_inspector, text, unformatted_text)
+        verify_line(ticket_inspector, unformatted_text)
+        
+        return ticket_inspector.__dict__
     else:
         return None
 
