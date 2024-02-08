@@ -85,6 +85,7 @@ def get_all_stations(line=None):
 def find_station(text, line=None, threshold=90):
     all_stations = get_all_stations(line)
     text_ner = M1.text(text)
+    print(text_ner)
     # Perform the fuzzy matching with the gathered list of stations
     best_match, score = process.extractOne(text_ner, all_stations)
     if score >= threshold:

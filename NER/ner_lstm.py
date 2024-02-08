@@ -105,4 +105,4 @@ class Model:
         return newDoc.text
 
 
-M1 = Model('NER/models/loss17')
+M1 = Model('NER/models/model-best')

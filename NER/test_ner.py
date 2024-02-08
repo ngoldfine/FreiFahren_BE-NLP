@@ -23,6 +23,9 @@ def testANNOTS(MODEL: Model, DATASET=TEST_DATA ):
 
 
 def testMessages(Model: Model, DATASET='data/messages.txt'):
+    colors = {'LINE': '#F67DE3',
+          'STATION': '#7DF6D9'}
+    options = {'colors': colors}
 
     with open(DATASET) as file:
         messages = file.read().split('\n')
@@ -32,7 +35,7 @@ def testMessages(Model: Model, DATASET='data/messages.txt'):
         matches = Model.identify_stations(message, return_doc=True)
         docs.append(matches)
 
-    displacy.serve(docs, style='ent', auto_select_port=True)
+    displacy.serve(docs, style='ent', auto_select_port=True, options=options)
 
-M1 = Model('NER/models/loss17')
+M1 = Model('NER/models/model-best')
 testMessages(M1)
