@@ -104,5 +104,19 @@ class Model:
         newDoc = Doc(self.nlp.vocab, words=words, ents=ents, tags=tags)
         return newDoc.text
 
+    def get_one_station(self, text):
+        doc = self.nlp(text)
+        
+        for ent in doc.ents:
+            if ent.label_ == 'STATION':
+                return ent.text
+        
+    
+    def get_line(self, text):
+        doc = self.nlp(text)
+        for ent in doc.ents:
+            if ent.label_ == 'LINE':
+                return ent.text
+    
 
-M1 = Model('NER/models/model-best')
+M1 = Model('NER/models/ner-best')

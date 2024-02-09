@@ -5,6 +5,7 @@ from fuzzywuzzy import process
 import json
 # from dotenv import load_dotenv
 from NER.ner_lstm import M1
+from NER.spancat import M2
 # from fuzzy import getSimilar  # type: ignore
 
 
@@ -37,7 +38,6 @@ def find_line(text, lines):
             if i + 1 < len(words):
                 words[i + 1] = word.lower() + words[i + 1]
 
-    print(words)
     for word in words:
         for line in sorted_lines:
             if line.lower() in word.lower():
@@ -84,10 +84,9 @@ def get_all_stations(line=None):
 
 def find_station(text, line=None, threshold=90):
     all_stations = get_all_stations(line)
-    text_ner = M1.text(text)
-    print(text_ner)
+    # text_cat = M1.text(text)
     # Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(text_ner, all_stations)
+    best_match, score = process.extractOne(text, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():
@@ -97,6 +96,27 @@ def find_station(text, line=None, threshold=90):
                     return station
     return None
 
+# def getBestMatch(text, all_stations, threshold=90):
+#     best_match, score = process.extractOne(text, all_stations)
+#     if score >= threshold:
+#         # Find the station that matches the best match
+#         for station_type in stations_with_synonyms.values():
+#             for station, synonyms in station_type.items():
+#                 if best_match in [station.lower()] + \
+#                         [synonym.lower() for synonym in synonyms]:
+#                     return station
+#     return None
+
+# def find_station(text, line=None, threshold=90):
+#     all_stations = get_all_stations(line)
+
+#     text_ner = M1.get_one_station(text)
+   
+#     ner_prediction = getBestMatch(text_ner, all_stations, threshold)
+#     if ner_prediction is not None:
+#         return ner_prediction
+#     else:
+#         return getBestMatch(text, all_stations, threshold)
 
 def find_direction(text, line):
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
