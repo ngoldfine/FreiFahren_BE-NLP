@@ -1,20 +1,19 @@
 from telethon import TelegramClient
 from datetime import datetime, timedelta, timezone
 import asyncio
-from dotenv import load_dotenv
 import csv
 import os
+from dotenv import load_dotenv
+import random
 
 load_dotenv()
 
-# Your credentials from my.telegram.org
 api_id = os.getenv('API_ID')
+print(api_id)
 api_hash = os.getenv('API_HASH')
+print(api_hash)
 
-# The name of the session file.
 session_file = 'Get1000Messages'
-
-# Target group username or group ID
 group_identifier = '@freifahren_BE'
 
 client = TelegramClient(session_file, api_id, api_hash)
@@ -24,32 +23,41 @@ async def get_messages(group_identifier):
     await client.start()
     print('Client Created')
 
-    # The timeframe for messages to fetch, making them timezone aware
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(days=7)
 
-    message_texts = []
+    hourly_messages = {}
 
-    # Fetch a large number of messages first, to filter through
-    all_messages = await client.get_messages(group_identifier, limit=5000)
+    # Fetch messages within the last 7 days, up to a limit
+    all_messages = await client.get_messages(group_identifier, limit=10000)
     
     for message in all_messages:
         if start_time <= message.date <= end_time:
-            # Append both message text and the timestamp
-            message_texts.append((message.message, message.date.strftime('%Y-%m-%d %H:%M:%S')))
-        # Break early if message is older than our timeframe
-        if message.date < start_time:
-            break
+            # Format the message date to round down to the nearest hour
+            hour = message.date.replace(minute=0, second=0, microsecond=0)
+            if hour not in hourly_messages:
+                hourly_messages[hour] = []
+            hourly_messages[hour].append((
+                message.message,
+                message.date.strftime('%Y-%m-%d %H:%M:%S')
+            ))
+    
+    # Select up to 15 random messages from each hourly group
+    selected_messages = []
+    for _hour, messages in hourly_messages.items():
+        if len(messages) > 15:
+            selected_messages.extend(random.sample(messages, 15))
+        else:
+            selected_messages.extend(messages)
 
     await client.disconnect()
-    return message_texts
+    return selected_messages
 
 if __name__ == '__main__':
     messages = asyncio.run(get_messages(group_identifier))
 
-    # Save the messages to a CSV file
+    # Save the selected messages to a CSV file
     with open('group_messages.csv', 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         for message_text, timestamp in messages:
-            # Write each message text and its timestamp as a row in the CSV file
             writer.writerow([message_text, timestamp])
