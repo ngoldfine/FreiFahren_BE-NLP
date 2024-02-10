@@ -117,6 +117,12 @@ class Model:
         for ent in doc.ents:
             if ent.label_ == 'LINE':
                 return ent.text
+        
+    def get_direction(self, text):
+        doc = self.nlp(text)
+        for ent in doc.ents:
+            if ent.label_ == 'DIRECTION':
+                return ent.text
     
 
-M1 = Model('NER/models/ner-best')
+M1 = Model('NER/models/loss17')

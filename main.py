@@ -5,7 +5,7 @@ from fuzzywuzzy import process
 import json
 # from dotenv import load_dotenv
 from NER.ner_lstm import M1
-from NER.spancat import M2
+
 # from fuzzy import getSimilar  # type: ignore
 
 
@@ -84,9 +84,9 @@ def get_all_stations(line=None):
 
 def find_station(text, line=None, threshold=90):
     all_stations = get_all_stations(line)
-    # text_cat = M1.text(text)
-    # Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(text, all_stations)
+    text_cat = M1.text(text)
+    #Perform the fuzzy matching with the gathered list of stations
+    best_match, score = process.extractOne(text_cat, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():

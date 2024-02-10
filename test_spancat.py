@@ -22,6 +22,7 @@ for test in test_cases:
 
     p_station_ner = M1.get_one_station(message)
     p_line_ner = M1.get_line(message)
+    p_direction_ner = M1.get_direction(message)
 
     p_info_fuzzy = extract_ticket_inspector_info(message)
     
@@ -44,8 +45,8 @@ for test in test_cases:
     print("\n")
 
     table_ner = []
-    table_ner.append(["Station (NER)", "Predicted Station (NER)", "Line (NER)", "Predicted Line (NER)"])
-    table_ner.append([station, p_station_ner, line, p_line_ner])
+    table_ner.append(["Station (NER)", "Predicted Station (NER)", "Line (NER)", "Predicted Line (NER)", "Direction", "Predicted Direction (NER)"])
+    table_ner.append([station, p_station_ner, line, p_line_ner, direction, p_direction_ner])
 
     print(tabulate(table_ner, headers="firstrow", tablefmt="grid"))
     print("\n")
@@ -59,3 +60,5 @@ for test in test_cases:
 
     print("\n\n\n\n")
 
+
+# threshold pro buchstabe, z.b landsberger alle darf kein gleichen threshold haben wie alex

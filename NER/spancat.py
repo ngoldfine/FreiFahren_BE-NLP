@@ -111,7 +111,7 @@ class Model:
         spans = []
         for span in doc.spans['sc']:
             if span.label_ == "LINE":
-                if span.text is not "S-":
+                if span.text != "S-":
                     return span.text
     
         
@@ -124,5 +124,7 @@ class Model:
 
         
 
-
 M2 = Model('NER/models/spancat-best')
+
+txt = M2.serve("U8 Rosi Richtung Hermannstrasse ")
+
