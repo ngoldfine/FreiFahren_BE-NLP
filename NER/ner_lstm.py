@@ -23,12 +23,12 @@ class Model:
             self.nlp.add_pipe('ner')
 
             now = datetime.now()
-            dt_string = now.strftime("%d-%m-%Y___%H.%M.%S")
+            dt_string = now.strftime('%d-%m-%Y___%H.%M.%S')
             self.model_path = f'models/{dt_string}'
 
-            print(f'new blank \'de\' model loaded in {self.model_path}')
+            print(f"new blank \'de\' model loaded in {self.model_path}")
         else:
-            self.nlp = spacy.load(f"{self.model_path}")
+            self.nlp = spacy.load(f'{self.model_path}')
             self.ner = self.nlp.get_pipe('ner')
 
             print(f'model from {self.model_path} loaded')
@@ -60,8 +60,8 @@ class Model:
             words.append(ent.text)
             tags.append(ent.label_)
 
-        newDoc = Doc(self.nlp.vocab, words=words, ents=ents, tags=tags)
-        return newDoc.text
+        new_doc = Doc(self.nlp.vocab, words=words, ents=ents, tags=tags)
+        return new_doc.text
 
     def get_one_station(self, text):
         doc = self.nlp(text)
