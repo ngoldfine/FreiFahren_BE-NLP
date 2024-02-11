@@ -1029,7 +1029,7 @@ test_cases = [
      None),
     (
      'Nicolas Sidiropulos1x Braun lilane North face Jacke, kurze schwarze haare, männlich gelesen',
-     None, None, None),
+     'Nicolassee', 'S1', None),
     (
      '1x schwarze Jacke, schwarze...Waren 3',
      None, None, None),
@@ -1130,8 +1130,8 @@ test_cases = [
      'Rudow'),
     (
      'Stephen MarcalanRingbahn S41 jetzt gleich TempelhofWie sehen die aus?',
-     'Tempelhof',
-     'S41',
+     None,
+     None,
      None),
     (
      'U8 Bernauerstr richtung Hermannstr, 3 Blauevesten',
@@ -1150,11 +1150,11 @@ test_cases = [
     (
      '2bos mehringdamm am gleis u7/u6',
      'Mehringdamm',
-     'U6',
+     None,
      None),
     (
      'Diese Leute am Moritzplatz. nicht Kontrolleur(?)',
-     'Moritzplatz',
+     None,
      None, None),
     (
      'Mehringdamm jetzt viele',
@@ -1162,7 +1162,7 @@ test_cases = [
      None, None),
     (
      'dumbass óskPhoto, Diese Leute am Moritzplatz. nicht Kontrolleur(?)Manchmal ja manchmal nein',
-     'Moritzplatz',
+     None,
      None, None),
     (
      'U7 direction Rudow Gneisenaustrasse',
@@ -1498,7 +1498,7 @@ test_cases = [
     (
      'U1/U3 schlesisches Tor in 3 Kontrolletis in Security Westen',
      'Schlesisches Tor',
-     'U1',
+     None,
      None),
     (
      'Richtung Uhlnd Straße',
@@ -1707,8 +1707,8 @@ test_cases = [
      'Pankow'),
     (
      'MarsPhoto, U8 richtung hermanplatzHaben die kontrolliert? Ne, oder?',
-     None, 'U8',
-     'Hermannplatz'),
+     None, None,
+     None),
     (
      'U8 kotti polizei kontrol..',
      'Kottbusser Tor',

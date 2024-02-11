@@ -1,12 +1,9 @@
-# import os
+import os
 import re
 from fuzzywuzzy import process
-# import telebot
+import telebot
 import json
-# from dotenv import load_dotenv
-from NER.ner_lstm import M1
-
-# from fuzzy import getSimilar  # type: ignore
+from dotenv import load_dotenv
 
 
 class TicketInspector:
@@ -15,34 +12,56 @@ class TicketInspector:
         self.line = line
         self.station = station
         self.direction = direction
+        
 
-
-with open('data/stations_and_lines.json', 'r') as f:
+with open('stations_and_lines.json', 'r') as f:
     lines_with_stations = json.load(f)
+   
+
+def format_text_for_line_search(text):
+    # Replace commas, dots, dashes, and slashes with spaces
+    text = text.replace(',', ' ').replace('.', ' ').replace('-', ' ').replace('/', ' ')
+    words = text.split()
+
+    # When 's' or 'u' are followed by a number, combine them
+    formatted_words = []
+    for i, word in enumerate(words):
+        lower_word = word.lower()
+        if (lower_word == 's' or lower_word == 'u') and i + 1 < len(words):
+            combined_word = lower_word + words[i + 1]
+            formatted_words.append(combined_word)
+        else:
+            formatted_words.append(word)
+
+    return ' '.join(formatted_words)
+
+
+def process_matches(matches_per_word):
+    # Decide what to return based on the collected matches
+    if len(matches_per_word) == 1:
+        return sorted(matches_per_word[list(matches_per_word.keys())[0]], key=len, reverse=True)[0]
+    elif any(len(matches) > 1 for matches in matches_per_word.values()):
+        for _word, matches in matches_per_word.items():
+            if len(matches) > 1:
+                return sorted(matches, key=len, reverse=True)[0]
+    return None
 
 
 def find_line(text, lines):
-    # remove all of the commas and dots from the text
-    text = text.replace(',', ' ')
-    text = text.replace('.', ' ')
+    formatted_text = format_text_for_line_search(text)
+    if formatted_text is None:
+        return None
 
-    # Split the text into individual words
-    words = text.split()
-
-    # Sort lines by length in descending order to prioritize longer matches
+    words = formatted_text.split()
     sorted_lines = sorted(lines.keys(), key=len, reverse=True)
+    matches_per_word = {}
 
-    # Check if the word is 's' or 'u' and combine it with the next word
-    for i, word in enumerate(words):
-        if word.lower() == 's' or word.lower() == 'u':
-            if i + 1 < len(words):
-                words[i + 1] = word.lower() + words[i + 1]
-
-    for word in words:
+    for word in set(words):
         for line in sorted_lines:
             if line.lower() in word.lower():
-                return line
-    return None
+                matches_per_word.setdefault(word, []).append(line)
+
+    return process_matches(matches_per_word)
 
 
 def format_text(text):
@@ -53,7 +72,7 @@ def format_text(text):
     return text
 
 
-with open('data/synonyms.json', 'r') as f:
+with open('data.json', 'r') as f:
     stations_with_synonyms = json.load(f)
 
 
@@ -84,9 +103,9 @@ def get_all_stations(line=None):
 
 def find_station(text, line=None, threshold=90):
     all_stations = get_all_stations(line)
-    text_cat = M1.text(text)
-    #Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(text_cat, all_stations)
+
+    # Perform the fuzzy matching with the gathered list of stations
+    best_match, score = process.extractOne(text, all_stations)
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():
@@ -96,29 +115,12 @@ def find_station(text, line=None, threshold=90):
                     return station
     return None
 
-# def getBestMatch(text, all_stations, threshold=90):
-#     best_match, score = process.extractOne(text, all_stations)
-#     if score >= threshold:
-#         # Find the station that matches the best match
-#         for station_type in stations_with_synonyms.values():
-#             for station, synonyms in station_type.items():
-#                 if best_match in [station.lower()] + \
-#                         [synonym.lower() for synonym in synonyms]:
-#                     return station
-#     return None
-
-# def find_station(text, line=None, threshold=90):
-#     all_stations = get_all_stations(line)
-
-#     text_ner = M1.get_one_station(text)
-   
-#     ner_prediction = getBestMatch(text_ner, all_stations, threshold)
-#     if ner_prediction is not None:
-#         return ner_prediction
-#     else:
-#         return getBestMatch(text, all_stations, threshold)
 
 def find_direction(text, line):
+    # It is unlikely that the direction is mentioned when there is no line
+    if line is None:
+        return None, text
+    
     direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
 
     for keyword in direction_keywords:
@@ -279,6 +281,11 @@ def verify_line(ticket_inspector, text):
         
 
 def extract_ticket_inspector_info(unformatted_text):
+    # If the text contains a question mark, indicate that no processing should occur
+    if '?' in unformatted_text:
+        ticket_inspector = TicketInspector(line=None, station=None, direction=None)
+        return ticket_inspector.__dict__
+    
     found_line = find_line(unformatted_text, lines_with_stations)
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
@@ -300,21 +307,21 @@ def extract_ticket_inspector_info(unformatted_text):
         return None
 
 
-# if __name__ == '__main__':
-#     load_dotenv()  # take environment variables from .env.
-#     BOT_TOKEN = os.getenv('BOT_TOKEN')
-#     bot = telebot.TeleBot(BOT_TOKEN)
+if __name__ == '__main__':
+    load_dotenv()  # take environment variables from .env.
+    BOT_TOKEN = os.getenv('BOT_TOKEN')
+    bot = telebot.TeleBot(BOT_TOKEN)
 
-#     print('Bot is running...🏃‍♂️')
+    print('Bot is running...🏃‍♂️')
 
-#     # Messages set to private for testing purposes
-#     @bot.message_handler(func=lambda message: message.chat.type == 'private')
-#     def get_info(message):
-#         info = extract_ticket_inspector_info(message.text)
-#         if info:
-#             print(info)
-#         else:
-#             print('No valuable information found')
-#             return None
+    # Messages set to private for testing purposes
+    @bot.message_handler(func=lambda message: message.chat.type == 'private')
+    def get_info(message):
+        info = extract_ticket_inspector_info(message.text)
+        if info:
+            print(info)
+        else:
+            print('No valuable information found')
+            return None
 
-#     bot.infinity_polling()
+    bot.infinity_polling()
