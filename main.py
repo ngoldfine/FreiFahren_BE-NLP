@@ -315,19 +315,18 @@ if __name__ == '__main__':
 
     @bot.message_handler(func=lambda message: message.chat.type == 'private')
     def get_info(message):
-        chat_id = message.chat.id
+        author_id = message.chat.id
         current_time = datetime.datetime.now()
         
-        # Check if this chat_id already has messages
-        if chat_id in conversations and conversations[chat_id]:
-            last_message = conversations[chat_id][-1]  # Get the last message from this chat_id
+        # Check if this author_id already has messages
+        if author_id in conversations and conversations[author_id]:
+            last_message = conversations[author_id][-1]  # Get the last message from this author_id
             last_message_time = last_message['time']
             time_difference = current_time - last_message_time
             
             if time_difference.total_seconds() <= 60:
                 # If the new message is within one minute of the last message, merge them
                 merged_text = f"{last_message['text']} {message.text}"
-                print('\n Merged message:', merged_text)
                 
                 # Update the last message in the conversation
                 last_message['text'] = merged_text
@@ -336,18 +335,16 @@ if __name__ == '__main__':
                 last_message['info'] = info
             else:
                 # Handle as a new message
-                process_new_message(chat_id, message, current_time)
+                process_new_message(author_id, message, current_time)
         else:
-            # This is the first message from this chat_id or no previous conversation exists
-            process_new_message(chat_id, message, current_time)
+            # This is the first message from this author_id or no previous conversation exists
+            process_new_message(author_id, message, current_time)
 
-        print('Conversations dict:', conversations)
-
-    def process_new_message(chat_id, message, current_time):
+    def process_new_message(author_id, message, current_time):
         info = extract_ticket_inspector_info(message.text)
-        if chat_id not in conversations:
-            conversations[chat_id] = []
-        conversations[chat_id].append({'text': message.text, 'time': current_time, 'info': info})
+        if author_id not in conversations:
+            conversations[author_id] = []
+        conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
         if info:
             print('Found Info:', info)
         else:
@@ -355,6 +352,3 @@ if __name__ == '__main__':
             
     bot.infinity_polling()
     
-# Todo: 
-    # - handle two messages from the same user (merge messages)
-    # - overwrite old message with the merged message
