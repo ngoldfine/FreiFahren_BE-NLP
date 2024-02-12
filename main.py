@@ -2,6 +2,7 @@ import os
 import re
 from fuzzywuzzy import process
 import telebot
+import datetime
 import json
 from dotenv import load_dotenv
 
@@ -315,45 +316,45 @@ if __name__ == '__main__':
     @bot.message_handler(func=lambda message: message.chat.type == 'private')
     def get_info(message):
         chat_id = message.chat.id
+        current_time = datetime.datetime.now()
         
-        print('\nInput message:', message.text)
-        if message.reply_to_message:
-            # If the message is a reply, construct a merged message
-            original_msg = message.reply_to_message.text
-            reply_msg = message.text
-            combined_message = f'{original_msg} {reply_msg}'
-            print('combined message: ', combined_message)
+        # Check if this chat_id already has messages
+        if chat_id in conversations and conversations[chat_id]:
+            last_message = conversations[chat_id][-1]  # Get the last message from this chat_id
+            last_message_time = last_message['time']
+            time_difference = current_time - last_message_time
             
-            # Process the merged message
-            info = extract_ticket_inspector_info(combined_message)
-            if info:
-                print(info)
-                # After processing, update the original message with the combined message
-                # Find the original message in the conversation list and update it
-                for stored_message in conversations.get(chat_id, []):
-                    if stored_message['text'] == original_msg:
-                        stored_message['text'] = combined_message
-                        stored_message['info'] = info
-                        break
+            if time_difference.total_seconds() <= 60:
+                # If the new message is within one minute of the last message, merge them
+                merged_text = f"{last_message['text']} {message.text}"
+                print('\n Merged message:', merged_text)
+                
+                # Update the last message in the conversation
+                last_message['text'] = merged_text
+                last_message['time'] = current_time  # Update the timestamp to the latest message
+                info = extract_ticket_inspector_info(merged_text)
+                last_message['info'] = info
             else:
-                print('No valuable information found')
+                # Handle as a new message
+                process_new_message(chat_id, message, current_time)
         else:
-            # If not a reply, just process the message directly
-            info = extract_ticket_inspector_info(message.text)
-            if info:
-                print('Found Info: ', info)
-            else:
-                print('No valuable information found')
-            # Store the message with its info for potential future replies
-            if chat_id not in conversations:
-                conversations[chat_id] = []
-            conversations[chat_id].append({'text': message.text, 'info': info})
+            # This is the first message from this chat_id or no previous conversation exists
+            process_new_message(chat_id, message, current_time)
 
-        print('conversation dict: ', conversations)
+        print('Conversations dict:', conversations)
+
+    def process_new_message(chat_id, message, current_time):
+        info = extract_ticket_inspector_info(message.text)
+        if chat_id not in conversations:
+            conversations[chat_id] = []
+        conversations[chat_id].append({'text': message.text, 'time': current_time, 'info': info})
+        if info:
+            print('Found Info:', info)
+        else:
+            print('No valuable information found')
+            
     bot.infinity_polling()
     
-# Todo:
-    # - handle replies (merge message)
-    # - overwrite old message when it was a reply
+# Todo: 
     # - handle two messages from the same user (merge messages)
     # - overwrite old message with the merged message
