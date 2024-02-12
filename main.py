@@ -199,7 +199,6 @@ def correct_direction(ticket_inspector, lines_with_final_station):
     if ticket_inspector.line in lines_with_final_station.keys():
         stations_of_line = lines_with_final_station[ticket_inspector.line]
         if ticket_inspector.direction in [stations_of_line[0], stations_of_line[-1]]:
-            print('Direction is in final stations, therefore no correction needed')
             return ticket_inspector
         elif (
             ticket_inspector.station in lines_with_final_station[ticket_inspector.line]
@@ -221,21 +220,17 @@ def correct_direction(ticket_inspector, lines_with_final_station):
                 ticket_inspector.direction = lines_with_final_station[
                     ticket_inspector.line
                 ][-1]
-                print('Direction was corrected to the last station of the line')
             else:
                 ticket_inspector.direction = lines_with_final_station[
                     ticket_inspector.line
                 ][0]
-                print('Direction was corrected to the first station of the line')
 
             return ticket_inspector
         else:
-            print('Not enough information to correct direction')
             ticket_inspector.direction = None
             return ticket_inspector
 
     else:
-        print('Train is not in lines_with_final_station')
         return ticket_inspector
 
 
@@ -250,13 +245,11 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
     if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
-        print('Station is actually direction therefore station is None and direction is station')
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
-        print('Ticket inspector got off the train, therefore direction is None')
         ticket_inspector.direction = None
         ticket_inspector.line = None
 
@@ -287,7 +280,6 @@ def verify_line(ticket_inspector, text):
 def extract_ticket_inspector_info(unformatted_text):
     # If the text contains a question mark, indicate that no processing should occur
     if '?' in unformatted_text:
-        print('Everything after a question mark is ignored')
         ticket_inspector = TicketInspector(line=None, station=None, direction=None)
         return ticket_inspector.__dict__
     
@@ -297,13 +289,10 @@ def extract_ticket_inspector_info(unformatted_text):
     text = format_text(unformatted_text)
     result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
-    print('Found direction, after first search: ', found_direction)
     ticket_inspector.direction = found_direction
     text_without_direction = result[1]
-    print('Text without direction', text_without_direction)
 
     found_station = find_station(text_without_direction, ticket_inspector.line)
-    print('Found station, after first search: ', found_station)
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
@@ -319,17 +308,52 @@ if __name__ == '__main__':
     load_dotenv()  # take environment variables from .env.
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     bot = telebot.TeleBot(BOT_TOKEN)
+    conversations = {}  # Dictionary to store conversations with more detailed structure
 
     print('Bot is running...🏃‍♂️')
 
-    # Messages set to private for testing purposes
     @bot.message_handler(func=lambda message: message.chat.type == 'private')
     def get_info(message):
-        info = extract_ticket_inspector_info(message.text)
-        if info:
-            print(info)
+        chat_id = message.chat.id
+        
+        print('\nInput message:', message.text)
+        if message.reply_to_message:
+            # If the message is a reply, construct a merged message
+            original_msg = message.reply_to_message.text
+            reply_msg = message.text
+            combined_message = f'{original_msg} {reply_msg}'
+            print('combined message: ', combined_message)
+            
+            # Process the merged message
+            info = extract_ticket_inspector_info(combined_message)
+            if info:
+                print(info)
+                # After processing, update the original message with the combined message
+                # Find the original message in the conversation list and update it
+                for stored_message in conversations.get(chat_id, []):
+                    if stored_message['text'] == original_msg:
+                        stored_message['text'] = combined_message
+                        stored_message['info'] = info
+                        break
+            else:
+                print('No valuable information found')
         else:
-            print('No valuable information found')
-            return None
+            # If not a reply, just process the message directly
+            info = extract_ticket_inspector_info(message.text)
+            if info:
+                print('Found Info: ', info)
+            else:
+                print('No valuable information found')
+            # Store the message with its info for potential future replies
+            if chat_id not in conversations:
+                conversations[chat_id] = []
+            conversations[chat_id].append({'text': message.text, 'info': info})
 
+        print('conversation dict: ', conversations)
     bot.infinity_polling()
+    
+# Todo:
+    # - handle replies (merge message)
+    # - overwrite old message when it was a reply
+    # - handle two messages from the same user (merge messages)
+    # - overwrite old message with the merged message
