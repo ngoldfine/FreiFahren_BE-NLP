@@ -20,9 +20,9 @@ class TransportInformationRecognizer:
         
         match = self.nlp(text)
         matches = []
-        for ent in match.ents:
-            if ent.label_ == 'STATION':
-                matches.append(ent)
+        for entity in match.ents:
+            if entity.label_ == 'STATION':
+                matches.append(entity)
             
         return matches
 
@@ -31,16 +31,16 @@ class TransportInformationRecognizer:
     def process_text(self, text: str) -> str:
 
         doc = self.nlp(text)
-        ents = []
+        entities = []
         words = []
         tags = []
 
-        for ent in doc.ents:
-            ents.append(ent)
-            words.append(ent.text)
-            tags.append(ent.label_)
+        for entity in doc.ents:
+            entities.append(entity)
+            words.append(entities.text)
+            tags.append(entities.label_)
 
-        new_doc = Doc(self.nlp.vocab, words=words, ents=ents, tags=tags)
+        new_doc = Doc(self.nlp.vocab, words=words, entitiess=entitiess, tags=tags)
         return new_doc.text
     
 
