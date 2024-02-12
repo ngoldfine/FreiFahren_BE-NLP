@@ -80,13 +80,11 @@ with open('data.json', 'r') as f:
 def get_all_stations(line=None):
     all_stations = []
     line = line.upper() if line is not None else None
-    print('Line:', line)
 
     if line is not None:
         # If a specific line is provided, add stations and synonyms from that line
         stations_of_line = lines_with_stations.get(line, [])
         all_stations.extend([station.lower() for station in stations_of_line])
-        print('Stations of line:', stations_of_line)
         
         # Add synonyms for the stations on the specified line
         for station in stations_of_line:
@@ -108,12 +106,8 @@ def get_all_stations(line=None):
 def find_station(text, line=None, threshold=75):
     all_stations = get_all_stations(line)
     ner_text = M1.text(text)
-    print('NER text:', ner_text)
     # Perform the fuzzy matching with the gathered list of stations
     match = process.extractOne(ner_text, all_stations)
-    if match is None:
-        print('No match found')
-        return None
     best_match, score = match
     if score >= threshold:
         # Find the station that matches the best match
@@ -190,12 +184,9 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
     line_index = text.rfind(line)
     after_line = text[line_index + len(line):].strip()
     after_line_words = after_line.split()
-    print('After line words', after_line_words)
     if len(after_line_words) > 0:
         # Check if the word after the line is a station
-        print(after_line_words[0])
         found_station = find_station(after_line_words[0], line)
-        print('Found station in second check:', found_station)
 
         if found_station:
             # Check if the station matches one of the final stations of the line
@@ -203,9 +194,7 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
                 ticket_inspector.direction = found_station
                 # remove the word after the line from the text
                 text_without_direction = text.replace(after_line_words[0], '').strip()
-                print('Text without direction:', text_without_direction)
                 ticket_inspector.station = find_station(text_without_direction, line)
-                print('Station', ticket_inspector.station)
 
                 return ticket_inspector
 
@@ -216,7 +205,6 @@ def correct_direction(ticket_inspector, lines_with_final_station):
     if ticket_inspector.line in lines_with_final_station.keys():
         stations_of_line = lines_with_final_station[ticket_inspector.line]
         if ticket_inspector.direction in [stations_of_line[0], stations_of_line[-1]]:
-            print('Direction is in final stations, therefore no correction needed')
             return ticket_inspector
         elif (
             ticket_inspector.station in lines_with_final_station[ticket_inspector.line]
@@ -238,21 +226,17 @@ def correct_direction(ticket_inspector, lines_with_final_station):
                 ticket_inspector.direction = lines_with_final_station[
                     ticket_inspector.line
                 ][-1]
-                print('Direction was corrected to the last station of the line')
             else:
                 ticket_inspector.direction = lines_with_final_station[
                     ticket_inspector.line
                 ][0]
-                print('Direction was corrected to the first station of the line')
 
             return ticket_inspector
         else:
-            print('Not enough information to correct direction')
             ticket_inspector.direction = None
             return ticket_inspector
 
     else:
-        print('Train is not in lines_with_final_station')
         return ticket_inspector
 
 
@@ -263,12 +247,10 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
-    if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
-        print('Station is actually direction therefore station is None and direction is station')
+    check_if_station_is_actually_direction(unformatted_text, ticket_inspector)
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
-        print('Ticket inspector got off the train, therefore direction is None')
         ticket_inspector.direction = None
         ticket_inspector.line = None
 
@@ -302,7 +284,6 @@ def verify_line(ticket_inspector, text):
 def extract_ticket_inspector_info(unformatted_text):
     # If the text contains a question mark, indicate that no processing should occur
     if '?' in unformatted_text:
-        print('Everything after a question mark is ignored')
         ticket_inspector = TicketInspector(line=None, station=None, direction=None)
         return ticket_inspector.__dict__
     
@@ -312,13 +293,10 @@ def extract_ticket_inspector_info(unformatted_text):
     text = format_text(unformatted_text)
     result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
-    print('Found direction, after first search: ', found_direction)
     ticket_inspector.direction = found_direction
     text_without_direction = result[1]
-    print('Text without direction', text_without_direction)
 
     found_station = find_station(text_without_direction, ticket_inspector.line)
-    print('Found station, after first search: ', found_station)
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
