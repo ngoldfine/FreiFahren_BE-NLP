@@ -758,7 +758,7 @@ test_cases = [
 
         'U6',
 
-        'Tegel',
+        'Alt-Tegel',
 
     ),
     (
@@ -1409,7 +1409,7 @@ test_cases = [
      None, None, None),
     (
      'U6 naturkundemuseum Richtung Kurt Schumacher',
-     'Naturalkundemuseum',
+     'Naturkundemuseum',
      'U6',
      'Kurt-Schumacher-Platz'),
     (

@@ -1,5 +1,9 @@
 .env
 /__pycache__
+NER/__pycache__
 ```
 .DS_Store
-labeled_messages.csv
+
+.vscode/settings.json
+*.pyc
+*.pyc
