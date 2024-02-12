@@ -40,7 +40,7 @@ class TransportInformationRecognizer:
             words.append(entity.text)
             tags.append(entity.label_)
 
-        new_doc = Doc(self.nlp.vocab, words=words, entities=entities, tags=tags)
+        new_doc = Doc(self.nlp.vocab, words=words, ents=entities, tags=tags)
         return new_doc.text
     
 
