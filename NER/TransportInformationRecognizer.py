@@ -33,19 +33,14 @@ class TransportInformationRecognizer:
         doc = self.nlp(text)
         entities = []
         words = []
-        tags = []
 
         for entity in doc.ents:
-            entities.append(entity)
-            words.append(entity.text)
-            tags.append(entity.label_)
+            if entity.label_ == 'STATION':
+                entities.append(entity)
+                words.append(entity.text)
 
-        new_doc = Doc(self.nlp.vocab, words=words, ents=entities, tags=tags)
+        new_doc = Doc(self.nlp.vocab, words=words, ents=entities)
         return new_doc.text
     
 
 TextProcessor = TransportInformationRecognizer('NER/models/loss17')
-
-processed_text = TextProcessor.process_text('u2 jetzt zoo')
-
-print(processed_text)
