@@ -120,13 +120,14 @@ def find_station(text, line=None, threshold=75):
     return None
 
 
+direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
+
+
 def find_direction(text, line):
     # It is unlikely that the direction is mentioned when there is no line
     if line is None:
         return None, text
     
-    direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
-
     for keyword in direction_keywords:
         if keyword in text:
             # Split the text at the keyword
@@ -241,6 +242,24 @@ def correct_direction(ticket_inspector, lines_with_final_station):
         return ticket_inspector
 
 
+def check_word_before_direction_keyword(unformatted_text, ticket_inspector):
+    for keyword in direction_keywords:
+        if keyword in unformatted_text:
+            # Get the word directly before the keyword
+            parts = unformatted_text.split(keyword, 1)
+            if len(parts) > 1:
+                before_keyword = parts[0].strip()
+                words_before_keyword = before_keyword.split()
+                if len(words_before_keyword) > 0:
+                    # Check if the word before the keyword is a station
+                    found_station = find_station(words_before_keyword[-1], ticket_inspector.line)
+                    if found_station and found_station != ticket_inspector.station:
+                        ticket_inspector.direction = found_station
+
+                        return ticket_inspector
+    return ticket_inspector
+
+    
 def verify_direction(ticket_inspector, text, unformatted_text):
     # Set the Ringbahn to always be directionless
     if ticket_inspector.line == 'S41' or ticket_inspector.line == 'S42':
@@ -254,6 +273,9 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     if handle_get_off(text):
         ticket_inspector.direction = None
         ticket_inspector.line = None
+
+    if ticket_inspector.direction is None:
+        check_word_before_direction_keyword(unformatted_text, ticket_inspector)
 
     # Check if the direction is the final station of the line and correct it
     ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
