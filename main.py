@@ -102,7 +102,7 @@ def get_all_stations(line=None):
     return all_stations
 
 
-def find_station(text, line=None, threshold=90):
+def find_station(text, line=None, threshold=75):
     all_stations = get_all_stations(line)
     ner_text = M1.text(text)
     # Perform the fuzzy matching with the gathered list of stations
