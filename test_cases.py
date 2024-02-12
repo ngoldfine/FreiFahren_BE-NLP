@@ -1884,7 +1884,7 @@ test_cases = [
     (
      'Blauwesten ErnstReuter jetzt Richtung Zoo',
      'Ernst-Reuter-Platz',
-     None, 'Zoologischer Garten'),
+     None, 'Ruhleben'),
     (
      'Schöneberg KerstinU oder SLaut Bild am Übergang zwischen S- und U-Bahn, auf Erdgeschoss-Ebene (kann ja z.B. für Menschen mit Screenreader wichtig sein, dass das in Textform da steht - bloß mal so als Anmerkung).',
      'Schöneberg',

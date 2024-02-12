@@ -79,11 +79,14 @@ with open('data.json', 'r') as f:
 
 def get_all_stations(line=None):
     all_stations = []
+    line = line.upper() if line is not None else None
+    print('Line:', line)
 
     if line is not None:
         # If a specific line is provided, add stations and synonyms from that line
         stations_of_line = lines_with_stations.get(line, [])
         all_stations.extend([station.lower() for station in stations_of_line])
+        print('Stations of line:', stations_of_line)
         
         # Add synonyms for the stations on the specified line
         for station in stations_of_line:
@@ -105,8 +108,13 @@ def get_all_stations(line=None):
 def find_station(text, line=None, threshold=75):
     all_stations = get_all_stations(line)
     ner_text = M1.text(text)
+    print('NER text:', ner_text)
     # Perform the fuzzy matching with the gathered list of stations
-    best_match, score = process.extractOne(ner_text, all_stations)
+    match = process.extractOne(ner_text, all_stations)
+    if match is None:
+        print('No match found')
+        return None
+    best_match, score = match
     if score >= threshold:
         # Find the station that matches the best match
         for station_type in stations_with_synonyms.values():
@@ -172,26 +180,34 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
     line = ticket_inspector.line.lower()
     text = unformatted_text.lower()
 
-    # get the word after the line
+    # Get the final stations of the line
+    final_stations = []
+    if ticket_inspector.line in lines_with_stations:
+        final_stations.append(lines_with_stations[ticket_inspector.line][0])
+        final_stations.append(lines_with_stations[ticket_inspector.line][-1])
+
+    # Get the word after the line
     line_index = text.rfind(line)
-    after_line = text[line_index + len(line) :].strip()
+    after_line = text[line_index + len(line):].strip()
     after_line_words = after_line.split()
+    print('After line words', after_line_words)
     if len(after_line_words) > 0:
-        # check if the word after the line is a station
-        found_station = find_station(after_line_words[0], ticket_inspector.line)
+        # Check if the word after the line is a station
+        print(after_line_words[0])
+        found_station = find_station(after_line_words[0], line)
+        print('Found station in second check:', found_station)
 
-        all_final_stations = []
-        for stations in lines_with_stations.items():
-            all_final_stations.append(stations[0])
-            all_final_stations.append(stations[-1])
+        if found_station:
+            # Check if the station matches one of the final stations of the line
+            if found_station in final_stations:
+                ticket_inspector.direction = found_station
+                # remove the word after the line from the text
+                text_without_direction = text.replace(after_line_words[0], '').strip()
+                print('Text without direction:', text_without_direction)
+                ticket_inspector.station = find_station(text_without_direction, line)
+                print('Station', ticket_inspector.station)
 
-        if ticket_inspector.line and found_station:
-            # check if the station is in the line
-            if (
-                found_station == lines_with_stations[ticket_inspector.line][0]
-                or found_station == lines_with_stations[ticket_inspector.line][-1]
-            ):
-                return True
+                return ticket_inspector
 
     return False
 
@@ -241,9 +257,6 @@ def correct_direction(ticket_inspector, lines_with_final_station):
 
 
 def verify_direction(ticket_inspector, text, unformatted_text):
-    # Check if the direction is the final station of the line and correct it
-    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
-
     # Set the Ringbahn to always be directionless
     if ticket_inspector.line == 'S41' or ticket_inspector.line == 'S42':
         ticket_inspector.direction = None
@@ -252,14 +265,15 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
     if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
         print('Station is actually direction therefore station is None and direction is station')
-        ticket_inspector.direction = ticket_inspector.station
-        ticket_inspector.station = None
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
         print('Ticket inspector got off the train, therefore direction is None')
         ticket_inspector.direction = None
         ticket_inspector.line = None
+
+    # Check if the direction is the final station of the line and correct it
+    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
 
     return ticket_inspector
 
