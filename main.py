@@ -199,6 +199,7 @@ def correct_direction(ticket_inspector, lines_with_final_station):
     if ticket_inspector.line in lines_with_final_station.keys():
         stations_of_line = lines_with_final_station[ticket_inspector.line]
         if ticket_inspector.direction in [stations_of_line[0], stations_of_line[-1]]:
+            print('Direction is in final stations, therefore no correction needed')
             return ticket_inspector
         elif (
             ticket_inspector.station in lines_with_final_station[ticket_inspector.line]
@@ -220,10 +221,12 @@ def correct_direction(ticket_inspector, lines_with_final_station):
                 ticket_inspector.direction = lines_with_final_station[
                     ticket_inspector.line
                 ][-1]
+                print('Direction was corrected to the last station of the line')
             else:
                 ticket_inspector.direction = lines_with_final_station[
                     ticket_inspector.line
                 ][0]
+                print('Direction was corrected to the first station of the line')
 
             return ticket_inspector
         else:
@@ -247,12 +250,13 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
     if check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
+        print('Station is actually direction therefore station is None and direction is station')
         ticket_inspector.direction = ticket_inspector.station
         ticket_inspector.station = None
 
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
-        print('Ticket inspector got off the train')
+        print('Ticket inspector got off the train, therefore direction is None')
         ticket_inspector.direction = None
         ticket_inspector.line = None
 
@@ -283,6 +287,7 @@ def verify_line(ticket_inspector, text):
 def extract_ticket_inspector_info(unformatted_text):
     # If the text contains a question mark, indicate that no processing should occur
     if '?' in unformatted_text:
+        print('Everything after a question mark is ignored')
         ticket_inspector = TicketInspector(line=None, station=None, direction=None)
         return ticket_inspector.__dict__
     
@@ -292,10 +297,13 @@ def extract_ticket_inspector_info(unformatted_text):
     text = format_text(unformatted_text)
     result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
+    print('Found direction, after first search: ', found_direction)
     ticket_inspector.direction = found_direction
     text_without_direction = result[1]
+    print('Text without direction', text_without_direction)
 
     found_station = find_station(text_without_direction, ticket_inspector.line)
+    print('Found station, after first search: ', found_station)
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
