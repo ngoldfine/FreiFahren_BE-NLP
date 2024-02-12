@@ -4,7 +4,7 @@ from fuzzywuzzy import process
 import telebot
 import json
 from dotenv import load_dotenv
-from NER.ner_lstm import M1
+from NER.TransportInformationRecognizer import TextProcessor
 
 
 class TicketInspector:
@@ -105,9 +105,10 @@ def get_all_stations(line=None):
 
 def find_station(text, line=None, threshold=75):
     all_stations = get_all_stations(line)
-    ner_text = M1.text(text)
+    processed_text = TextProcessor.process_text(text)
+    
     # Perform the fuzzy matching with the gathered list of stations
-    match = process.extractOne(ner_text, all_stations)
+    match = process.extractOne(processed_text, all_stations)
     best_match, score = match
     if score >= threshold:
         # Find the station that matches the best match
