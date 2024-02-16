@@ -59,5 +59,5 @@ if __name__ == '__main__':
     # Save the selected messages to a CSV file
     with open('group_messages.csv', 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        for message_text, timestamp in messages:
-            writer.writerow([message_text, timestamp])
+        for message_text in messages:
+            writer.writerow([message_text])
