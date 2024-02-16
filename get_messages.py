@@ -1,7 +1,6 @@
 from telethon import TelegramClient
 from datetime import datetime, timedelta, timezone
 import asyncio
-import csv
 import os
 from dotenv import load_dotenv
 import random
@@ -56,8 +55,7 @@ async def get_messages(group_identifier):
 if __name__ == '__main__':
     messages = asyncio.run(get_messages(group_identifier))
 
-    # Save the selected messages to a CSV file
-    with open('group_messages.csv', 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
+    # Save the selected messages to a text file
+    with open('group_messages.txt', 'w', encoding='utf-8') as file:
         for message_text in messages:
-            writer.writerow([message_text])
+            file.write(message_text[0] + '\n')

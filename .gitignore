@@ -7,3 +7,4 @@ NER/__pycache__
 .vscode/settings.json
 *.pyc
 *.pyc
+group_messages.txt
