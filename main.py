@@ -124,10 +124,6 @@ direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'directi
 
 
 def find_direction(text, line):
-    # It is unlikely that the direction is mentioned when there is no line
-    if line is None:
-        return None, text
-    
     for keyword in direction_keywords:
         if keyword in text:
             # Split the text at the keyword
@@ -261,24 +257,26 @@ def check_word_before_direction_keyword(unformatted_text, ticket_inspector):
 
     
 def verify_direction(ticket_inspector, text, unformatted_text):
+    # direction should be None if the ticket inspector got off the train
+    if handle_get_off(text):
+        ticket_inspector.direction = None
+        ticket_inspector.line = None
+        return ticket_inspector
+    
+    # Check if the direction is the final station of the line and correct it
+    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
+    
     # Set the Ringbahn to always be directionless
     if ticket_inspector.line == 'S41' or ticket_inspector.line == 'S42':
         ticket_inspector.direction = None
 
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
-    check_if_station_is_actually_direction(unformatted_text, ticket_inspector)
-
-    # direction should be None if the ticket inspector got off the train
-    if handle_get_off(text):
-        ticket_inspector.direction = None
-        ticket_inspector.line = None
+    if ticket_inspector.direction is None:
+        check_if_station_is_actually_direction(unformatted_text, ticket_inspector)
 
     if ticket_inspector.direction is None:
         check_word_before_direction_keyword(unformatted_text, ticket_inspector)
-
-    # Check if the direction is the final station of the line and correct it
-    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
 
     return ticket_inspector
 
