@@ -120,14 +120,15 @@ def find_station(text, line=None, threshold=75):
     return None
 
 
-direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction']
+direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri']
 
 
 def find_direction(text, line):
-    for keyword in direction_keywords:
-        if keyword in text:
+    words = text.split()
+    for word in words:
+        if word in direction_keywords:
             # Split the text at the keyword
-            parts = text.split(keyword, 1)
+            parts = text.split(word, 1)
             if len(parts) > 1:
                 after_keyword = parts[1].strip()
 
@@ -139,7 +140,7 @@ def find_direction(text, line):
                     found_direction = find_station(word, line)
                     if found_direction:
                         # Remove the direction and the keyword from the text
-                        replace_segment = keyword + ' ' + word
+                        replace_segment = word
                         text_without_direction = text.replace(
                             replace_segment, ''
                         ).strip()
