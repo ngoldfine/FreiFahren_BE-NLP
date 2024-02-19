@@ -246,7 +246,7 @@ test_cases = [
     (
         'U8 Wittenau sind U Jannowitzbrücke raus',
 
-        'Jannowitzbrücke',
+        'Jannowitz Brücke',
 
         None,
         None,
@@ -375,7 +375,7 @@ test_cases = [
     (
         'Jannowitzbrücke U8',
 
-        'Jannowitzbrücke',
+        'Jannowitz Brücke',
 
         'U8',
 
@@ -478,7 +478,7 @@ test_cases = [
         '''Controller in S7 Richtung Alexanderplatz
         Was just checked in jannowitzbrucke''',
 
-        'Jannowitzbrücke',
+        'Jannowitz Brücke',
 
         'S7',
 
@@ -936,11 +936,11 @@ test_cases = [
      None),
     (
      'Neukölln  sbahn 2 männlich gelesene',
-     'Neuköln',
+     'Neukölln',
      None, None),
     (
      'Lazi ♀️Neukölln  sbahn 2 männlich geleseneBeide glatze',
-     'Neuköln',
+     'Neukölln',
      None, None),
     (
      'Jetzt noch zusätzlich zwei weitere steigen von s41 aus in Tempelhof',
@@ -1047,7 +1047,7 @@ test_cases = [
     (
      '2 blaue Westen U9 Richtung Steglitz ',
      None, 'U9',
-     'Steglitz'),
+     'Rathaus Steglitz'),
     (
      'am u amruner str ausgestiegen',
      'Amrunerstraße',
@@ -1100,7 +1100,7 @@ test_cases = [
      'Hauptbahnhof'),
     (
      'U7 Wilmersdorfer str richtung Rudow',
-     'Wilmersdorfer',
+     'Wilmersdorferstraße',
      'U7',
      'Rudow'),
     (
@@ -1213,7 +1213,7 @@ test_cases = [
      None, None),
     (
      'U5 - Brandenburg Tor',
-     'Brandenburg Tor',
+     'Brandenburger Tor',
      'U5',
      None),
     (
@@ -1309,7 +1309,7 @@ test_cases = [
      None),
     (
      '4 balue Westen in U8 jannowitzbruecke',
-     'Jannowitzbrücke',
+     'Jannowitz Brücke',
      'U8',
      None),
     (
@@ -1334,7 +1334,7 @@ test_cases = [
      None),
     (
      'U8 Hermanplatz',
-     'Hermanplatz',
+     'Hermannplatz',
      'U8',
      None),
     (
@@ -1398,7 +1398,7 @@ test_cases = [
      None, None, None),
     (
      'Kontrolle in der u8 richtung wittensu bei der janowitzbrücke',
-     'Janowitzbrücke',
+     'Janowitz Brücke',
      'U8',
      'Wittenau'),
     (
