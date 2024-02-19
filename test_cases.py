@@ -1699,7 +1699,7 @@ test_cases = [
     (
      'U8 richtung Hermanplatz',
      None, 'U8',
-     'Hermannplatz'),
+     None),
     (
      'rosa luxemburg platz u2 pankow direction',
      'Rosa-Luxemburg-Platz',

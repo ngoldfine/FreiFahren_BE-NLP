@@ -105,6 +105,9 @@ def get_all_stations(line=None):
 
 def find_station(text, line=None, threshold=75):
     all_stations = get_all_stations(line)
+    # print all_stations in alphabetical order
+    # all_stations.sort()
+    # print(all_stations)
     NER_result = TextProcessor.process_text(text)
     print(f'Text returned from the NER: {NER_result}')
     
@@ -249,6 +252,7 @@ def correct_direction(ticket_inspector, lines_with_final_station):
 
             return ticket_inspector
         else:
+            print('direction is not a final station')
             ticket_inspector.direction = None
             return ticket_inspector
 
