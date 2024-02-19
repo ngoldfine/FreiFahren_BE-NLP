@@ -209,7 +209,7 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
 
         if found_station:
             # Check if the station matches one of the final stations of the line
-            if found_station in final_stations:
+            if found_station in final_stations and found_station != ticket_inspector.station:
                 ticket_inspector.direction = found_station
                 # remove the word after the line from the text
                 text_without_direction = text.replace(after_line_words[0], '').strip()

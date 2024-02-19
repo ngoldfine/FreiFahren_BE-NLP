@@ -1458,7 +1458,7 @@ test_cases = [
      None, None, None),
     (
      'U6 Schumacher-Platz merhingdam',
-     'Merhingdamm',
+     'Mehringdamm',
      'U6',
      'Kurt-Schumacher-Platz'),
     (
