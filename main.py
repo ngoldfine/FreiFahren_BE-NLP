@@ -278,7 +278,7 @@ def check_word_before_direction_keyword(unformatted_text, ticket_inspector):
     return ticket_inspector
 
     
-def verify_direction(ticket_inspector, text, unformatted_text):
+def verify_direction(ticket_inspector, text):
     # direction should be None if the ticket inspector got off the train
     if handle_get_off(text):
         ticket_inspector.direction = None
@@ -296,10 +296,10 @@ def verify_direction(ticket_inspector, text, unformatted_text):
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
     if ticket_inspector.direction is None and ticket_inspector.station is not None:
         print('station is actually direction')
-        check_if_station_is_actually_direction(unformatted_text, ticket_inspector)
+        check_if_station_is_actually_direction(text, ticket_inspector)
 
     if ticket_inspector.direction is None:
-        check_word_before_direction_keyword(unformatted_text, ticket_inspector)
+        check_word_before_direction_keyword(text, ticket_inspector)
 
     return ticket_inspector
 
@@ -347,8 +347,8 @@ def extract_ticket_inspector_info(unformatted_text):
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
-        verify_direction(ticket_inspector, text, unformatted_text)
-        verify_line(ticket_inspector, unformatted_text)
+        verify_direction(ticket_inspector, text)
+        verify_line(ticket_inspector, text)
         
         return ticket_inspector.__dict__
     else:
