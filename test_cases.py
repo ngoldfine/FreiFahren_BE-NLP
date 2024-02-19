@@ -1657,7 +1657,7 @@ test_cases = [
      None, None, None),
     (
      'U6 kochstrase',
-     'Kochstraße',
+     'Kochstraße (Checkpoint Charlie)',
      'U6',
      None),
     (
