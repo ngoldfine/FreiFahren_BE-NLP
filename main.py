@@ -105,10 +105,11 @@ def get_all_stations(line=None):
 
 def find_station(text, line=None, threshold=75):
     all_stations = get_all_stations(line)
-    processed_text = TextProcessor.process_text(text)
+    NER_result = TextProcessor.process_text(text)
+    print(f'Text returned from the NER: {NER_result}')
     
     # Perform the fuzzy matching with the gathered list of stations
-    match = process.extractOne(processed_text, all_stations)
+    match = process.extractOne(NER_result, all_stations)
     best_match, score = match
     if score >= threshold:
         # Find the station that matches the best match
@@ -127,6 +128,7 @@ def find_direction(text, line):
     words = text.split()
     for word in words:
         if word in direction_keywords:
+            found_direction_keyword = word
             # Split the text at the keyword
             parts = text.split(word, 1)
             if len(parts) > 1:
@@ -141,6 +143,21 @@ def find_direction(text, line):
                     if found_direction:
                         # Remove the direction and the keyword from the text
                         replace_segment = word
+                        text_without_direction = text.replace(
+                            replace_segment, ''
+                        ).strip()
+                        return found_direction, text_without_direction
+
+                # If no station is found after the keyword, check word directly before the keyword
+                index = words.index(found_direction_keyword)
+                print('found word:', found_direction_keyword)
+                if index > 0:
+                    previous_word = words[index - 1]
+                    print(f'previous_word: {previous_word}')
+                    found_direction = find_station(previous_word, line)
+                    if found_direction:
+                        # Remove the direction and the keyword from the text
+                        replace_segment = previous_word + ' ' + found_direction_keyword
                         text_without_direction = text.replace(
                             replace_segment, ''
                         ).strip()
@@ -273,7 +290,8 @@ def verify_direction(ticket_inspector, text, unformatted_text):
 
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
-    if ticket_inspector.direction is None:
+    if ticket_inspector.direction is None and ticket_inspector.station is not None:
+        print('station is actually direction')
         check_if_station_is_actually_direction(unformatted_text, ticket_inspector)
 
     if ticket_inspector.direction is None:
@@ -315,10 +333,13 @@ def extract_ticket_inspector_info(unformatted_text):
     text = format_text(unformatted_text)
     result = find_direction(text, ticket_inspector.line)
     found_direction = result[0]
+    print(f'found_direction: {found_direction}')
     ticket_inspector.direction = found_direction
     text_without_direction = result[1]
 
+    print(f'text_without_direction: {text_without_direction}')
     found_station = find_station(text_without_direction, ticket_inspector.line)
+    print(f'found_station: {found_station}')
     ticket_inspector.station = found_station
 
     if found_line or found_station or found_direction:
@@ -337,15 +358,10 @@ if __name__ == '__main__':
 
     print('Bot is running...🏃‍♂️')
 
-    # Messages set to private for testing purposes
-    @bot.message_handler(func=lambda message: message.chat.type == 'private')
-    def get_info(message):
-        info = extract_ticket_inspector_info(message.text)
+    while True:
+        message = input("\nEnter your message: ")
+        info = extract_ticket_inspector_info(message)
         if info:
             print(info)
-            bot.send_message(message.chat.id, str(info))
         else:
             print('No valuable information found')
-            return None
-
-    bot.infinity_polling()

@@ -1775,7 +1775,7 @@ test_cases = [
      None, None, None),
     (
      'U8 leinestrasse, wittenau direction, 4 people',
-     'Leinestrasse',
+     'Leinestraße',
      'U8',
      'Wittenau'),
     (
