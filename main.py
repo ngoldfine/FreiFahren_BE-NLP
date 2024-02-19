@@ -342,6 +342,7 @@ if __name__ == '__main__':
         info = extract_ticket_inspector_info(message.text)
         if info:
             print(info)
+            bot.send_message(message.chat.id, str(info))
         else:
             print('No valuable information found')
             return None
