@@ -103,37 +103,46 @@ def get_all_stations(line=None):
     return all_stations
 
 
+def get_best_match(text, items, threshold=75):
+    match = process.extractOne(text, items)
+    best_match, score = match
+    if score >= threshold:
+        return best_match
+    return None
+
+
+def find_match_in_stations(best_match, stations_with_synonyms):
+    for station_type in stations_with_synonyms.values():
+        for station, synonyms in station_type.items():
+            if best_match in [station.lower()] + [synonym.lower() for synonym in synonyms]:
+                return station
+    return None
+
+
 def find_station(text, ticket_inspector, threshold=75):
     all_stations = get_all_stations(ticket_inspector.line)
-
+    
+    # Use the NER Model to get the unrecognized stations from the text
     NER_results = TextProcessor.process_text(text)
     print(f'Text returned from the NER: {NER_results}')
-    
-    # Perform the fuzzy matching with the gathered list of stations
-    for NER_result in NER_results:
-        match = process.extractOne(NER_result, all_stations)
-        best_match, score = match
-        if score >= threshold:
-            # Find the station that matches the best match
-            for station_type in stations_with_synonyms.values():
-                for station, synonyms in station_type.items():
-                    if best_match in [station.lower()] + \
-                            [synonym.lower() for synonym in synonyms]:
-                        found_station = station
 
-                        if ticket_inspector.direction is None and len(NER_results) > 1:
-                            # check if the second element in the NER_results is a station
-                            match = process.extractOne(NER_results[1], all_stations)
-                            best_match, score = match
-                            if score >= threshold:
-                                for station_type in stations_with_synonyms.values():
-                                    for direction, synonyms in station_type.items():
-                                        if best_match in [direction.lower()] + \
-                                                [synonym.lower() for synonym in synonyms]:
-                                            ticket_inspector.direction = direction
-                                            print(f'set direction to be: {direction}')
-                        return found_station
-    
+    for NER_result in NER_results:
+        # Get the fuzzy match of the NER result with the stations
+        best_match = get_best_match(NER_result, all_stations, threshold)
+        if best_match:
+            # Find the correct station name for the best match
+            found_station_name = find_match_in_stations(best_match, stations_with_synonyms)
+            if found_station_name:
+                # Catch secret direction, as the next station
+                # This is triggered when the direction could not be found via direction keywords
+                if ticket_inspector.direction is None and len(NER_results) > 1:
+                    best_match = get_best_match(NER_results[1], all_stations, threshold)
+                    if best_match:
+                        direction = find_match_in_stations(best_match, stations_with_synonyms)
+                        if direction:
+                            ticket_inspector.direction = direction
+                            print(f'set direction to be: {direction}')
+                return found_station_name
     return None
 
 
