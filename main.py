@@ -67,7 +67,7 @@ def find_line(text, lines):
 
 def format_text(text):
     # Replace all '-' with whitespaces and convert to lowercase
-    text = text.lower().replace('-', ' ').replace('.', ' ').replace(',', ' ')
+    text = text.lower().replace('.', ' ').replace(',', ' ')
     # Remove all isolated 's' and 'u'
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
@@ -103,31 +103,44 @@ def get_all_stations(line=None):
     return all_stations
 
 
-def find_station(text, line=None, threshold=75):
-    all_stations = get_all_stations(line)
-    # print all_stations in alphabetical order
-    # all_stations.sort()
-    # print(all_stations)
-    NER_result = TextProcessor.process_text(text)
-    print(f'Text returned from the NER: {NER_result}')
+def find_station(text, ticket_inspector, threshold=75):
+    all_stations = get_all_stations(ticket_inspector.line)
+
+    NER_results = TextProcessor.process_text(text)
+    print(f'Text returned from the NER: {NER_results}')
     
     # Perform the fuzzy matching with the gathered list of stations
-    match = process.extractOne(NER_result, all_stations)
-    best_match, score = match
-    if score >= threshold:
-        # Find the station that matches the best match
-        for station_type in stations_with_synonyms.values():
-            for station, synonyms in station_type.items():
-                if best_match in [station.lower()] + \
-                        [synonym.lower() for synonym in synonyms]:
-                    return station
+    for NER_result in NER_results:
+        match = process.extractOne(NER_result, all_stations)
+        best_match, score = match
+        if score >= threshold:
+            # Find the station that matches the best match
+            for station_type in stations_with_synonyms.values():
+                for station, synonyms in station_type.items():
+                    if best_match in [station.lower()] + \
+                            [synonym.lower() for synonym in synonyms]:
+                        found_station = station
+
+                        if ticket_inspector.direction is None and len(NER_results) > 1:
+                            # check if the second element in the NER_results is a station
+                            match = process.extractOne(NER_results[1], all_stations)
+                            best_match, score = match
+                            if score >= threshold:
+                                for station_type in stations_with_synonyms.values():
+                                    for direction, synonyms in station_type.items():
+                                        if best_match in [direction.lower()] + \
+                                                [synonym.lower() for synonym in synonyms]:
+                                            ticket_inspector.direction = direction
+                                            print(f'set direction to be: {direction}')
+                        return found_station
+    
     return None
 
 
 direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri']
 
 
-def find_direction(text, line):
+def find_direction(text, ticket_inspector):
     words = text.split()
     for word in words:
         if word in direction_keywords:
@@ -142,7 +155,7 @@ def find_direction(text, line):
 
                 # Find the first station name in the text after the keyword
                 for word in words_after_keyword:
-                    found_direction = find_station(word, line)
+                    found_direction = find_station(word, ticket_inspector)
                     if found_direction:
                         # Remove the direction and the keyword from the text
                         replace_segment = word
@@ -157,14 +170,14 @@ def find_direction(text, line):
                 if index > 0:
                     previous_word = words[index - 1]
                     print(f'previous_word: {previous_word}')
-                    found_direction = find_station(previous_word, line)
+                    found_direction = find_station(previous_word, ticket_inspector)
                     if found_direction:
                         # Remove the direction and the keyword from the text
                         replace_segment = previous_word + ' ' + found_direction_keyword
                         text_without_direction = text.replace(
                             replace_segment, ''
                         ).strip()
-                        return found_direction, text_without_direction
+                        return text_without_direction
 
     return None, text
 
@@ -205,7 +218,7 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
     after_line_words = after_line.split()
     if len(after_line_words) > 0:
         # Check if the word after the line is a station
-        found_station = find_station(after_line_words[0], line)
+        found_station = find_station(after_line_words[0], ticket_inspector)
 
         if found_station:
             # Check if the station matches one of the final stations of the line
@@ -213,7 +226,7 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
                 ticket_inspector.direction = found_station
                 # remove the word after the line from the text
                 text_without_direction = text.replace(after_line_words[0], '').strip()
-                ticket_inspector.station = find_station(text_without_direction, line)
+                ticket_inspector.station = find_station(text_without_direction, ticket_inspector)
 
                 return ticket_inspector
 
@@ -270,7 +283,7 @@ def check_word_before_direction_keyword(unformatted_text, ticket_inspector):
                 words_before_keyword = before_keyword.split()
                 if len(words_before_keyword) > 0:
                     # Check if the word before the keyword is a station
-                    found_station = find_station(words_before_keyword[-1], ticket_inspector.line)
+                    found_station = find_station(words_before_keyword[-1], ticket_inspector)
                     if found_station and found_station != ticket_inspector.station:
                         ticket_inspector.direction = found_station
 
@@ -335,14 +348,14 @@ def extract_ticket_inspector_info(unformatted_text):
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
     text = format_text(unformatted_text)
-    result = find_direction(text, ticket_inspector.line)
+    result = find_direction(text, ticket_inspector)
     found_direction = result[0]
     print(f'found_direction: {found_direction}')
     ticket_inspector.direction = found_direction
     text_without_direction = result[1]
 
     print(f'text_without_direction: {text_without_direction}')
-    found_station = find_station(text_without_direction, ticket_inspector.line)
+    found_station = find_station(text_without_direction, ticket_inspector)
     print(f'found_station: {found_station}')
     ticket_inspector.station = found_station
 
