@@ -13,10 +13,16 @@ class TicketInspector:
         self.line = line
         self.station = station
         self.direction = direction
-        
 
-with open('stations_and_lines.json', 'r') as f:
-    lines_with_stations = json.load(f)
+
+def load_data(filename):
+    with open(filename, 'r') as f:
+        data = json.load(f)
+    return data
+
+
+lines_with_stations = load_data('stations_and_lines.json')
+stations_with_synonyms = load_data('data.json')
    
 
 def format_text_for_line_search(text):
@@ -71,10 +77,6 @@ def format_text(text):
     # Remove all isolated 's' and 'u'
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
-
-
-with open('data.json', 'r') as f:
-    stations_with_synonyms = json.load(f)
 
 
 def get_all_stations(line=None):
