@@ -148,6 +148,14 @@ def find_station(text, ticket_inspector, threshold=75):
     return None
 
 
+def remove_direction_and_keyword(text, direction_keyword, direction):
+    if direction_keyword and direction:
+        replace_segment = f'{direction_keyword} {direction}'
+        text_without_direction = text.replace(replace_segment, '').strip()
+        return text_without_direction
+    return text
+
+
 direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri']
 
 
@@ -156,39 +164,29 @@ def find_direction(text, ticket_inspector):
     for word in words:
         if word in direction_keywords:
             found_direction_keyword = word
-            # Split the text at the keyword
             parts = text.split(word, 1)
             if len(parts) > 1:
                 after_keyword = parts[1].strip()
-
-                # Split the text after keyword into words
                 words_after_keyword = after_keyword.split()
 
-                # Find the first station name in the text after the keyword
-                for word in words_after_keyword:
-                    found_direction = find_station(word, ticket_inspector)
+                for word_after_keyword in words_after_keyword:
+                    found_direction = find_station(word_after_keyword, ticket_inspector)
                     if found_direction:
-                        # Remove the direction and the keyword from the text
-                        replace_segment = word
-                        text_without_direction = text.replace(
-                            replace_segment, ''
-                        ).strip()
+                        text_without_direction = remove_direction_and_keyword(
+                            text, found_direction_keyword, word_after_keyword
+                        )
                         return found_direction, text_without_direction
 
-                # If no station is found after the keyword, check word directly before the keyword
+                # If no station found after keyword, check the word directly before the keyword
                 index = words.index(found_direction_keyword)
-                print('found word:', found_direction_keyword)
                 if index > 0:
                     previous_word = words[index - 1]
-                    print(f'previous_word: {previous_word}')
                     found_direction = find_station(previous_word, ticket_inspector)
                     if found_direction:
-                        # Remove the direction and the keyword from the text
-                        replace_segment = previous_word + ' ' + found_direction_keyword
-                        text_without_direction = text.replace(
-                            replace_segment, ''
-                        ).strip()
-                        return text_without_direction
+                        text_without_direction = remove_direction_and_keyword(
+                            text, found_direction_keyword, word_after_keyword
+                        )
+                        return found_direction, text_without_direction
 
     return None, text
 
@@ -283,24 +281,6 @@ def correct_direction(ticket_inspector, lines_with_final_station):
     else:
         return ticket_inspector
 
-
-def check_word_before_direction_keyword(unformatted_text, ticket_inspector):
-    for keyword in direction_keywords:
-        if keyword in unformatted_text:
-            # Get the word directly before the keyword
-            parts = unformatted_text.split(keyword, 1)
-            if len(parts) > 1:
-                before_keyword = parts[0].strip()
-                words_before_keyword = before_keyword.split()
-                if len(words_before_keyword) > 0:
-                    # Check if the word before the keyword is a station
-                    found_station = find_station(words_before_keyword[-1], ticket_inspector)
-                    if found_station and found_station != ticket_inspector.station:
-                        ticket_inspector.direction = found_station
-
-                        return ticket_inspector
-    return ticket_inspector
-
     
 def verify_direction(ticket_inspector, text):
     # direction should be None if the ticket inspector got off the train
@@ -321,9 +301,6 @@ def verify_direction(ticket_inspector, text):
     if ticket_inspector.direction is None and ticket_inspector.station is not None:
         print('station is actually direction')
         check_if_station_is_actually_direction(text, ticket_inspector)
-
-    if ticket_inspector.direction is None:
-        check_word_before_direction_keyword(text, ticket_inspector)
 
     return ticket_inspector
 
@@ -358,18 +335,20 @@ def extract_ticket_inspector_info(unformatted_text):
     found_line = find_line(unformatted_text, lines_with_stations)
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
+    # Get the direction
     text = format_text(unformatted_text)
-    result = find_direction(text, ticket_inspector)
-    found_direction = result[0]
+    found_direction = find_direction(text, ticket_inspector)[0]
     print(f'found_direction: {found_direction}')
     ticket_inspector.direction = found_direction
-    text_without_direction = result[1]
 
+    # Get the station
+    text_without_direction = find_direction(text, ticket_inspector)[1]
     print(f'text_without_direction: {text_without_direction}')
     found_station = find_station(text_without_direction, ticket_inspector)
     print(f'found_station: {found_station}')
     ticket_inspector.station = found_station
 
+    # Verify the direction and line with the given information
     if found_line or found_station or found_direction:
         verify_direction(ticket_inspector, text)
         verify_line(ticket_inspector, text)
