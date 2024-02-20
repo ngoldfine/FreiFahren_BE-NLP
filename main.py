@@ -161,6 +161,8 @@ direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'directi
 
 def find_direction(text, ticket_inspector):
     words = text.split()
+    word_after_keyword = None  # Because we want to use it outside the loop
+
     for word in words:
         if word in direction_keywords:
             found_direction_keyword = word
@@ -243,43 +245,38 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
 
 
 def correct_direction(ticket_inspector, lines_with_final_station):
-    if ticket_inspector.line in lines_with_final_station.keys():
-        stations_of_line = lines_with_final_station[ticket_inspector.line]
-        if ticket_inspector.direction in [stations_of_line[0], stations_of_line[-1]]:
-            return ticket_inspector
-        elif (
-            ticket_inspector.station in lines_with_final_station[ticket_inspector.line]
-            and ticket_inspector.line
-            and ticket_inspector.direction
-            in lines_with_final_station[ticket_inspector.line]
-        ):
-            # Get index of the station and direction in the list of stations
-            station_index = lines_with_final_station[ticket_inspector.line].index(
-                ticket_inspector.station
-            )
-            direction_index = lines_with_final_station[ticket_inspector.line].index(
-                ticket_inspector.direction
-            )
+    line = ticket_inspector.line
+    direction = ticket_inspector.direction
+    station = ticket_inspector.station
 
-            # Check if the station is before or after the direction to correct it
-            # example: 'S7 jetzt Warschauer nach Ostkreuz' should be S7 to Ahrensfelde
-            if station_index < direction_index:
-                ticket_inspector.direction = lines_with_final_station[
-                    ticket_inspector.line
-                ][-1]
-            else:
-                ticket_inspector.direction = lines_with_final_station[
-                    ticket_inspector.line
-                ][0]
-
-            return ticket_inspector
-        else:
-            print('direction is not a final station')
-            ticket_inspector.direction = None
-            return ticket_inspector
-
-    else:
+    # No need to correct the direction if it is already a final station
+    if line is None:
         return ticket_inspector
+
+    stations_of_line = lines_with_final_station[line]
+
+    # If direction is a final station, return ticket_inspector
+    if direction in [stations_of_line[0], stations_of_line[-1]]:
+        return ticket_inspector
+
+    # If station and direction are in the line, correct the direction
+    if station in stations_of_line and direction in stations_of_line:
+        station_index = stations_of_line.index(station)
+        direction_index = stations_of_line.index(direction)
+
+        # Correct the direction based on the station's position
+        # For example: 'S7 jetzt Alexanderplatz richtung Ostkreuz' should be to Ahrensfelde
+        if station_index < direction_index:
+            ticket_inspector.direction = stations_of_line[-1]
+        else:
+            ticket_inspector.direction = stations_of_line[0]
+
+        return ticket_inspector
+
+    # If direction is not a final station, set direction to None
+    print('direction is not a final station')
+    ticket_inspector.direction = None
+    return ticket_inspector
 
     
 def verify_direction(ticket_inspector, text):
