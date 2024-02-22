@@ -74,7 +74,7 @@ def find_line(text, lines):
 def format_text(text):
     # Replace all '-' with whitespaces and convert to lowercase
     text = text.lower().replace('.', ' ').replace(',', ' ')
-    # Remove all isolated 's' and 'u'
+    # Remove all isolated 's' and 'u' to reduce noise
     text = re.sub(r'\b(s|u)\b', '', text)
     return text
 
