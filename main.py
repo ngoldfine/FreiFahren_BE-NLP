@@ -126,7 +126,6 @@ def find_station(text, ticket_inspector, threshold=75):
     
     # Use the NER Model to get the unrecognized stations from the text
     ner_results = TextProcessor.process_text(text)
-    print(f'Text returned from the NER: {ner_results}')
 
     for ner_result in ner_results:
         # Get the fuzzy match of the NER result with the stations
@@ -143,7 +142,6 @@ def find_station(text, ticket_inspector, threshold=75):
                         direction = find_match_in_stations(best_match, stations_with_synonyms)
                         if direction:
                             ticket_inspector.direction = direction
-                            print(f'set direction to be: {direction}')
                 return found_station_name
     return None
 
@@ -274,7 +272,6 @@ def correct_direction(ticket_inspector, lines_with_final_station):
         return ticket_inspector
 
     # If direction is not a final station, set direction to None
-    print('direction is not a final station')
     ticket_inspector.direction = None
     return ticket_inspector
 
@@ -296,7 +293,6 @@ def verify_direction(ticket_inspector, text):
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
     if ticket_inspector.direction is None and ticket_inspector.station is not None:
-        print('station is actually direction')
         check_if_station_is_actually_direction(text, ticket_inspector)
 
     return ticket_inspector
@@ -335,14 +331,11 @@ def extract_ticket_inspector_info(unformatted_text):
     # Get the direction
     text = format_text(unformatted_text)
     found_direction = find_direction(text, ticket_inspector)[0]
-    print(f'found_direction: {found_direction}')
     ticket_inspector.direction = found_direction
 
     # Get the station
     text_without_direction = find_direction(text, ticket_inspector)[1]
-    print(f'text_without_direction: {text_without_direction}')
     found_station = find_station(text_without_direction, ticket_inspector)
-    print(f'found_station: {found_station}')
     ticket_inspector.station = found_station
 
     # Verify the direction and line with the given information
