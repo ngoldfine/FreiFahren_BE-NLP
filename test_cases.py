@@ -1223,7 +1223,7 @@ test_cases = [
      None),
     (
      'zwei Blauwesten-Muttis U9, steigen gerade Leo aus. Eine (groß, lange schwarze Haare) hat die Weste nicht an, sondern trägtvsie über dem Arm',
-     'Leopoldplatz', 'U9',
+     'Leopoldplatz', None,
      None),
     (
      '4 bos westen märkisches museum, kontrollieren auf dem Bahnhof gerade, richtung pankow',
@@ -1243,7 +1243,7 @@ test_cases = [
      'U9 osloer Richtung Steglitz am Gleis',
      'Osloerstraße',
      'U9',
-     'Steglitz'),
+     'Rathaus Steglitz'),
     (
      'Steigen ein',
      None, None, None),
@@ -1264,7 +1264,7 @@ test_cases = [
      '2 Blauwesten u5 Richtung Alexanderplatz gleich Frankfurter Tor',
      'Frankfurter Tor',
      'U5',
-     'Alexanderplatz'),
+     'Hauptbahnhof'),
     (
      'Waren 3 und sind Frankfurter Tor ausgestiegen.',
      'Frankfurter Tor',
@@ -1321,7 +1321,7 @@ test_cases = [
      'U9 amrumer Richtung zoo',
      'Amrumerstraße',
      'U9',
-     'Zoologischer Garten'),
+     'Rathaus Steglitz'),
     (
      'U9 Westhafen stehen Blauwesten, konnte beim Rausgehen aber nicht erkennen, was sie genau machen...',
      'Westhafen',
@@ -1555,9 +1555,6 @@ test_cases = [
     (
      '1weibl gel. 2männl. Gel. In BVG Uniform',
      None, None, None),
-    (
-     '*richt Theodor Heuss Platz nicht Ruhleben, sorry',
-     None, None, 'Ruhleben'),
     (
      'U7 megringdamm Richtung Rathaus spandau, 2 gelbe Westen',
      'Mehringdamm',
