@@ -125,20 +125,20 @@ def find_station(text, ticket_inspector, threshold=75):
     all_stations = get_all_stations(ticket_inspector.line)
     
     # Use the NER Model to get the unrecognized stations from the text
-    NER_results = TextProcessor.process_text(text)
-    print(f'Text returned from the NER: {NER_results}')
+    ner_results = TextProcessor.process_text(text)
+    print(f'Text returned from the NER: {ner_results}')
 
-    for NER_result in NER_results:
+    for ner_result in ner_results:
         # Get the fuzzy match of the NER result with the stations
-        best_match = get_best_match(NER_result, all_stations, threshold)
+        best_match = get_best_match(ner_result, all_stations, threshold)
         if best_match:
             # Find the correct station name for the best match
             found_station_name = find_match_in_stations(best_match, stations_with_synonyms)
             if found_station_name:
                 # Catch secret direction, as the next station
                 # This is triggered when the direction could not be found via direction keywords
-                if ticket_inspector.direction is None and len(NER_results) > 1:
-                    best_match = get_best_match(NER_results[1], all_stations, threshold)
+                if ticket_inspector.direction is None and len(ner_results) > 1:
+                    best_match = get_best_match(ner_results[1], all_stations, threshold)
                     if best_match:
                         direction = find_match_in_stations(best_match, stations_with_synonyms)
                         if direction:
@@ -362,10 +362,14 @@ if __name__ == '__main__':
 
     print('Bot is running...🏃‍♂️')
 
-    while True:
-        message = input("\nEnter your message: ")
-        info = extract_ticket_inspector_info(message)
+    # Messages set to private for testing purposes
+    @bot.message_handler(func=lambda message: message.chat.type == 'private')
+    def get_info(message):
+        info = extract_ticket_inspector_info(message.text)
         if info:
             print(info)
         else:
             print('No valuable information found')
+            return None
+
+    bot.infinity_polling()
