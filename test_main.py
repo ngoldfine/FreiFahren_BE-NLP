@@ -48,7 +48,7 @@ class TestFindStationAndLineFunction(unittest.TestCase):
         if cls.failures:
             for failure in cls.failures:
                 print(failure)
-            print(f'\nTotal Failures: {len(cls.failures)/total_tests * 100}%')
+            print(f'\nTotal Failures: {len(cls.failures) / total_tests * 100}%')
         else:
             print('All tests passed successfully!')
 

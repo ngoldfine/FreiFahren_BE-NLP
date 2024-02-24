@@ -1,5 +1,5 @@
 import spacy
-from spacy.tokens import Doc
+# from spacy.tokens import Doc
 
 # NER = Named Entity Recognition
 # This class is used to recognize stations (also lines and direction) in a text message
@@ -28,19 +28,16 @@ class TransportInformationRecognizer:
 
     # input: text message (string)
     # return: a text message with only the recognized stations
-    def process_text(self, text: str) -> str:
+    def process_text(self, text: str) -> list:
 
         doc = self.nlp(text)
-        entities = []
-        words = []
+        stations = []
 
         for entity in doc.ents:
             if entity.label_ == 'STATION':
-                entities.append(entity)
-                words.append(entity.text)
+                stations.append(entity.text)
 
-        new_doc = Doc(self.nlp.vocab, words=words, ents=entities)
-        return new_doc.text
+        return stations
     
 
 TextProcessor = TransportInformationRecognizer('NER/models/loss17')

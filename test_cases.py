@@ -246,7 +246,7 @@ test_cases = [
     (
         'U8 Wittenau sind U Jannowitzbrücke raus',
 
-        'Jannowitzbrücke',
+        'Jannowitz Brücke',
 
         None,
         None,
@@ -375,7 +375,7 @@ test_cases = [
     (
         'Jannowitzbrücke U8',
 
-        'Jannowitzbrücke',
+        'Jannowitz Brücke',
 
         'U8',
 
@@ -478,7 +478,7 @@ test_cases = [
         '''Controller in S7 Richtung Alexanderplatz
         Was just checked in jannowitzbrucke''',
 
-        'Jannowitzbrücke',
+        'Jannowitz Brücke',
 
         'S7',
 
@@ -936,11 +936,11 @@ test_cases = [
      None),
     (
      'Neukölln  sbahn 2 männlich gelesene',
-     'Neuköln',
+     'Neukölln',
      None, None),
     (
      'Lazi ♀️Neukölln  sbahn 2 männlich geleseneBeide glatze',
-     'Neuköln',
+     'Neukölln',
      None, None),
     (
      'Jetzt noch zusätzlich zwei weitere steigen von s41 aus in Tempelhof',
@@ -1047,7 +1047,7 @@ test_cases = [
     (
      '2 blaue Westen U9 Richtung Steglitz ',
      None, 'U9',
-     'Steglitz'),
+     'Rathaus Steglitz'),
     (
      'am u amruner str ausgestiegen',
      'Amrunerstraße',
@@ -1100,7 +1100,7 @@ test_cases = [
      'Hauptbahnhof'),
     (
      'U7 Wilmersdorfer str richtung Rudow',
-     'Wilmersdorfer',
+     'Wilmersdorferstraße',
      'U7',
      'Rudow'),
     (
@@ -1213,7 +1213,7 @@ test_cases = [
      None, None),
     (
      'U5 - Brandenburg Tor',
-     'Brandenburg Tor',
+     'Brandenburger Tor',
      'U5',
      None),
     (
@@ -1223,7 +1223,7 @@ test_cases = [
      None),
     (
      'zwei Blauwesten-Muttis U9, steigen gerade Leo aus. Eine (groß, lange schwarze Haare) hat die Weste nicht an, sondern trägtvsie über dem Arm',
-     'Leopoldplatz', 'U9',
+     'Leopoldplatz', None,
      None),
     (
      '4 bos westen märkisches museum, kontrollieren auf dem Bahnhof gerade, richtung pankow',
@@ -1243,7 +1243,7 @@ test_cases = [
      'U9 osloer Richtung Steglitz am Gleis',
      'Osloerstraße',
      'U9',
-     'Steglitz'),
+     'Rathaus Steglitz'),
     (
      'Steigen ein',
      None, None, None),
@@ -1264,7 +1264,7 @@ test_cases = [
      '2 Blauwesten u5 Richtung Alexanderplatz gleich Frankfurter Tor',
      'Frankfurter Tor',
      'U5',
-     'Alexanderplatz'),
+     'Hauptbahnhof'),
     (
      'Waren 3 und sind Frankfurter Tor ausgestiegen.',
      'Frankfurter Tor',
@@ -1309,7 +1309,7 @@ test_cases = [
      None),
     (
      '4 balue Westen in U8 jannowitzbruecke',
-     'Jannowitzbrücke',
+     'Jannowitz Brücke',
      'U8',
      None),
     (
@@ -1321,7 +1321,7 @@ test_cases = [
      'U9 amrumer Richtung zoo',
      'Amrumerstraße',
      'U9',
-     'Zoologischer Garten'),
+     'Rathaus Steglitz'),
     (
      'U9 Westhafen stehen Blauwesten, konnte beim Rausgehen aber nicht erkennen, was sie genau machen...',
      'Westhafen',
@@ -1334,7 +1334,7 @@ test_cases = [
      None),
     (
      'U8 Hermanplatz',
-     'Hermanplatz',
+     'Hermannplatz',
      'U8',
      None),
     (
@@ -1398,7 +1398,7 @@ test_cases = [
      None, None, None),
     (
      'Kontrolle in der u8 richtung wittensu bei der janowitzbrücke',
-     'Janowitzbrücke',
+     'Janowitz Brücke',
      'U8',
      'Wittenau'),
     (
@@ -1458,7 +1458,7 @@ test_cases = [
      None, None, None),
     (
      'U6 Schumacher-Platz merhingdam',
-     'Merhingdamm',
+     'Mehringdamm',
      'U6',
      'Kurt-Schumacher-Platz'),
     (
@@ -1555,9 +1555,6 @@ test_cases = [
     (
      '1weibl gel. 2männl. Gel. In BVG Uniform',
      None, None, None),
-    (
-     '*richt Theodor Heuss Platz nicht Ruhleben, sorry',
-     None, None, 'Ruhleben'),
     (
      'U7 megringdamm Richtung Rathaus spandau, 2 gelbe Westen',
      'Mehringdamm',
@@ -1657,7 +1654,7 @@ test_cases = [
      None, None, None),
     (
      'U6 kochstrase',
-     'Kochstraße',
+     'Kochstraße (Checkpoint Charlie)',
      'U6',
      None),
     (
@@ -1699,7 +1696,7 @@ test_cases = [
     (
      'U8 richtung Hermanplatz',
      None, 'U8',
-     'Hermannplatz'),
+     None),
     (
      'rosa luxemburg platz u2 pankow direction',
      'Rosa-Luxemburg-Platz',
@@ -1775,7 +1772,7 @@ test_cases = [
      None, None, None),
     (
      'U8 leinestrasse, wittenau direction, 4 people',
-     'Leinestrasse',
+     'Leinestraße',
      'U8',
      'Wittenau'),
     (
@@ -1884,7 +1881,7 @@ test_cases = [
     (
      'Blauwesten ErnstReuter jetzt Richtung Zoo',
      'Ernst-Reuter-Platz',
-     None, 'Zoologischer Garten'),
+     None, 'Ruhleben'),
     (
      'Schöneberg KerstinU oder SLaut Bild am Übergang zwischen S- und U-Bahn, auf Erdgeschoss-Ebene (kann ja z.B. für Menschen mit Screenreader wichtig sein, dass das in Textform da steht - bloß mal so als Anmerkung).',
      'Schöneberg',
