@@ -2,6 +2,7 @@ import os
 import re
 from fuzzywuzzy import process
 import telebot
+import datetime
 import json
 from dotenv import load_dotenv
 from NER.TransportInformationRecognizer import TextProcessor
@@ -209,9 +210,6 @@ def handle_get_off(text):
 
 
 def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
-    if ticket_inspector.line is None:
-        return False
-
     line = ticket_inspector.line.lower()
     text = unformatted_text.lower()
 
@@ -292,8 +290,13 @@ def verify_direction(ticket_inspector, text):
 
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
-    if ticket_inspector.direction is None and ticket_inspector.station is not None:
+    if ticket_inspector.direction is None and ticket_inspector.station and ticket_inspector.line:
         check_if_station_is_actually_direction(text, ticket_inspector)
+
+    # direction should be None if the ticket inspector got off the train
+    if handle_get_off(text):
+        ticket_inspector.direction = None
+        ticket_inspector.line = None
 
     return ticket_inspector
 
@@ -352,17 +355,46 @@ if __name__ == '__main__':
     load_dotenv()  # take environment variables from .env.
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     bot = telebot.TeleBot(BOT_TOKEN)
+    conversations = {}  # Dictionary to store conversations with more detailed structure
 
     print('Bot is running...🏃‍♂️')
 
-    # Messages set to private for testing purposes
     @bot.message_handler(func=lambda message: message.chat.type == 'private')
     def get_info(message):
+        author_id = message.chat.id
+        current_time = datetime.datetime.now()
+        
+        # Check if this author_id already has messages
+        if author_id in conversations and conversations[author_id]:
+            last_message = conversations[author_id][-1]  # Get the last message from this author_id
+            last_message_time = last_message['time']
+            time_difference = current_time - last_message_time
+            
+            if time_difference.total_seconds() <= 60:
+                # If the new message is within one minute of the last message, merge them
+                merged_text = f"{last_message['text']} {message.text}"
+                
+                # Update the last message in the conversation
+                last_message['text'] = merged_text
+                last_message['time'] = current_time  # Update the timestamp to the latest message
+                info = extract_ticket_inspector_info(merged_text)
+                last_message['info'] = info
+            else:
+                # Handle as a new message
+                process_new_message(author_id, message, current_time)
+        else:
+            # This is the first message from this author_id or no previous conversation exists
+            process_new_message(author_id, message, current_time)
+
+    def process_new_message(author_id, message, current_time):
         info = extract_ticket_inspector_info(message.text)
+        if author_id not in conversations:
+            conversations[author_id] = []
+        conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
         if info:
-            print(info)
+            print('Found Info:', info)
         else:
             print('No valuable information found')
-            return None
-
+            
     bot.infinity_polling()
+    
