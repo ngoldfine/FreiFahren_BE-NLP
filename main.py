@@ -10,7 +10,6 @@ from NER.TransportInformationRecognizer import TextProcessor
 
 class TicketInspector:
     def __init__(self, line, station, direction):
-        # self.time = time
         self.line = line
         self.station = station
         self.direction = direction
