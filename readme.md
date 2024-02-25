@@ -41,7 +41,7 @@ This function operates in two stages:
 Detailed Functions
 - `find_station`: Utilizes a Named Entity Recognition (NER) model to pinpoint stations within messages, refined through fuzzy matching against a comprehensive station database.
 
-- find_line: Employs a straightforward word search to identify mentioned transit lines, based on a list of lines within the Berlin public transport network.
+- `find_line`: Employs a straightforward word search to identify mentioned transit lines, based on a list of lines within the Berlin public transport network.
 
 - `find_direction`: Splits the message at directional keywords (e.g., "towards") to isolate and identify subsequent station names, aiding in the determination of the inspector's direction.
 
