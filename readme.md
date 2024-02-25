@@ -1,57 +1,51 @@
 # Freifahren
 
-## What is Freifahren?
-Freifahren is a project that aims to track all ticket inspectors in the berlin public transport system. The goal is to provide a live map of all ticket inspectors in the city, so that people can avoid them for whatever reason.
+## Overview
 
-The data for the live map is provided by the community of the [Freifahren](https://t.me/freifahren_BE) Telegram group. Members of the group are reporting when they see ticket inspectors and the data is then processed and displayed on the map. This repository is responsible for the natural language processing and the data processing of the messages in the Telegram group.
+Freifahren is an innovative project designed to map the presence of ticket inspectors across the Berlin public transport network. By offering a live map that tracks inspectors in real-time, the initiative seeks to inform and empower users to navigate the city with added confidence. The project leverages community-driven data from the [Freifahren Telegram group](https://t.me/freifahren_BE), where users report sightings of ticket inspectors. This repository focuses on the natural language processing (NLP) and data handling of these community reports to maintain high accuracy and reliability.
 
-**Current Accuracy:** 82.7% of messages are processed perfectly, 17.3% of messages are processed with some errors.
+**Current Accuracy:** As of now, our system successfully processes 82.7% of incoming messages with perfect accuracy, while the remaining 17.3% encounter minor errors.
 
-## Quickstart Guide
+## Getting Started
 
 ### Prerequisites
-- Python 3.6 or higher
 
-### Setup
-1. Clone the repository
-````bash
-git clone https://github.com/johan-t/freiFahren
-````
-2. Install the required packages with `pip install -r requirements.txt`
-3. Set the environment variable `BOT_TOKEN` to your Bot API Token. You can get one by creating a new bot with the [BotFather](https://t.me/botfather).
+- Python version 3.6 or newer
 
-### Run the bot
-````bash
-python main.py
-````
-Once the bot is running it will start processing the messages it receives from the Telegram group.
+### Installation
 
-## How does it work?
-When the bot notices a new message in the group it will trigger the `extract_data` function. This function will extract the relevant information of station where the ticket inspectors were seen, the name of line they were on, the direction the train was going as well as the time of the sighting. 
+1. First, clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/johan-t/freiFahren
+2. Install the necessary Python packages:
+    `pip install -r requirements.txt`
+3. Acquire a Bot API Token by creating a new bot through [BotFather](https://t.me/botFather) and set it as the BOT_TOKEN environment variable.
 
-### how extract_data works 
+### Running the Bot
+Execute the following command to start the bot:
+`python main.py`
 
-The `extract_data` function is separated into two parts. In the first part we are initially getting the station, line and direction from the messages. In the second part we are correcting the data, by validating it using the already collected data about the stations, lines and directions.
+Upon launch, the bot begins processing messages from the Telegram group, applying our custom NLP algorithms to extract and validate data in real-time.
 
-### find_station
+## How it Works
 
-The find_station function is responsible for finding the stations mentioned in the messages. It is called multiple times in the pipeline of the extract_data function. 
-It uses an NER model to find what characters in the message are stations. The NER model is trained on the labeled messages from the group.
-We then pass the info of the NER model into a fuzzy matching algorithm to find the most similar station out of the list of stations and their synonyms.
+### Message Processing
 
+Upon detecting a new message, the bot activates the extract_data function to parse and interpret the content. This involves identifying key details such as the station, line, and direction of the reported ticket inspector sightings, along with the timestamp of the event.
 
-### find_line
+The `extract_ticket_inspector_info` Function
+This function operates in two stages:
+1. **Initial Extraction:** It first attempts to determine the station, line, and direction directly from the user's message.
+2. **Data Validation:** Subsequently, it validates and corrects this preliminary data against a pre-compiled database of stations, lines, and directions to ensure accuracy.
 
-The find_line function is responsible for finding the lines mentioned in the messages. It uses a simple word search to identify the lines in the messages. The word search is done using a list of all the lines in the Berlin public transport system.
+Detailed Functions
+- `find_station`: Utilizes a Named Entity Recognition (NER) model to pinpoint stations within messages, refined through fuzzy matching against a comprehensive station database.
 
-### find_direction
+- find_line: Employs a straightforward word search to identify mentioned transit lines, based on a list of lines within the Berlin public transport network.
 
-The find_direction function is responsible for finding the direction mentioned in the messages. It splits the message into two parts seperated by a direction keyword, for example "torwards". It then looks for a station in the part after the keyword by using `find_station`.
+- `find_direction`: Splits the message at directional keywords (e.g., "towards") to isolate and identify subsequent station names, aiding in the determination of the inspector's direction.
 
-### validate_data
-Once we have the basic data gathered we can cross validate it with the data we already have with the following rules:
-- The ringbahn is always directionless.
-- If it is mentioned that the inspectors got off the train, the ticket inspectors should be directionless and without a line.
-- If the direction was set to a not valid station for example by using the info of the station and the line.
+### Data Validation
+The validation process employs specific rules to fine-tune the accuracy of extracted data, such as handling directionless Ringbahn reports, adjusting for reports of inspectors disembarking, and reconciling directions with invalid or nonexistent stations.
 
-
+This structured and meticulous approach ensures that Freifahren remains a reliable resource for navigating Berlin's public transport system free from unwelcome surprises.
