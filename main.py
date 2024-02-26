@@ -221,48 +221,40 @@ def get_final_stations_of_line(line):
     return final_stations_of_line
 
 
+def get_words_after_line(text, line):
+    line_index = text.rfind(line)
+    after_line = text[line_index + len(line):].strip()
+    return after_line.split()
+
+
 def check_if_station_is_actually_direction(text, ticket_inspector):
     if ticket_inspector.direction is None or ticket_inspector.station is None:
         return ticket_inspector
 
     line = ticket_inspector.line
-    # Get the final stations of the line
     final_stations_of_line = get_final_stations_of_line(line)
 
-    # Convert the line to lowercase because the text is also in lowercase
-    line = line.lower()
+    line = line.lower()  # convert to lowercase because text is in lowercase
+    after_line_words = get_words_after_line(text, line)
 
-    # Get the word after the line
-    line_index = text.rfind(line)
-    after_line = text[line_index + len(line):].strip()
-    after_line_words = after_line.split()
-    if len(after_line_words) > 0:
-        print('Word after line:', after_line_words[0])
-        # Check if the word after the line is a station
-        found_station = find_station(after_line_words[0], ticket_inspector)
-        print('Station found after line:', found_station)
+    if not after_line_words:
+        return ticket_inspector
 
-        if found_station:
-            # Check if the station matches one of the final stations of the line
-            if found_station in final_stations_of_line:
-                # create text without the found station
-                text_without_direction = remove_direction_and_keyword(
-                    text,
-                    line,
-                    after_line_words[0]
-                )
-                print('Text without direction:', text_without_direction)
+    # Get the word directly after the line
+    found_station_after_line = find_station(after_line_words[0], ticket_inspector)
 
-                # get a new station
-                new_station = find_station(text_without_direction, ticket_inspector)
-                print('New station:', new_station)
-                if new_station is not None:
+    if not found_station_after_line or found_station_after_line not in final_stations_of_line:
+        return ticket_inspector
 
-                    ticket_inspector.direction = found_station
-                    ticket_inspector.station = new_station
-                    print('Station is actually direction:', ticket_inspector.station)
+    # Remove the word after line from the text to find the new station
+    text_without_direction = remove_direction_and_keyword(text, line, after_line_words[0])
+    new_station = find_station(text_without_direction, ticket_inspector)
 
-                    return ticket_inspector
+    if new_station is None:
+        return ticket_inspector
+
+    ticket_inspector.direction = found_station_after_line
+    ticket_inspector.station = new_station
 
     return ticket_inspector
 
