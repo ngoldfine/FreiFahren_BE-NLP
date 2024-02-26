@@ -15,7 +15,7 @@ class EmojiTestResult(unittest.TextTestResult):
         super().printErrors()
         if self.wasSuccessful():
             # Print a custom message with green text (ANSI escape code) and emojis if all tests pass
-            print("\033[92mAll tests passed! 🎉🎉🎉\033[0m")
+            print('\033[92mAll tests passed! 🎉🎉🎉\033[0m')
 
 
 class EmojiTextTestRunner(unittest.TextTestRunner):
