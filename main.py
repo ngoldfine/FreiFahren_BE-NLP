@@ -214,7 +214,7 @@ def handle_get_off(text, ticket_inspector):
             return ticket_inspector
 
 
-def check_if_station_is_actually_direction(unformatted_text, ticket_inspector): # this rule needs to be adjusted so that it is higher in priority than catch secret direction
+def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
     if ticket_inspector.line is None:
         return ticket_inspector
 
@@ -385,7 +385,7 @@ if __name__ == '__main__':
 
     print('Bot is running...🏃‍♂️')
 
-    @bot.message_handler(func=lambda message: message.chat.type == 'private')
+    @bot.message_handler(func=lambda message: message.chat.type == 'private')  # private for testing
     def get_info(message):
         author_id = message.chat.id
         current_time = datetime.datetime.now()
@@ -405,6 +405,12 @@ if __name__ == '__main__':
                 last_message['time'] = current_time  # Update the timestamp to the latest message
                 info = extract_ticket_inspector_info(merged_text)
                 last_message['info'] = info
+
+                # Print the information after merging the messages
+                if info:
+                    print('Found Info:', info)
+                else:
+                    print('No valuable information found')
             else:
                 # Handle as a new message
                 process_new_message(author_id, message, current_time)
