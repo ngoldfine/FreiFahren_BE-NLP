@@ -204,6 +204,7 @@ def handle_get_off(text, ticket_inspector):
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
+            # When getting off, we only know they are at a station
             ticket_inspector.line = None
             ticket_inspector.direction = None
             return ticket_inspector
