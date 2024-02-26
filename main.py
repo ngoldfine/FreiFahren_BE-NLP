@@ -214,23 +214,23 @@ def handle_get_off(text, ticket_inspector):
             return ticket_inspector
 
 
-def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
-    if ticket_inspector.line is None:
-        return ticket_inspector
-
-    if ticket_inspector.direction is None:
-        return ticket_inspector
-
-    if ticket_inspector.station is None:
-        return ticket_inspector
-
-    line = ticket_inspector.line.lower()
-    text = unformatted_text.lower()
-
-    # Get the final stations of the line
+def get_final_stations_of_line(line):
     final_stations_of_line = []
-    final_stations_of_line.append(lines_with_stations[ticket_inspector.line][0])
-    final_stations_of_line.append(lines_with_stations[ticket_inspector.line][-1])
+    final_stations_of_line.append(lines_with_stations[line][0])
+    final_stations_of_line.append(lines_with_stations[line][-1])
+    return final_stations_of_line
+
+
+def check_if_station_is_actually_direction(text, ticket_inspector):
+    if ticket_inspector.direction is None or ticket_inspector.station is None:
+        return ticket_inspector
+
+    line = ticket_inspector.line
+    # Get the final stations of the line
+    final_stations_of_line = get_final_stations_of_line(line)
+
+    # Convert the line to lowercase because the text is also in lowercase
+    line = line.lower()
 
     # Get the word after the line
     line_index = text.rfind(line)
@@ -247,7 +247,7 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
             if found_station in final_stations_of_line:
                 # create text without the found station
                 text_without_direction = remove_direction_and_keyword(
-                    unformatted_text,
+                    text,
                     line,
                     after_line_words[0]
                 )
@@ -267,16 +267,12 @@ def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
     return ticket_inspector
 
 
-def correct_direction(ticket_inspector, lines_with_final_station):
+def correct_direction(ticket_inspector, lines_with_stations):
     line = ticket_inspector.line
     direction = ticket_inspector.direction
     station = ticket_inspector.station
 
-    # If we don't have a line, we can't correct the direction
-    if line is None:
-        return ticket_inspector
-
-    stations_of_line = lines_with_final_station[line]
+    stations_of_line = lines_with_stations[line]
 
     # If direction is a final station, return ticket_inspector
     if direction in [stations_of_line[0], stations_of_line[-1]]:
@@ -311,6 +307,9 @@ def set_ringbahn_directionless(ticket_inspector):
 def verify_direction(ticket_inspector, text):
     # direction should be None if the ticket inspector got off the train
     handle_get_off(text, ticket_inspector)
+
+    if ticket_inspector.line is None:
+        return ticket_inspector
     
     # Check if the direction is the final station of the line and correct it
     correct_direction(ticket_inspector, lines_with_stations)
