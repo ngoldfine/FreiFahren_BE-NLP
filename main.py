@@ -72,7 +72,6 @@ def find_line(text, lines):
 
 
 def format_text(text):
-    # Replace all '-' with whitespaces and convert to lowercase
     text = text.lower().replace('.', ' ').replace(',', ' ')
     # Remove all isolated 's' and 'u' to reduce noise
     text = re.sub(r'\b(s|u)\b', '', text)
@@ -147,11 +146,17 @@ def find_station(text, ticket_inspector, threshold=75):
 
 
 def remove_direction_and_keyword(text, direction_keyword, direction):
-    if direction_keyword and direction:
-        replace_segment = f'{direction_keyword} {direction}'
-        text_without_direction = text.replace(replace_segment, '').strip()
-        return text_without_direction
-    return text
+    replace_segment = f'{direction_keyword} {direction}'.strip()
+    if replace_segment in text:
+        # If the exact match is found, replace it
+        return text.replace(replace_segment, '').strip()
+    else:
+        # If only the direction_keyword is found, attempt to remove it and any trailing spaces
+        replace_keyword_only = f'{direction_keyword}'.strip()
+        if replace_keyword_only in text:
+            # Remove the keyword and any single trailing space (if present)
+            text = text.replace(replace_keyword_only, '', 1).strip()
+        return text
 
 
 direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri']
@@ -191,7 +196,7 @@ def find_direction(text, ticket_inspector):
     return None, text
 
 
-def handle_get_off(text):
+def handle_get_off(text, ticket_inspector):
     getting_off_keywords = [
         'ausgestiegen',
         'raus',
@@ -205,50 +210,63 @@ def handle_get_off(text):
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
-            return True
+            # When getting off, we only know they are at a station
+            ticket_inspector.line = None
+            ticket_inspector.direction = None
+            return ticket_inspector
 
 
-def check_if_station_is_actually_direction(unformatted_text, ticket_inspector):
-    line = ticket_inspector.line.lower()
-    text = unformatted_text.lower()
+def get_final_stations_of_line(line):
+    final_stations_of_line = []
+    final_stations_of_line.append(lines_with_stations[line][0])
+    final_stations_of_line.append(lines_with_stations[line][-1])
+    return final_stations_of_line
 
-    # Get the final stations of the line
-    final_stations = []
-    if ticket_inspector.line in lines_with_stations:
-        final_stations.append(lines_with_stations[ticket_inspector.line][0])
-        final_stations.append(lines_with_stations[ticket_inspector.line][-1])
 
-    # Get the word after the line
+def get_words_after_line(text, line):
     line_index = text.rfind(line)
     after_line = text[line_index + len(line):].strip()
-    after_line_words = after_line.split()
-    if len(after_line_words) > 0:
-        # Check if the word after the line is a station
-        found_station = find_station(after_line_words[0], ticket_inspector)
-
-        if found_station:
-            # Check if the station matches one of the final stations of the line
-            if found_station in final_stations and found_station != ticket_inspector.station:
-                ticket_inspector.direction = found_station
-                # remove the word after the line from the text
-                text_without_direction = text.replace(after_line_words[0], '').strip()
-                ticket_inspector.station = find_station(text_without_direction, ticket_inspector)
-
-                return ticket_inspector
-
-    return False
+    return after_line.split()
 
 
-def correct_direction(ticket_inspector, lines_with_final_station):
+def check_if_station_is_actually_direction(text, ticket_inspector):
+    if ticket_inspector.direction is None or ticket_inspector.station is None:
+        return ticket_inspector
+
+    line = ticket_inspector.line
+    final_stations_of_line = get_final_stations_of_line(line)
+
+    line = line.lower()  # convert to lowercase because text is in lowercase
+    after_line_words = get_words_after_line(text, line)
+
+    if not after_line_words:
+        return ticket_inspector
+
+    # Get the word directly after the line
+    found_station_after_line = find_station(after_line_words[0], ticket_inspector)
+
+    if not found_station_after_line or found_station_after_line not in final_stations_of_line:
+        return ticket_inspector
+
+    # Remove the word after line from the text to find the new station
+    text_without_direction = remove_direction_and_keyword(text, line, after_line_words[0])
+    new_station = find_station(text_without_direction, ticket_inspector)
+
+    if new_station is None:
+        return ticket_inspector
+
+    ticket_inspector.direction = found_station_after_line
+    ticket_inspector.station = new_station
+
+    return ticket_inspector
+
+
+def correct_direction(ticket_inspector, lines_with_stations):
     line = ticket_inspector.line
     direction = ticket_inspector.direction
     station = ticket_inspector.station
 
-    # No need to correct the direction if it is already a final station
-    if line is None:
-        return ticket_inspector
-
-    stations_of_line = lines_with_final_station[line]
+    stations_of_line = lines_with_stations[line]
 
     # If direction is a final station, return ticket_inspector
     if direction in [stations_of_line[0], stations_of_line[-1]]:
@@ -272,30 +290,30 @@ def correct_direction(ticket_inspector, lines_with_final_station):
     ticket_inspector.direction = None
     return ticket_inspector
 
-    
-def verify_direction(ticket_inspector, text):
-    # direction should be None if the ticket inspector got off the train
-    if handle_get_off(text):
-        ticket_inspector.direction = None
-        ticket_inspector.line = None
-        return ticket_inspector
-    
-    # Check if the direction is the final station of the line and correct it
-    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
-    
-    # Set the Ringbahn to always be directionless
+
+def set_ringbahn_directionless(ticket_inspector):
     if ticket_inspector.line == 'S41' or ticket_inspector.line == 'S42':
         ticket_inspector.direction = None
 
+    return ticket_inspector
+
+
+def verify_direction(ticket_inspector, text):
+    # direction should be None if the ticket inspector got off the train
+    handle_get_off(text, ticket_inspector)
+
+    if ticket_inspector.line is None:
+        return ticket_inspector
+    
+    # Check if the direction is the final station of the line and correct it
+    correct_direction(ticket_inspector, lines_with_stations)
+    
+    # Set direction to None if the line is S41 or S42
+    set_ringbahn_directionless(ticket_inspector)
+
     # if station is mentioned directly after the line, it is the direction
     # example 'U8 Hermannstraße' is most likely 'U8 Richtung Hermannstraße'
-    if ticket_inspector.direction is None and ticket_inspector.station and ticket_inspector.line:
-        check_if_station_is_actually_direction(text, ticket_inspector)
-
-    # direction should be None if the ticket inspector got off the train
-    if handle_get_off(text):
-        ticket_inspector.direction = None
-        ticket_inspector.line = None
+    check_if_station_is_actually_direction(text, ticket_inspector)
 
     return ticket_inspector
 
@@ -358,7 +376,7 @@ if __name__ == '__main__':
 
     print('Bot is running...🏃‍♂️')
 
-    @bot.message_handler(func=lambda message: message.chat.type == 'private')
+    @bot.message_handler(func=lambda message: message.chat.type == 'private')  # private for testing
     def get_info(message):
         author_id = message.chat.id
         current_time = datetime.datetime.now()
@@ -378,6 +396,12 @@ if __name__ == '__main__':
                 last_message['time'] = current_time  # Update the timestamp to the latest message
                 info = extract_ticket_inspector_info(merged_text)
                 last_message['info'] = info
+
+                # Print the information after merging the messages
+                if info:
+                    print('Found Info:', info)
+                else:
+                    print('No valuable information found')
             else:
                 # Handle as a new message
                 process_new_message(author_id, message, current_time)

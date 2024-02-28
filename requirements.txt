@@ -1,6 +1,7 @@
 pyTelegramBotAPI
 fuzzywuzzy 
 python-Levenshtein
+python-dotenv
 
 flake8
 flake8-quotes
