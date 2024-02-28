@@ -30,7 +30,7 @@ class CustomTestRunner(unittest.TextTestRunner):
         filled_length = int(bar_length * percentage_passed / 100)
         bar = '█' * filled_length + '-' * (bar_length - filled_length)
 
-        print(f"\nPercentage of passed tests: {percentage_passed:.2f}% [{bar}]")
+        print(f'\nPercentage of passed tests: {percentage_passed:.2f}% [{bar}]')
         return result
 
 
