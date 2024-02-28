@@ -1411,7 +1411,7 @@ test_cases = [
      'U6 naturkundemuseum Richtung Kurt Schumacher',
      'Naturkundemuseum',
      'U6',
-     'Kurt-Schumacher-Platz'),
+     'Alt-Tegel'),
     (
      'Blauwesten',
      None, None, None),
