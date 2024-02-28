@@ -1,4 +1,4 @@
-from main import lines_with_stations, find_station, remove_direction_and_keyword
+from process_message import lines_with_stations, find_station, remove_direction_and_keyword
 
 
 def handle_ringbahn(text):
