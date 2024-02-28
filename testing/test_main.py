@@ -13,7 +13,7 @@ reset = '\033[0m'
 gray = '\033[90m'
 
 total_tests = 344
-from remove_direction_and_keyword_test import TestRemoveDirectionAndKeyword
+from testing.remove_direction_and_keyword_test import TestRemoveDirectionAndKeyword
 
 
 class EmojiTestResult(unittest.TextTestResult):
