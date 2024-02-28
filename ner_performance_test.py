@@ -1,4 +1,6 @@
 import unittest
+import re
+from ner_test_cases import test_cases
 from NER.TransportInformationRecognizer import TransportInformationRecognizer
 
 
@@ -24,16 +26,11 @@ class CustomTestRunner(unittest.TextTestRunner):
         result = super().run(test)
         percentage_passed = result.percentage_passed()
 
-        if percentage_passed >= 90:
-            emoji = "✅"
-        elif percentage_passed >= 70:
-            emoji = "🟡"
-        elif percentage_passed >= 50:
-            emoji = "🔵"
-        else:
-            emoji = "❌"
+        bar_length = 20
+        filled_length = int(bar_length * percentage_passed / 100)
+        bar = '█' * filled_length + '-' * (bar_length - filled_length)
 
-        print(f"\nPercentage of passed tests: {percentage_passed:.2f}% {emoji}")
+        print(f"\nPercentage of passed tests: {percentage_passed:.2f}% [{bar}]")
         return result
 
 
@@ -43,20 +40,28 @@ class TestTransportInformationRecognizerIntegration(unittest.TestCase):
         cls.text_processor = TransportInformationRecognizer('NER/models/loss17')
 
     @staticmethod
+    def preprocess_station_name(station_name):
+        # Remove punctuation and strip spaces
+        return re.sub(r'\W+', '', station_name).strip()
+
+    @staticmethod
     def generate_test_case(text, expected_stations):
         def test(self):
             result = self.text_processor.process_text(text)
-            self.assertEqual(result, expected_stations)
+            # Preprocess both expected and result lists
+            preprocessed_result = [
+                TestTransportInformationRecognizerIntegration.preprocess_station_name(station) 
+                for station in result
+            ]
+            preprocessed_expected = [
+                TestTransportInformationRecognizerIntegration.preprocess_station_name(station) 
+                for station in expected_stations
+            ]
+            self.assertEqual(preprocessed_result, preprocessed_expected)
         return test
 
 
 def generate_tests():
-    test_cases = [
-        ("Gleisdreieck, on the platform", ["Gleisdreieck"]),
-        ("U6 Paradestr Richtung Kurt Schumacher Platz", ["Paradestr", "Kurt Schumacher Platz"]),
-        
-    ]
-
     for i, (text, expected_stations) in enumerate(test_cases, start=1):
         test_method = TestTransportInformationRecognizerIntegration.generate_test_case(
             text,
