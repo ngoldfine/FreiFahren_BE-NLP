@@ -50,11 +50,11 @@ class TestTransportInformationRecognizerIntegration(unittest.TestCase):
             result = self.text_processor.process_text(text)
             # Preprocess both expected and result lists
             preprocessed_result = [
-                TestTransportInformationRecognizerIntegration.preprocess_station_name(station) 
+                TestTransportInformationRecognizerIntegration.preprocess_station_name(station)
                 for station in result
             ]
             preprocessed_expected = [
-                TestTransportInformationRecognizerIntegration.preprocess_station_name(station) 
+                TestTransportInformationRecognizerIntegration.preprocess_station_name(station)
                 for station in expected_stations
             ]
             self.assertEqual(preprocessed_result, preprocessed_expected)
