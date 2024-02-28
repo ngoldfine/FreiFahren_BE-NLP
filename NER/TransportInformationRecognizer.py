@@ -1,8 +1,4 @@
 import spacy
-# from spacy.tokens import Doc
-
-# NER = Named Entity Recognition
-# This class is used to recognize stations (also lines and direction) in a text message
 
 
 class TransportInformationRecognizer:
