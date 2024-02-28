@@ -147,11 +147,17 @@ def find_station(text, ticket_inspector, threshold=75):
 
 
 def remove_direction_and_keyword(text, direction_keyword, direction):
-    if direction_keyword and direction:
-        replace_segment = f'{direction_keyword} {direction}'
-        text_without_direction = text.replace(replace_segment, '').strip()
-        return text_without_direction
-    return text
+    replace_segment = f'{direction_keyword} {direction}'.strip()
+    if replace_segment in text:
+        # If the exact match is found, replace it
+        return text.replace(replace_segment, '').strip()
+    else:
+        # If only the direction_keyword is found, attempt to remove it and any trailing spaces
+        replace_keyword_only = f'{direction_keyword}'.strip()
+        if replace_keyword_only in text:
+            # Remove the keyword and any single trailing space (if present)
+            text = text.replace(replace_keyword_only, '', 1).strip()
+        return text
 
 
 direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri']
