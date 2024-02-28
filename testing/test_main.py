@@ -1,5 +1,19 @@
 import unittest
-from remove_direction_and_keyword_test import TestRemoveDirectionAndKeyword
+from collections import defaultdict
+import sys
+import os
+# Add the parent folder to the Python module search path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from main import extract_ticket_inspector_info
+from test_cases import test_cases
+
+red = '\033[91m'
+reset = '\033[0m'
+gray = '\033[90m'
+
+total_tests = 344
+from testing.remove_direction_and_keyword_test import TestRemoveDirectionAndKeyword
 
 
 class EmojiTestResult(unittest.TextTestResult):
