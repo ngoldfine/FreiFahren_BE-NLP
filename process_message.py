@@ -2,12 +2,13 @@ import re
 import json
 from fuzzywuzzy import process
 from NER.TransportInformationRecognizer import TextProcessor
-
+import os
 
 def load_data(filename):
-    with open(filename, 'r') as f:
-        data = json.load(f)
-    return data
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, filename)
+    with open(file_path, 'r') as f:
+        return json.load(f)
 
 
 lines_with_stations = load_data('data/stations_and_lines.json')
