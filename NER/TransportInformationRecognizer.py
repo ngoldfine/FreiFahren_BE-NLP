@@ -1,12 +1,12 @@
+import os
 import spacy
 
 
 class TransportInformationRecognizer:
-    def __init__(self, model_path='NER/models/loss17'):
-        self.model_path = model_path
-        
+    def __init__(self, model_path):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.model_path = os.path.join(base_dir, model_path)
         self.nlp = spacy.load(f'{self.model_path}')
-        self.ner = self.nlp.get_pipe('ner')
 
         print(f'model {self.model_path} loaded')
 
@@ -36,4 +36,4 @@ class TransportInformationRecognizer:
         return stations
     
 
-TextProcessor = TransportInformationRecognizer('NER/models/loss17')
+TextProcessor = TransportInformationRecognizer('models/loss17')

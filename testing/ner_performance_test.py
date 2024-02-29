@@ -42,7 +42,7 @@ class CustomTestRunner(unittest.TextTestRunner):
 class TestTransportInformationRecognizerIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.text_processor = TransportInformationRecognizer('NER/models/loss17')
+        cls.text_processor = TransportInformationRecognizer('models/loss17')
 
     @staticmethod
     def preprocess_station_name(station_name):

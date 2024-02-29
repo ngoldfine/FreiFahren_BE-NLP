@@ -1,5 +1,5 @@
 import unittest
-from main import remove_direction_and_keyword
+from process_message import remove_direction_and_keyword
 
 
 class TestRemoveDirectionAndKeyword(unittest.TestCase):

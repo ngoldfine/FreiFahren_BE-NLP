@@ -2,7 +2,7 @@ import unittest
 from collections import defaultdict
 import sys
 import os
-# Add the parent folder to the Python module search path
+# move up one directory
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from main import extract_ticket_inspector_info
