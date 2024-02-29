@@ -5,6 +5,7 @@ import os
 # Add the parent folder to the Python module search path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from NER import TransportInformationRecognizer
 from main import extract_ticket_inspector_info
 from test_cases import test_cases
 

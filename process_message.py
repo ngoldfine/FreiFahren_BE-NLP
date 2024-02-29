@@ -10,8 +10,8 @@ def load_data(filename):
     return data
 
 
-lines_with_stations = load_data('stations_and_lines.json')
-stations_with_synonyms = load_data('data.json')
+lines_with_stations = load_data('data/stations_and_lines.json')
+stations_with_synonyms = load_data('data/synonyms.json')
    
 
 def format_text_for_line_search(text):
