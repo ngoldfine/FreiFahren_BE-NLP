@@ -1,6 +1,7 @@
 import os
 import spacy
 
+
 class TransportInformationRecognizer:
     def __init__(self, model_path):
         base_dir = os.path.dirname(os.path.abspath(__file__))
