@@ -19,7 +19,7 @@ def create_table_if_not_exists():
     conn = create_connection()
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
-    cursor.execute(sql.SQL("""
+    cursor.execute(sql.SQL('''
         CREATE TABLE IF NOT EXISTS ticket_info (
             id SERIAL PRIMARY KEY,
             timestamp TIMESTAMP NOT NULL,
@@ -29,7 +29,7 @@ def create_table_if_not_exists():
             direction VARCHAR(255),
             station VARCHAR(255)
         );
-    """))
+    '''))
     cursor.close()
     conn.close()
 
@@ -37,10 +37,10 @@ def create_table_if_not_exists():
 def insert_ticket_info(timestamp, message, author, line, direction, station):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute(sql.SQL("""
+    cursor.execute(sql.SQL('''
         INSERT INTO ticket_info (timestamp, message, author, line, direction, station)
         VALUES (%s, %s, %s, %s, %s, %s);
-    """), (timestamp, message, author, line, direction, station))
+    '''), (timestamp, message, author, line, direction, station))
     conn.commit()
     cursor.close()
     conn.close()
