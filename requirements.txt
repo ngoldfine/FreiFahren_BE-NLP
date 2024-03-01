@@ -13,3 +13,5 @@ watchdog
 openai
 
 spacy
+
+psycopg2-binary
