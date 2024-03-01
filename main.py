@@ -10,6 +10,7 @@ from process_message import (
     format_text,
     lines_with_stations
 )
+from db_utils import create_table_if_not_exists, insert_ticket_info
 
 
 class TicketInspector:
@@ -54,6 +55,9 @@ if __name__ == '__main__':
     bot = telebot.TeleBot(BOT_TOKEN)
     conversations = {}  # Dictionary to store conversations with more detailed structure
 
+    # Ensure the database table exists before the bot starts running
+    create_table_if_not_exists()
+
     print('Bot is running...🏃‍♂️')
 
     @bot.message_handler(func=lambda message: message.chat.type == 'private')  # private for testing
@@ -96,6 +100,15 @@ if __name__ == '__main__':
         conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
         if info:
             print('Found Info:', info)
+            # Insert the data into the database
+            insert_ticket_info(
+                current_time,
+                message.text,
+                author_id,
+                info.get('line'),
+                info.get('direction'),
+                info.get('station')
+            )
         else:
             print('No valuable information found')
             
