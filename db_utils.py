@@ -24,7 +24,7 @@ def create_table_if_not_exists():
             id SERIAL PRIMARY KEY,
             timestamp TIMESTAMP NOT NULL,
             message TEXT NOT NULL,
-            author TEXT NOT NULL,
+            author BIGINT NOT NULL,
             line VARCHAR(3),
             direction VARCHAR(255),
             station VARCHAR(255)

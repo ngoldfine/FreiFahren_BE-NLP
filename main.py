@@ -111,9 +111,7 @@ if __name__ == '__main__':
     
     @bot.message_handler(func=lambda message: message.chat.id == -1001370021231)
     def get_info(message):
-        author_id = message.chat.username
-        if author_id is None:
-            author_id = message.chat.first_name
+        author_id = message.from_user.id
         current_time = datetime.datetime.now()
 
         if author_id in conversations and conversations[author_id]:
