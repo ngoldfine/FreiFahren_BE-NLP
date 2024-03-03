@@ -59,8 +59,9 @@ if __name__ == '__main__':
     create_table_if_not_exists()
 
     print('Bot is running...🏃‍♂️')
-
-    @bot.message_handler(func=lambda message: message.chat.type == 'private')  # private for testing
+    
+    # @bot.message_handler(func=lambda message: message.chat.id == -1001370021231)
+    @bot.message_handler(func=lambda message: message)
     def get_info(message):
         author_id = message.chat.id
         current_time = datetime.datetime.now()
