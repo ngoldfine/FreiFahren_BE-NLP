@@ -24,12 +24,13 @@ def create_table_if_not_exists():
             id SERIAL PRIMARY KEY,
             timestamp TIMESTAMP NOT NULL,
             message TEXT NOT NULL,
-            author BIGINT NOT NULL,
+            author TEXT NOT NULL,
             line VARCHAR(3),
             direction VARCHAR(255),
             station VARCHAR(255)
         );
     '''))
+    print('created table')
     cursor.close()
     conn.close()
 
@@ -46,7 +47,7 @@ def insert_ticket_info(timestamp, message, author, line, direction, station):
     conn.close()
 
 
-def merge_ticket_info(last_known_message, timestamp, message, author, line, direction, station):
+def update_info(last_known_message, timestamp, message, author, line, direction, station):
     conn = create_connection()
     cursor = conn.cursor()
     

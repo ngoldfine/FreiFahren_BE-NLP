@@ -10,7 +10,7 @@ from process_message import (
     format_text,
     lines_with_stations
 )
-from db_utils import create_table_if_not_exists, insert_ticket_info, merge_ticket_info
+from db_utils import create_table_if_not_exists, insert_ticket_info, update_info
 
 
 class TicketInspector:
@@ -21,7 +21,7 @@ class TicketInspector:
         
 
 def extract_ticket_inspector_info(unformatted_text):
-    # If the text contains a question mark, indicate that no processing should occur
+    # usually just a question about an old report not a new report
     if '?' in unformatted_text:
         ticket_inspector = TicketInspector(line=None, station=None, direction=None)
         return ticket_inspector.__dict__
@@ -34,12 +34,12 @@ def extract_ticket_inspector_info(unformatted_text):
     found_direction = find_direction(text, ticket_inspector)[0]
     ticket_inspector.direction = found_direction
 
-    # Get the station
+    # Pass the text without direction to avoid finding the direction again
     text_without_direction = find_direction(text, ticket_inspector)[1]
     found_station = find_station(text_without_direction, ticket_inspector)
     ticket_inspector.station = found_station
 
-    # Verify the direction and line with the given information
+    # With the found info we can cross check the direction and line
     if found_line or found_station or found_direction:
         verify_direction(ticket_inspector, text)
         verify_line(ticket_inspector, text)
@@ -49,80 +49,76 @@ def extract_ticket_inspector_info(unformatted_text):
         return None
 
 
-if __name__ == '__main__':
-    load_dotenv()  # take environment variables from .env.
-    BOT_TOKEN = os.getenv('BOT_TOKEN')
-    bot = telebot.TeleBot(BOT_TOKEN)
-    conversations = {}  # Dictionary to store conversations with more detailed structure
+def merge_messages(author_id, message, conversations, current_time):
+    last_message = conversations[author_id][-1]
+    last_message_time = last_message['time']
+    time_difference = current_time - last_message_time
 
-    # Ensure the database table exists before the bot starts running
-    create_table_if_not_exists()
+    # If the last message was sent less than 60 seconds ago, merge the messages
+    if time_difference.total_seconds() <= 60:
+        last_known_message = last_message['text']
+        merged_text = f"{last_message['text']} {message.text}"
+        last_message['text'] = merged_text
+        last_message['time'] = current_time
+        info = extract_ticket_inspector_info(merged_text)
+        last_message['info'] = info
 
-    print('Bot is running...🏃‍♂️')
-    
-    # @bot.message_handler(func=lambda message: message.chat.id == -1001370021231)
-    @bot.message_handler(func=lambda message: message)
-    def get_info(message):
-        author_id = message.chat.id
-        current_time = datetime.datetime.now()
-        
-        # Check if this author_id already has messages
-        if author_id in conversations and conversations[author_id]:
-            last_message = conversations[author_id][-1]  # Get the last message from this author_id
-            last_message_time = last_message['time']
-            time_difference = current_time - last_message_time
-            
-            if time_difference.total_seconds() <= 60:
-                # This is import for distinguishing the message between each other
-                last_known_message = last_message['text']
-
-                # If the new message is within one minute of the last message, merge them
-                merged_text = f"{last_message['text']} {message.text}"
-                
-                # Update the last message in the conversation
-                last_message['text'] = merged_text
-                last_message['time'] = current_time  # Update the timestamp to the latest message
-                info = extract_ticket_inspector_info(merged_text)
-                last_message['info'] = info
-
-                # Print the information after merging the messages
-                if info:
-                    merge_ticket_info(last_known_message,
-                                      current_time,
-                                      merged_text,
-                                      author_id,
-                                      info.get('line'),
-                                      info.get('direction'),
-                                      info.get('station')
-                                      )
-                    
-                    print('Merged info:', info)
-                else:
-                    print('No valuable information found')
-            else:
-                # Handle as a new message
-                process_new_message(author_id, message, current_time)
-        else:
-            # This is the first message from this author_id or no previous conversation exists
-            process_new_message(author_id, message, current_time)
-
-    def process_new_message(author_id, message, current_time):
-        info = extract_ticket_inspector_info(message.text)
-        if author_id not in conversations:
-            conversations[author_id] = []
-        conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
         if info:
-            print('Found Info:', info)
-            # Insert the data into the database
-            insert_ticket_info(
+            update_info(
+                last_known_message,
                 current_time,
-                message.text,
+                merged_text,
                 author_id,
                 info.get('line'),
                 info.get('direction'),
                 info.get('station')
             )
+            print('Merged info:', info)
         else:
             print('No valuable information found')
+    else:
+        process_new_message(author_id, message, current_time, conversations)
+
+
+def process_new_message(author_id, message, current_time, conversations):
+    info = extract_ticket_inspector_info(message.text)
+    if author_id not in conversations:
+        conversations[author_id] = []
+    conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
+    if info:
+        print('Found Info:', info)
+        insert_ticket_info(
+            current_time,
+            message.text,
+            author_id,
+            info.get('line'),
+            info.get('direction'),
+            info.get('station')
+        )
+    else:
+        print('No valuable information found')
+
+
+if __name__ == '__main__':
+    load_dotenv()
+    BOT_TOKEN = os.getenv('BOT_TOKEN')
+    bot = telebot.TeleBot(BOT_TOKEN)
+    conversations = {}
+
+    create_table_if_not_exists()
+
+    print('Bot is running...')
+    
+    @bot.message_handler(func=lambda message: message.chat.id == -1001370021231)
+    def get_info(message):
+        author_id = message.chat.username
+        if author_id is None:
+            author_id = message.chat.first_name
+        current_time = datetime.datetime.now()
+
+        if author_id in conversations and conversations[author_id]:
+            merge_messages(author_id, message, conversations, current_time)
+        else:
+            process_new_message(author_id, message, current_time, conversations)
             
     bot.infinity_polling()
