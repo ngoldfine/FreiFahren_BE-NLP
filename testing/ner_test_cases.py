@@ -362,3 +362,4 @@ test_cases = [
     ('2 blue vests Kotti u8', ['Kotti']),
     ('Götlitzer bahnhof blaue weste raus', ['Götlitzer bahnhof']),
 ]
+

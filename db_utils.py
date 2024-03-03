@@ -44,3 +44,18 @@ def insert_ticket_info(timestamp, message, author, line, direction, station):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def merge_ticket_info(last_known_message, timestamp, message, author, line, direction, station):
+    conn = create_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute(sql.SQL('''
+        UPDATE ticket_info
+        SET timestamp = %s, message = %s, author = %s, line = %s, direction = %s, station = %s
+        WHERE message = %s AND author = %s;
+    '''), (timestamp, message, author, line, direction, station, last_known_message, author))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
