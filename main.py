@@ -57,7 +57,7 @@ def merge_messages(author_id, message, conversations, current_time):
     # If the last message was sent less than 60 seconds ago, merge the messages
     if time_difference.total_seconds() <= 60:
         last_known_message = last_message['text']
-        merged_text = f"{last_message['text']} {message.text}"
+        merged_text = f'{last_message["text"]} {message.text}'
         last_message['text'] = merged_text
         last_message['time'] = current_time
         info = extract_ticket_inspector_info(merged_text)
