@@ -10,7 +10,7 @@ from process_message import (
     format_text,
     lines_with_stations
 )
-from db_utils import create_table_if_not_exists, insert_ticket_info
+from db_utils import create_table_if_not_exists, insert_ticket_info, merge_ticket_info
 
 
 class TicketInspector:
@@ -72,6 +72,9 @@ if __name__ == '__main__':
             time_difference = current_time - last_message_time
             
             if time_difference.total_seconds() <= 60:
+                # This is import for distinguishing the message between each other
+                last_known_message = last_message['text']
+
                 # If the new message is within one minute of the last message, merge them
                 merged_text = f"{last_message['text']} {message.text}"
                 
@@ -83,7 +86,16 @@ if __name__ == '__main__':
 
                 # Print the information after merging the messages
                 if info:
-                    print('Found Info:', info)
+                    merge_ticket_info(last_known_message,
+                                      current_time,
+                                      merged_text,
+                                      author_id,
+                                      info.get('line'),
+                                      info.get('direction'),
+                                      info.get('station')
+                                      )
+                    
+                    print('Merged info:', info)
                 else:
                     print('No valuable information found')
             else:
