@@ -16,7 +16,7 @@ Freifahren is an innovative project designed to map the presence of ticket inspe
 
 1. First, clone the repository to your local machine:
    ```bash
-   git clone https://github.com/johan-t/freiFahren
+   git clone https://github.com/FreiFahren/FreiFahren_BE-NLP
 2. Install the necessary Python packages:
     `pip install -r requirements.txt`
 3. Acquire a Bot API Token by creating a new bot through [BotFather](https://t.me/botFather) and set it as the BOT_TOKEN environment variable.
