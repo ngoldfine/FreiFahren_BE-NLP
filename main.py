@@ -109,7 +109,13 @@ if __name__ == '__main__':
 
     print('Bot is running...')
     
-    @bot.message_handler(func=lambda message: message.chat.id == -1001370021231)
+    DEV_CHAT_ID = os.getenv('DEV_CHAT_ID')
+    FREIFAHREN_BE_CHAT_ID = os.getenv('FREIFAHREN_BE_CHAT_ID')
+    
+    @bot.message_handler(func=lambda message: message.chat.id in [
+        int(DEV_CHAT_ID),
+        int(FREIFAHREN_BE_CHAT_ID)
+    ])
     def get_info(message):
         author_id = message.from_user.id
         current_time = datetime.datetime.now()
