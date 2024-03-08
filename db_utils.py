@@ -26,8 +26,10 @@ def create_table_if_not_exists():
             message TEXT NOT NULL,
             author BIGINT NOT NULL,
             line VARCHAR(3),
-            direction VARCHAR(255),
-            station VARCHAR(255)
+            station_name VARCHAR(255),
+            station_id VARCHAR(10),
+            direction_name VARCHAR(255),
+            direction_id VARCHAR(10)
         );
     '''))
     print('created table')
@@ -35,27 +37,70 @@ def create_table_if_not_exists():
     conn.close()
 
 
-def insert_ticket_info(timestamp, message, author, line, direction, station):
+def insert_ticket_info(
+    timestamp,
+    message,
+    author,
+    line,
+    station_name,
+    station_id,
+    direction_name,
+    direction_id
+):
     conn = create_connection()
     cursor = conn.cursor()
     cursor.execute(sql.SQL('''
-        INSERT INTO ticket_info (timestamp, message, author, line, direction, station)
-        VALUES (%s, %s, %s, %s, %s, %s);
-    '''), (timestamp, message, author, line, direction, station))
+        INSERT INTO ticket_info (
+            timestamp, message, author, line, station_name, station_id, direction_name, direction_id
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+    '''), (
+        timestamp,
+        message,
+        author,
+        line,
+        station_name,
+        station_id,
+        direction_name,
+        direction_id
+    ))
     conn.commit()
     cursor.close()
     conn.close()
 
 
-def update_info(last_known_message, timestamp, message, author, line, direction, station):
+def update_info(
+    last_known_message,
+    timestamp,
+    message,
+    author,
+    line,
+    station_name,
+    station_id,
+    direction_name,
+    direction_id
+):
     conn = create_connection()
     cursor = conn.cursor()
     
     cursor.execute(sql.SQL('''
         UPDATE ticket_info
-        SET timestamp = %s, message = %s, author = %s, line = %s, direction = %s, station = %s
+        SET timestamp = %s, message = %s, author = %s, line = %s,
+            station_name = %s, station_id = %s, direction_name = %s,
+            direction_id = %s
         WHERE message = %s AND author = %s;
-    '''), (timestamp, message, author, line, direction, station, last_known_message, author))
+    '''), (
+        timestamp,
+        message,
+        author,
+        line,
+        station_name,
+        station_id,
+        direction_name,
+        direction_id,
+        last_known_message,
+        author
+    ))
 
     conn.commit()
     cursor.close()
