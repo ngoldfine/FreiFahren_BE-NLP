@@ -12,7 +12,6 @@ from process_message import (
     lines_with_stations
 )
 from db_utils import create_table_if_not_exists, insert_ticket_info, update_info
-import pytz
 
 
 class TicketInspector:
@@ -157,8 +156,7 @@ if __name__ == '__main__':
     @bot.message_handler(func=lambda message: message)
     def get_info(message):
         author_id = message.from_user.id
-        german_timezone = pytz.timezone('Europe/Berlin')
-        current_time = datetime.datetime.now(german_timezone)
+        current_time = datetime.datetime.now()
 
         if author_id in conversations and conversations[author_id]:
             merge_messages(author_id, message, conversations, current_time)
