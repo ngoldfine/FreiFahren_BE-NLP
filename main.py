@@ -1,5 +1,6 @@
 import os
 import telebot
+import requests
 import datetime
 from dotenv import load_dotenv
 from verify_info import verify_direction, verify_line
@@ -65,14 +66,27 @@ def merge_messages(author_id, message, conversations, current_time):
         last_message['info'] = info
 
         if info:
+            
+            # Initialize station_id and direction_id to None
+            station_id = None
+            direction_id = None
+            
+            # Make a request to the server to get the ids
+            if info.get('station'):
+                station_id = get_station_id(info.get('station'))
+            if info.get('direction'):
+                direction_id = get_station_id(info.get('direction'))
+            
             update_info(
                 last_known_message,
                 current_time,
                 merged_text,
                 author_id,
                 info.get('line'),
+                info.get('station'),
+                station_id,
                 info.get('direction'),
-                info.get('station')
+                direction_id
             )
             print('Merged info:', info)
         else:
@@ -81,6 +95,19 @@ def merge_messages(author_id, message, conversations, current_time):
         process_new_message(author_id, message, current_time, conversations)
 
 
+def get_station_id(station_name):
+    response = requests.get(f'http://localhost:8080/id?name={station_name}')
+    if response.status_code == 200:
+        station_id = response.text
+        # Replace the quotes
+        station_id = station_id.replace('"', '')
+
+        return station_id
+    else:
+        print(f'Failed to retrieve station ID for {station_name}. Error: {response.status_code}')
+        return None
+    
+       
 def process_new_message(author_id, message, current_time, conversations):
     info = extract_ticket_inspector_info(message.text)
     if author_id not in conversations:
@@ -89,18 +116,24 @@ def process_new_message(author_id, message, current_time, conversations):
     if info:
         print('Found Info:', info)
         
-        # Placeholder IDs for station_id and direction_id
-        station_id = 1  # This should be the actual ID from your stations table
-        direction_id = 1  # This should be the actual ID from your directions table
+        # Initialize station_id and direction_id to None
+        station_id = None
+        direction_id = None
         
+        # Make a request to the server to get the ids
+        if info.get('station'):
+            station_id = get_station_id(info.get('station'))
+        if info.get('direction'):
+            direction_id = get_station_id(info.get('direction'))
+            
         insert_ticket_info(
             current_time,
             message.text,
             author_id,
             info.get('line'),
-            info.get('station'),  # This is now 'station_name'
+            info.get('station'),
             station_id,
-            info.get('direction'),  # This is now 'direction_name'
+            info.get('direction'),
             direction_id
         )
     else:

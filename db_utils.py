@@ -27,9 +27,9 @@ def create_table_if_not_exists():
             author BIGINT NOT NULL,
             line VARCHAR(3),
             station_name VARCHAR(255),
-            station_id INT,
+            station_id VARCHAR(10),
             direction_name VARCHAR(255),
-            direction_id INT
+            direction_id VARCHAR(10)
         );
     '''))
     print('created table')
