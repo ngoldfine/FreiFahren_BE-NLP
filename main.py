@@ -88,13 +88,20 @@ def process_new_message(author_id, message, current_time, conversations):
     conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
     if info:
         print('Found Info:', info)
+        
+        # Placeholder IDs for station_id and direction_id
+        station_id = 1  # This should be the actual ID from your stations table
+        direction_id = 1  # This should be the actual ID from your directions table
+        
         insert_ticket_info(
             current_time,
             message.text,
             author_id,
             info.get('line'),
-            info.get('direction'),
-            info.get('station')
+            info.get('station'),  # This is now 'station_name'
+            station_id,
+            info.get('direction'),  # This is now 'direction_name'
+            direction_id
         )
     else:
         print('No valuable information found')
