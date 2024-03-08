@@ -96,7 +96,7 @@ def merge_messages(author_id, message, conversations, current_time):
 
 
 def get_station_id(station_name):
-    response = requests.get(f'http://localhost:8080/id?name={station_name}')
+    response = requests.get(f'{BACKEND_URL}/id?name={station_name}')
     if response.status_code == 200:
         station_id = response.text
         # Replace the quotes
@@ -143,6 +143,7 @@ def process_new_message(author_id, message, current_time, conversations):
 if __name__ == '__main__':
     load_dotenv()
     BOT_TOKEN = os.getenv('BOT_TOKEN')
+    BACKEND_URL = os.getenv('BACKEND_URL')
     bot = telebot.TeleBot(BOT_TOKEN)
     conversations = {}
 
