@@ -154,10 +154,7 @@ if __name__ == '__main__':
     DEV_CHAT_ID = os.getenv('DEV_CHAT_ID')
     FREIFAHREN_BE_CHAT_ID = os.getenv('FREIFAHREN_BE_CHAT_ID')
     
-    @bot.message_handler(func=lambda message: message.chat.id in [
-        int(DEV_CHAT_ID),
-        int(FREIFAHREN_BE_CHAT_ID)
-    ])
+    @bot.message_handler(func=lambda message: message)
     def get_info(message):
         author_id = message.from_user.id
         german_timezone = pytz.timezone('Europe/Berlin')
