@@ -98,8 +98,8 @@ def get_station_id(station_name):
     response = requests.get(f'{BACKEND_URL}/id?name={station_name}')
     if response.status_code == 200:
         station_id = response.text
-        # Replace the quotes
-        station_id = station_id.replace('"', '')
+        # Replace the quotes and newline
+        station_id = station_id.replace('"', '').replace('\n', '')
 
         return station_id
     else:
@@ -143,6 +143,7 @@ if __name__ == '__main__':
     load_dotenv()
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     BACKEND_URL = os.getenv('BACKEND_URL')
+
     bot = telebot.TeleBot(BOT_TOKEN)
     conversations = {}
 
