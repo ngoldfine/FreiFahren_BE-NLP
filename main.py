@@ -39,7 +39,7 @@ def extract_ticket_inspector_info(unformatted_text):
     text_without_direction = find_direction(text, ticket_inspector)[1]
     found_station = find_station(text_without_direction, ticket_inspector)
     ticket_inspector.station = found_station
-
+    
     # With the found info we can cross check the direction and line
     if found_line or found_station or found_direction:
         verify_direction(ticket_inspector, text)
@@ -87,7 +87,7 @@ def merge_messages(author_id, message, conversations, current_time):
                 info.get('direction'),
                 direction_id
             )
-            print('Merged info:', info)
+            print('Found Merged Info:\nLine:\t\t', info.get('line'), '\nStation:\t', info.get('station'), '\nDirection:\t', info.get('direction'))
         else:
             print('No valuable information found')
     else:
@@ -113,7 +113,7 @@ def process_new_message(author_id, message, current_time, conversations):
         conversations[author_id] = []
     conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
     if info:
-        print('Found Info:', info)
+        print('Found Info:\nLine:\t\t', info.get('line'), '\nStation:\t', info.get('station'), '\nDirection:\t', info.get('direction'))
         
         # Initialize station_id and direction_id to None
         station_id = None
