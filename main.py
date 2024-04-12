@@ -87,7 +87,7 @@ def merge_messages(author_id, message, conversations, current_time):
                 info.get('direction'),
                 direction_id
             )
-            print('Merged info:', info)
+            print('Found Merged Info:\nLine:\t\t', info.get('line'), '\nStation:\t', info.get('station'), '\nDirection:\t', info.get('direction'))
         else:
             print('No valuable information found')
     else:
@@ -113,7 +113,7 @@ def process_new_message(author_id, message, current_time, conversations):
         conversations[author_id] = []
     conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
     if info:
-        print('Found Info:\nLine:\t\t', info.get('line'),'\nStation:\t', info.get('station'),'\nDirection:\t', info.get('direction'))
+        print('Found Info:\nLine:\t\t', info.get('line'), '\nStation:\t', info.get('station'), '\nDirection:\t', info.get('direction'))
         
         # Initialize station_id and direction_id to None
         station_id = None
