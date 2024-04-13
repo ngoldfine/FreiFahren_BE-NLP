@@ -44,7 +44,7 @@ def extract_ticket_inspector_info(unformatted_text):
     if found_line or found_station or found_direction:
         verify_direction(ticket_inspector, text)
         verify_line(ticket_inspector, text)
-        
+
         return ticket_inspector.__dict__
     else:
         return None

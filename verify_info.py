@@ -18,7 +18,6 @@ def verify_line(ticket_inspector, text):
     # If it the ring set to S41
     if handle_ringbahn(text.lower()) and ticket_inspector.line is None:
         ticket_inspector.line = 'S41'
-        
     return ticket_inspector
 
 
@@ -52,13 +51,15 @@ def handle_get_off(text, ticket_inspector):
 def verify_direction(ticket_inspector, text):
     # direction should be None if the ticket inspector got off the train
     handle_get_off(text, ticket_inspector)
+    
+    check_for_line_through_station(ticket_inspector, lines_with_stations)
 
     if ticket_inspector.line is None:
         return ticket_inspector
-    
-    # Check if the direction is the final station of the line and correct it
-    correct_direction(ticket_inspector, lines_with_stations)
-    
+
+    # Update ticket inspector with the corrected direction returned by correct_direction
+    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
+
     # Set direction to None if the line is S41 or S42
     set_ringbahn_directionless(ticket_inspector)
 
@@ -142,3 +143,18 @@ def correct_direction(ticket_inspector, lines_with_stations):
     # If direction is not a final station, set direction to None
     ticket_inspector.direction = None
     return ticket_inspector
+
+
+def check_for_line_through_station(ticket_inspector, lines_with_stations):
+    lines_of_station_count = 0
+    found_line_for_station = None  # Initialize found_line_for_station outside the loop
+    for line, stations in lines_with_stations.items():  # Iterate over items instead of unpacking
+        if ticket_inspector.station in stations:
+            lines_of_station_count += 1
+            found_line_for_station = line  # Store the line if the station is found
+
+    if lines_of_station_count == 1:
+        line = found_line_for_station
+        ticket_inspector.line = line
+    else:
+        return ticket_inspector
