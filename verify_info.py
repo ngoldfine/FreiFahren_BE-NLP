@@ -15,6 +15,11 @@ def handle_ringbahn(text):
 
 
 def verify_line(ticket_inspector, text):
+    # If there is only one line traversing the station, set the line to that line
+    if ticket_inspector.line is None and ticket_inspector.station is not None:
+        stations_list_main = load_data('data/stations_list_main.json')
+        check_for_line_through_station(ticket_inspector, stations_list_main)
+
     # If it the ring set to S41
     if handle_ringbahn(text.lower()) and ticket_inspector.line is None:
         ticket_inspector.line = 'S41'
@@ -38,7 +43,7 @@ def handle_get_off(text, ticket_inspector):
         'getting off',
         'steigen aus',
     ]
-    
+
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
@@ -49,12 +54,6 @@ def handle_get_off(text, ticket_inspector):
 
 
 def verify_direction(ticket_inspector, text):
-    # direction should be None if the ticket inspector got off the train
-    handle_get_off(text, ticket_inspector)
-    
-    stations_list_main = load_data('data/statons_list_main.json')
-    check_for_line_through_station(ticket_inspector, stations_list_main)
-
     if ticket_inspector.line is None:
         return ticket_inspector
 
@@ -147,10 +146,10 @@ def correct_direction(ticket_inspector, lines_with_stations):
 
 
 def check_for_line_through_station(ticket_inspector, stations_list_main):
-    station_name = ticket_inspector.station
+    station_name = ticket_inspector.station.strip().lower().replace(" ", "")
 
-    for _station_code, station_info in stations_list_main.items():
-        if station_info['name'] == station_name:
+    for _key, station_info in stations_list_main.items():
+        if station_info['name'].strip().lower().replace(" ", "") == station_name:
             if len(station_info['lines']) == 1:
                 ticket_inspector.line = station_info['lines'][0]
                 return ticket_inspector

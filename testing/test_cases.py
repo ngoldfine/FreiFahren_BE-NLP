@@ -813,7 +813,7 @@ test_cases = [
 
         'Heinrich-Heine-Straße',
 
-        None,
+        'S7',
         None,
     ),
     (
@@ -1051,7 +1051,7 @@ test_cases = [
     (
      'am u amruner str ausgestiegen',
      'Amrumerstraße',
-     None, None),
+     'S7', None),
     (
      '3 Männer  U6 - Alt-Tempelhof',
      'Alt-Tempelhof',
@@ -1210,7 +1210,7 @@ test_cases = [
     (
      'Grade amruner str. ausgestiegen',
      'Amrunerstraße',
-     None, None),
+     'S7', None),
     (
      'U5 - Brandenburg Tor',
      'Brandenburger Tor',
@@ -1427,7 +1427,7 @@ test_cases = [
     (
      'U7 Wilmersdorf ausgestiegen',
      'Wilmersdorferstraße',
-     'U7',
+     None,
      None),
     (
      'Leopoldplatz -> Alt Tegel blauvesten',
@@ -1478,7 +1478,7 @@ test_cases = [
      '',
      None, None, None),
     ("Miguel GalindoPhotothey're at heinrich heine now", 'Heinrich-Heine-Straße',
-     None, None),
+     'U8', None),
     (
      'U6 tempelhof ',
      'Tempelhof',
