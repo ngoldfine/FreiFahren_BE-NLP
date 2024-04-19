@@ -12,21 +12,21 @@ from process_message import (
     lines_with_stations
 )
 from db_utils import create_table_if_not_exists, insert_ticket_info, update_info
-
+from verify_info import handle_get_off
 
 class TicketInspector:
     def __init__(self, line, station, direction):
         self.line = line
         self.station = station
         self.direction = direction
-        
+
 
 def extract_ticket_inspector_info(unformatted_text):
     # usually just a question about an old report not a new report
     if '?' in unformatted_text:
         ticket_inspector = TicketInspector(line=None, station=None, direction=None)
         return ticket_inspector.__dict__
-    
+
     found_line = find_line(unformatted_text, lines_with_stations)
     ticket_inspector = TicketInspector(line=found_line, station=None, direction=None)
 
@@ -39,12 +39,15 @@ def extract_ticket_inspector_info(unformatted_text):
     text_without_direction = find_direction(text, ticket_inspector)[1]
     found_station = find_station(text_without_direction, ticket_inspector)
     ticket_inspector.station = found_station
-    
+
     # With the found info we can cross check the direction and line
     if found_line or found_station or found_direction:
+        # direction and line should be None if the ticket inspector got off the train
+        handle_get_off(text, ticket_inspector)
+
         verify_direction(ticket_inspector, text)
         verify_line(ticket_inspector, text)
-        
+
         return ticket_inspector.__dict__
     else:
         return None
@@ -65,17 +68,17 @@ def merge_messages(author_id, message, conversations, current_time):
         last_message['info'] = info
 
         if info:
-            
+
             # Initialize station_id and direction_id to None
             station_id = None
             direction_id = None
-            
+
             # Make a request to the server to get the ids
             if info.get('station'):
                 station_id = get_station_id(info.get('station'))
             if info.get('direction'):
                 direction_id = get_station_id(info.get('direction'))
-            
+
             update_info(
                 last_known_message,
                 current_time,
@@ -105,8 +108,8 @@ def get_station_id(station_name):
     else:
         print(f'Failed to retrieve station ID for {station_name}. Error: {response.status_code}')
         return None
-    
-       
+
+
 def process_new_message(author_id, message, current_time, conversations):
     info = extract_ticket_inspector_info(message.text)
     if author_id not in conversations:
@@ -114,17 +117,17 @@ def process_new_message(author_id, message, current_time, conversations):
     conversations[author_id].append({'text': message.text, 'time': current_time, 'info': info})
     if info:
         print('Found Info:\nLine:\t\t', info.get('line'), '\nStation:\t', info.get('station'), '\nDirection:\t', info.get('direction'))
-        
+
         # Initialize station_id and direction_id to None
         station_id = None
         direction_id = None
-        
+
         # Make a request to the server to get the ids
         if info.get('station'):
             station_id = get_station_id(info.get('station'))
         if info.get('direction'):
             direction_id = get_station_id(info.get('direction'))
-            
+
         insert_ticket_info(
             current_time,
             message.text,
@@ -152,7 +155,7 @@ if __name__ == '__main__':
     print('Bot is running...')
     DEV_CHAT_ID = os.getenv('DEV_CHAT_ID')
     FREIFAHREN_BE_CHAT_ID = os.getenv('FREIFAHREN_BE_CHAT_ID')
-    
+
     @bot.message_handler(func=lambda message: message)
     def get_info(message):
         author_id = message.from_user.id
@@ -162,5 +165,5 @@ if __name__ == '__main__':
             merge_messages(author_id, message, conversations, current_time)
         else:
             process_new_message(author_id, message, current_time, conversations)
-            
+
     bot.infinity_polling()

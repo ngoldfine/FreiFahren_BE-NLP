@@ -142,7 +142,7 @@ test_cases = [
 
         'Paradestraße',
 
-        None,
+        'U6',
         None
     ),
     (
@@ -150,7 +150,7 @@ test_cases = [
 
         'Boddinstraße',
 
-        None,
+        'U8',
         None
     ),
     (
@@ -813,7 +813,7 @@ test_cases = [
 
         'Heinrich-Heine-Straße',
 
-        None,
+        'S7',
         None,
     ),
     (
@@ -912,12 +912,12 @@ test_cases = [
     (
      '3 bos u8 richtung wittenau, weinmeisterstr ausgestiegen',
      'Weinmeisterstraße',
-     None,
+     'U8',
      None),
     (
      'Große Kontrolle beim aussteigen an der U-Alt-Tempelhof U6',
      'Alt-Tempelhof',
-     None,
+     'U6',
      None),
     (
      'Ring, tempelhof, richtung sudkreuz',
@@ -1050,8 +1050,8 @@ test_cases = [
      'Rathaus Steglitz'),
     (
      'am u amruner str ausgestiegen',
-     'Amrunerstraße',
-     None, None),
+     'Amrumerstraße',
+     'S7', None),
     (
      '3 Männer  U6 - Alt-Tempelhof',
      'Alt-Tempelhof',
@@ -1073,7 +1073,7 @@ test_cases = [
     (
      'Polizei boddinstrasse',
      'Boddinstraße',
-     None, None),
+     'U8', None),
     (
      'U5 Alexanderplatz am Gleis richtung HBF 2 Blauwesten',
      'Alexanderplatz',
@@ -1118,11 +1118,11 @@ test_cases = [
     (
      'Just got out there standing on the platform Bernauer Straße',
      'Bernauerstraße',
-     None, None),
+     'U8', None),
     (
      'Sind ausgestiegen Bernauer Straße',
      'Bernauerstraße',
-     None, None),
+     'U8', None),
     (
      'U7 Wilmersdorfer str richtung rudow standing on the platform, 4 men wearing blue vests',
      'Wilmersdorferstraße',
@@ -1146,7 +1146,7 @@ test_cases = [
     (
      'Riesen Gruppe mit bos Jacken mitten auf Bahnsteig rosenthalerplatz',
      'Rosenthaler Platz',
-     None, None),
+     'U8', None),
     (
      '2bos mehringdamm am gleis u7/u6',
      'Mehringdamm',
@@ -1210,7 +1210,7 @@ test_cases = [
     (
      'Grade amruner str. ausgestiegen',
      'Amrunerstraße',
-     None, None),
+     'S7', None),
     (
      'U5 - Brandenburg Tor',
      'Brandenburger Tor',
@@ -1228,7 +1228,7 @@ test_cases = [
     (
      '4 bos westen märkisches museum, kontrollieren auf dem Bahnhof gerade, richtung pankow',
      'Märkisches Museum',
-     None, 'Pankow'),
+     'U2', 'Pankow'),
     (
      'Blauwesten u5 Alexanderplatz richtung hönow',
      'Alexanderplatz',
@@ -1268,11 +1268,11 @@ test_cases = [
     (
      'Waren 3 und sind Frankfurter Tor ausgestiegen.',
      'Frankfurter Tor',
-     None, None),
+     'U5', None),
     (
      '2 Blaue jetzt im Zug, Weberwiese raus',
      'Weberwiese',
-     None, None),
+     'U5', None),
     (
      'U5',
      None, 'U5',
@@ -1398,7 +1398,7 @@ test_cases = [
      None, None, None),
     (
      'Kontrolle in der u8 richtung wittensu bei der janowitzbrücke',
-     'Janowitz Brücke',
+     'Jannowitz Brücke',
      'U8',
      'Wittenau'),
     (
@@ -1478,7 +1478,7 @@ test_cases = [
      '',
      None, None, None),
     ("Miguel GalindoPhotothey're at heinrich heine now", 'Heinrich-Heine-Straße',
-     None, None),
+     'U8', None),
     (
      'U6 tempelhof ',
      'Tempelhof',
@@ -1539,7 +1539,7 @@ test_cases = [
     (
      '5 blauwesten weinmeister straße',
      'Weinmeisterstraße',
-     None, None),
+     'U8', None),
     (
      'U8',
      None, 'U8',
@@ -1568,7 +1568,7 @@ test_cases = [
     (
      'u7 richtung rathaus spanda, ca 5 mit bos westen und 2 mit bvg sicherheit sind mierendorff raus. männl gelesen.',
      'Alt-Mariendorf',
-     None,
+     'U7',
      None),
     (
      'U3 Richtung krumme lanke Wittenbergplatz',
@@ -1583,7 +1583,7 @@ test_cases = [
     (
      'Kontrolleur*innen warten am Ausgang S-Mahlsdorf',
      'Mahlsdorf',
-     None, None),
+     'S5', None),
     (
      'U2 Bülowstraße platform direction Ruhleben',
      'Bülowstraße',
@@ -1851,7 +1851,7 @@ test_cases = [
     (
      'Sind jetzt Betriebshof Marzahn ausgestiegen.',
      'Marzahn',
-     None, None),
+     'S7', None),
     (
      'unter den linder 2 personas',
      'Unter den Linden',
@@ -1881,7 +1881,7 @@ test_cases = [
     (
      'Blauwesten ErnstReuter jetzt Richtung Zoo',
      'Ernst-Reuter-Platz',
-     None, 'Ruhleben'),
+     'U2', 'Pankow'),
     (
      'Schöneberg KerstinU oder SLaut Bild am Übergang zwischen S- und U-Bahn, auf Erdgeschoss-Ebene (kann ja z.B. für Menschen mit Screenreader wichtig sein, dass das in Textform da steht - bloß mal so als Anmerkung).',
      'Schöneberg',

@@ -1,4 +1,4 @@
-from process_message import lines_with_stations, find_station, remove_direction_and_keyword
+from process_message import lines_with_stations, find_station, remove_direction_and_keyword, load_data
 
 
 def handle_ringbahn(text):
@@ -15,10 +15,14 @@ def handle_ringbahn(text):
 
 
 def verify_line(ticket_inspector, text):
+    # If there is only one line traversing the station, set the line to that line
+    if ticket_inspector.line is None and ticket_inspector.station is not None:
+        stations_list_main = load_data('data/stations_list_main.json')
+        check_for_line_through_station(ticket_inspector, stations_list_main)
+
     # If it the ring set to S41
     if handle_ringbahn(text.lower()) and ticket_inspector.line is None:
         ticket_inspector.line = 'S41'
-        
     return ticket_inspector
 
 
@@ -39,7 +43,7 @@ def handle_get_off(text, ticket_inspector):
         'getting off',
         'steigen aus',
     ]
-    
+
     # if any of the keywords are in the text return True
     for keyword in getting_off_keywords:
         if keyword in text:
@@ -50,15 +54,12 @@ def handle_get_off(text, ticket_inspector):
 
 
 def verify_direction(ticket_inspector, text):
-    # direction should be None if the ticket inspector got off the train
-    handle_get_off(text, ticket_inspector)
-
     if ticket_inspector.line is None:
         return ticket_inspector
-    
-    # Check if the direction is the final station of the line and correct it
-    correct_direction(ticket_inspector, lines_with_stations)
-    
+
+    # Update ticket inspector with the corrected direction returned by correct_direction
+    ticket_inspector = correct_direction(ticket_inspector, lines_with_stations)
+
     # Set direction to None if the line is S41 or S42
     set_ringbahn_directionless(ticket_inspector)
 
@@ -141,4 +142,16 @@ def correct_direction(ticket_inspector, lines_with_stations):
 
     # If direction is not a final station, set direction to None
     ticket_inspector.direction = None
+    return ticket_inspector
+
+
+def check_for_line_through_station(ticket_inspector, stations_list_main):
+    station_name = ticket_inspector.station.strip().lower().replace(" ", "")
+
+    for _key, station_info in stations_list_main.items():
+        if station_info['name'].strip().lower().replace(" ", "") == station_name:
+            if len(station_info['lines']) == 1:
+                ticket_inspector.line = station_info['lines'][0]
+                return ticket_inspector
+
     return ticket_inspector
