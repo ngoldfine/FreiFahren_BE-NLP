@@ -1050,7 +1050,7 @@ test_cases = [
      'Rathaus Steglitz'),
     (
      'am u amruner str ausgestiegen',
-     'Amrunerstraße',
+     'Amrumerstraße',
      None, None),
     (
      '3 Männer  U6 - Alt-Tempelhof',
@@ -1122,7 +1122,7 @@ test_cases = [
     (
      'Sind ausgestiegen Bernauer Straße',
      'Bernauerstraße',
-     None, None),
+     'U8', None),
     (
      'U7 Wilmersdorfer str richtung rudow standing on the platform, 4 men wearing blue vests',
      'Wilmersdorferstraße',
@@ -1398,7 +1398,7 @@ test_cases = [
      None, None, None),
     (
      'Kontrolle in der u8 richtung wittensu bei der janowitzbrücke',
-     'Janowitz Brücke',
+     'Jannowitz Brücke',
      'U8',
      'Wittenau'),
     (
