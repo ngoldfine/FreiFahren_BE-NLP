@@ -1,4 +1,4 @@
-from process_message import lines_with_stations, find_station, remove_direction_and_keyword
+from process_message import lines_with_stations, find_station, remove_direction_and_keyword, load_data
 
 
 def handle_ringbahn(text):
@@ -52,7 +52,8 @@ def verify_direction(ticket_inspector, text):
     # direction should be None if the ticket inspector got off the train
     handle_get_off(text, ticket_inspector)
     
-    check_for_line_through_station(ticket_inspector, lines_with_stations)
+    stations_list_main = load_data('data/statons_list_main.json')
+    check_for_line_through_station(ticket_inspector, stations_list_main)
 
     if ticket_inspector.line is None:
         return ticket_inspector
@@ -145,16 +146,13 @@ def correct_direction(ticket_inspector, lines_with_stations):
     return ticket_inspector
 
 
-def check_for_line_through_station(ticket_inspector, lines_with_stations):
-    lines_of_station_count = 0
-    found_line_for_station = None  # Initialize found_line_for_station outside the loop
-    for line, stations in lines_with_stations.items():  # Iterate over items instead of unpacking
-        if ticket_inspector.station in stations:
-            lines_of_station_count += 1
-            found_line_for_station = line  # Store the line if the station is found
+def check_for_line_through_station(ticket_inspector, stations_list_main):
+    station_name = ticket_inspector.station
 
-    if lines_of_station_count == 1:
-        line = found_line_for_station
-        ticket_inspector.line = line
-    else:
-        return ticket_inspector
+    for _station_code, station_info in stations_list_main.items():
+        if station_info['name'] == station_name:
+            if len(station_info['lines']) == 1:
+                ticket_inspector.line = station_info['lines'][0]
+                return ticket_inspector
+
+    return ticket_inspector
