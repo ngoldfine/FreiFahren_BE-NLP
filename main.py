@@ -14,6 +14,7 @@ from process_message import (
 from db_utils import create_table_if_not_exists, insert_ticket_info, update_info
 from verify_info import handle_get_off
 
+
 class TicketInspector:
     def __init__(self, line, station, direction):
         self.line = line
@@ -98,6 +99,7 @@ def merge_messages(author_id, message, conversations, current_time):
 
 
 stations_dict = load_data('data/stations_list_main.json')
+
 
 def get_station_id(station_name):
     station_name = station_name.strip().lower().replace(' ', '')
