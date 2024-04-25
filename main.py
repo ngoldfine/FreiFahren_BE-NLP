@@ -1,6 +1,5 @@
 import os
 import telebot
-import requests
 import datetime
 from dotenv import load_dotenv
 from verify_info import verify_direction, verify_line
@@ -9,7 +8,8 @@ from process_message import (
     find_direction,
     find_station,
     format_text,
-    lines_with_stations
+    lines_with_stations,
+    load_data
 )
 from db_utils import create_table_if_not_exists, insert_ticket_info, update_info
 from verify_info import handle_get_off
@@ -97,17 +97,15 @@ def merge_messages(author_id, message, conversations, current_time):
         process_new_message(author_id, message, current_time, conversations)
 
 
-def get_station_id(station_name):
-    response = requests.get(f'{BACKEND_URL}/id?name={station_name}')
-    if response.status_code == 200:
-        station_id = response.text
-        # Replace the quotes and newline
-        station_id = station_id.replace('"', '').replace('\n', '')
+stations_dict = load_data('data/stations_list_main.json')
 
-        return station_id
-    else:
-        print(f'Failed to retrieve station ID for {station_name}. Error: {response.status_code}')
-        return None
+def get_station_id(station_name):
+    station_name = station_name.strip().lower().replace(' ', '')
+
+    for station_code, station_info in stations_dict.items():
+        if station_info['name'].strip().lower().replace(' ', '') == station_name:
+            return station_code
+    return None
 
 
 def process_new_message(author_id, message, current_time, conversations):
