@@ -146,10 +146,10 @@ def correct_direction(ticket_inspector, lines_with_stations):
 
 
 def check_for_line_through_station(ticket_inspector, stations_list_main):
-    station_name = ticket_inspector.station.strip().lower().replace(" ", "")
+    station_name = ticket_inspector.station.strip().lower().replace(' ', '')
 
     for _key, station_info in stations_list_main.items():
-        if station_info['name'].strip().lower().replace(" ", "") == station_name:
+        if station_info['name'].strip().lower().replace(' ', '') == station_name:
             if len(station_info['lines']) == 1:
                 ticket_inspector.line = station_info['lines'][0]
                 return ticket_inspector
