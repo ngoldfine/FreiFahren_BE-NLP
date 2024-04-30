@@ -150,7 +150,7 @@ def remove_direction_and_keyword(text, direction_keyword, direction):
         return text
 
 
-direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri']
+direction_keywords = ['nach', 'richtung', 'bis', 'zu', 'to', 'towards', 'direction', 'ri', 'richtig']
 
 
 def find_direction(text, ticket_inspector):
